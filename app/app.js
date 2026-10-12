@@ -17,13 +17,21 @@ import {
   TERMS_VERSION,
 } from "./lib/terms-copy.js";
 const $ = (id) => document.getElementById(id);
-let herd;
+import { OwnershipUI } from "./lib/ownership-ui.js";
+import {
+  backupReminder,
+  snoozeBackup,
+  backupContent,
+  confirmRequestedBackup,
+} from "./lib/reminders.js";
+let herd, ownership, requestedBackup;
 let repo,
   accepted = false,
   snapshot,
   operationRevision,
   plan,
   restoreInput,
+  csvRestore = false,
   safetyBackup,
   decisions = {},
   busy = false;
@@ -85,6 +93,7 @@ async function refresh() {
   $("last-confirmed").textContent = meta.lastUserConfirmedBackupAt || "Never";
   $("save-settings").disabled = !accepted || !!repo.recovery;
   route();
+  showReminder();
 }
 function route() {
   if (!repo) return;
@@ -100,10 +109,17 @@ function route() {
   $("herd").hidden = !accepted || !herdTab || !!repo.recovery;
   if (!$("herd").hidden) herd.render(snapshot, path);
   const backup = tab === "backup";
+  $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery;
+  if (!$("ownership").hidden) ownership.render(snapshot);
   $("gate").hidden = accepted || backup || !!repo.recovery;
   $("backup").hidden = !backup || !!repo.recovery;
   $("placeholder").hidden =
-    !accepted || backup || herdTab || !!repo.recovery || tab === "terms";
+    !accepted ||
+    backup ||
+    herdTab ||
+    !!repo.recovery ||
+    tab === "terms" ||
+    tab === "reports";
   if (tab === "terms" && !repo.recovery) $("gate").hidden = false;
   $("gate-notice").hidden = accepted;
   for (const link of document.querySelectorAll("[data-tab]")) {
@@ -111,11 +127,11 @@ function route() {
       link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
-  $("placeholder-title").textContent = "Reports";
+  $("placeholder-title").textContent = "Page not found";
   $("placeholder-copy").textContent =
-    "Printable treatment logs, calving books and animal cards are planned for a later phase.";
+    "Choose a tab above to return to your records.";
 }
-async function bookkeeping(field) {
+async function bookkeeping(field, { preserveView = false } = {}) {
   const s = await repo.snapshot();
   const m = s.metadata[0],
     now = new Date().toISOString();
@@ -134,7 +150,8 @@ async function bookkeeping(field) {
     ],
     { bookkeeping: true },
   );
-  await refresh();
+  if (preserveView) await refreshReminder();
+  else await refresh();
 }
 async function showStorage() {
   const s = await storageStatus();
@@ -165,6 +182,7 @@ async function preview() {
   plan = await previewRestore(
     repo,
     restoreInput,
+    (csvRestore = false),
     $("restore-mode").value,
     decisions,
   );
@@ -300,6 +318,7 @@ on("accept", "click", async () => {
 });
 on("download", "click", async () => {
   const b = await exportBackup(repo);
+  requestedBackup = backupContent(b.stores);
   download(b, filename());
   await bookkeeping("lastExportAttemptAt");
   message(
@@ -311,7 +330,9 @@ $("saved-check").onchange = () => {
 };
 on("confirm-saved", "click", async () => {
   if (!$("saved-check").checked) return;
-  await bookkeeping("lastUserConfirmedBackupAt");
+  await confirmRequestedBackup(repo, requestedBackup);
+  await refresh();
+  requestedBackup = null;
   $("saved-check").checked = false;
   $("confirm-saved").disabled = true;
   message("Your backup confirmation was saved.");
@@ -328,6 +349,7 @@ on("verify-file", "change", async () => {
 $("restore-file").onchange = () => {
   resetPlan();
   restoreInput = null;
+  csvRestore = false;
   decisions = {};
   $("preview").disabled = !$("restore-file").files.length;
 };
@@ -336,9 +358,11 @@ $("restore-mode").onchange = () => {
   resetPlan();
 };
 on("preview", "click", async () => {
-  const file = $("restore-file").files[0];
-  if (!file) return;
-  restoreInput = await file.text();
+  if (!csvRestore) {
+    const file = $("restore-file").files[0];
+    if (!file) return;
+    restoreInput = await file.text();
+  }
   await preview();
 });
 on("cancel", "click", async () => {
@@ -433,6 +457,46 @@ on("migration-export", "click", async () => {
   download(saved, filename("pre-migration"));
   message("Pre-migration snapshot download requested.");
 });
+async function refreshReminder() {
+  snapshot = await repo.snapshot();
+  herd.s = snapshot;
+  showReminder();
+}
+function showReminder() {
+  const reminder = snapshot && backupReminder(snapshot);
+  $("backup-reminder").hidden = !accepted || !!repo?.recovery || !reminder?.due;
+  $("backup-reminder-text").textContent = reminder?.text || "";
+}
+on("backup-now", "click", async () => {
+  const b = await exportBackup(repo);
+  requestedBackup = backupContent(b.stores);
+  download(b, filename());
+  await bookkeeping("lastExportAttemptAt", { preserveView: true });
+  message(
+    "Export requested. After saving outside this browser, confirm it in Backup & Settings.",
+  );
+});
+on("backup-snooze", "click", async () => {
+  await snoozeBackup(repo);
+  await refreshReminder();
+  message("Backup reminder snoozed for one day. No backup was confirmed.");
+});
+ownership = new OwnershipUI($("ownership"), {
+  repository: () => repo,
+  refresh,
+  message,
+  advancedRestore: async (backup) => {
+    resetPlan();
+    restoreInput = backup;
+    csvRestore = true;
+    decisions = {};
+    $("preview").disabled = false;
+    location.hash = "#backup";
+    message(
+      "Complete CSV set validated. Choose Replace or Merge, then Preview to review the restore.",
+    );
+  },
+});
 herd = new HerdUI($("herd"), { repository: () => repo, refresh, message });
 window.addEventListener("hashchange", () => {
   void run(refresh);
@@ -440,6 +504,10 @@ window.addEventListener("hashchange", () => {
 await run(async () => {
   repo = await openRepository({
     onBlocked: message,
+    onBeforeUpgrade: () => {
+      message(backupReminder(snapshot, { reason: "schema-upgrade" }).text);
+      return false;
+    },
     onVersionChange: () => {
       message(
         "Another tab changed the database version. Reload this tab before continuing.",
@@ -466,10 +534,19 @@ await run(async () => {
 
 // Update only derived panels during ticks/resume, retaining unsaved forms and focus.
 async function refreshVisibleHealth() {
-  if (!repo || repo.recovery || document.hidden || busy || herd.saving) return;
+  if (
+    !repo ||
+    repo.recovery ||
+    document.hidden ||
+    busy ||
+    herd.saving ||
+    ownership.saving
+  )
+    return;
   await run(async () => {
     snapshot = await refreshHealth(repo);
     herd.s = snapshot;
+    showReminder();
     for (const panel of document.querySelectorAll(".withdrawal-panel"))
       herd.health.update(panel);
     for (const panel of document.querySelectorAll(".departure-preview"))

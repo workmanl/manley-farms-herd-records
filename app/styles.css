@@ -676,3 +676,152 @@ html[data-theme="sunlight"]
     display: none;
   }
 }
+
+/* Ownership controls and accessible screen previews. */
+#ownership > section {
+  margin-block: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border, #718166);
+  border-radius: 14px;
+}
+#ownership button {
+  margin: 0.25rem;
+}
+#ownership fieldset {
+  min-width: 0;
+  margin-block: 1rem;
+}
+#ownership pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 32rem;
+  overflow: auto;
+}
+#ownership label {
+  display: block;
+  margin-block: 0.6rem;
+}
+#backup-reminder {
+  margin: 1rem;
+  padding: 1rem;
+  border: 2px solid #4a7c59;
+}
+.report-preview {
+  background: white;
+  color: black;
+  padding: 1rem;
+  margin-block: 1rem;
+  overflow-wrap: anywhere;
+}
+.report-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.report-preview th,
+.report-preview td {
+  border: 1px solid black;
+  color: black;
+  background: white;
+  padding: 0.4rem;
+  vertical-align: top;
+  white-space: pre-wrap;
+  font-size: 0.85rem;
+}
+.report-preview p {
+  white-space: pre-wrap;
+}
+.report-print-footer {
+  font-size: 0.7rem;
+  border-top: 1px solid black;
+}
+@media screen and (max-width: 650px) {
+  .report-preview table {
+    table-layout: auto;
+  }
+  .report-preview tr {
+    display: block;
+    margin-block: 1rem;
+  }
+  .report-preview th,
+  .report-preview td {
+    display: block;
+  }
+}
+@page {
+  size: portrait;
+  margin: 15mm 12mm 40mm;
+}
+@page treatment {
+  size: landscape;
+  margin: 12mm 12mm 35mm;
+}
+@media print {
+  html,
+  body,
+  main,
+  #ownership,
+  #ownership > section {
+    background: white !important;
+    color: black !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+  body > :not(main),
+  main > :not(#ownership),
+  #ownership > :not(section),
+  #ownership > section:not(:has(#report-print-area)),
+  #ownership > section > :not(#report-print-area) {
+    display: none !important;
+  }
+  #ownership[hidden],
+  #report-print-area:empty {
+    display: none !important;
+  }
+  #report-print-area {
+    display: block;
+    padding: 0;
+    overflow: visible;
+  }
+  #report-print-area.landscape {
+    page: treatment;
+  }
+  .report-preview th,
+  .report-preview td {
+    color: black !important;
+    background: white !important;
+    border: 1px solid black !important;
+    font-size: 8pt;
+  }
+  .report-preview thead {
+    display: table-header-group;
+  }
+  .report-preview tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .report-preview h2,
+  .report-preview h3 {
+    break-after: avoid;
+  }
+  .report-preview p {
+    orphans: 3;
+    widows: 3;
+  }
+  .report-print-footer {
+    position: fixed;
+    bottom: -29mm;
+    left: 0;
+    right: 0;
+    font-size: 7pt;
+    line-height: 1.2;
+    background: white;
+    color: black;
+  }
+  .report-print-footer p {
+    margin: 2mm 0;
+  }
+}

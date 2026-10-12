@@ -18,7 +18,7 @@
       <div>
         <span class="eyebrow">MANLEY FARMS</span><strong>Herd Records</strong>
       </div>
-      <span class="badge">Local records · Phase 4</span>
+      <span class="badge">Local records · Phase 5</span>
     </header>
     <nav aria-label="Main navigation">
       <a href="#dashboard" data-tab="dashboard">Dashboard</a
@@ -27,7 +27,13 @@
       ><a href="#reports" data-tab="reports">Reports</a
       ><a href="#backup" data-tab="backup">Backup &amp; Settings</a>
     </nav>
+    <aside id="backup-reminder" hidden aria-label="Backup reminder">
+      <p id="backup-reminder-text"></p>
+      <button id="backup-now" type="button">Backup now</button>
+      <button id="backup-snooze" type="button">Snooze for one day</button>
+    </aside>
     <main id="main" tabindex="-1">
+      <section id="ownership" hidden></section>
       <p id="status" role="status" aria-live="polite">Opening local records…</p>
       <section id="recovery" class="notice" hidden>
         <h1>Recovery mode</h1>
@@ -77,18 +83,19 @@
       </section>
       <section id="herd" hidden></section>
       <section id="placeholder" hidden>
-        <span class="eyebrow">REPORTS</span>
-        <h1 id="placeholder-title">Reports</h1>
+        <span class="eyebrow">NAVIGATION</span>
+        <h1 id="placeholder-title">Page not found</h1>
         <div class="card">
-          <h2>Reports are planned for a later phase.</h2>
+          <h2>Choose a tab to continue.</h2>
           <p id="placeholder-copy"></p>
           <a class="button" href="#backup">Open Backup &amp; Settings</a>
         </div>
         <div class="notice">
           <strong>Recorded withdrawals are available on the Dashboard</strong>
           <p>
-            Verify original records and instructions. Printed treatment logs,
-            calving books and animal cards are planned for Phase 5.
+            Verify original records and instructions. Open Reports for treatment
+            logs, calving books, animal cards, CSV tools and the switching-away
+            guide.
           </p>
         </div>
       </section>
@@ -96,6 +103,11 @@
         <div class="heading">
           <span class="eyebrow">KEEP A COPY OUTSIDE THIS BROWSER</span>
           <h1>Backup &amp; Settings</h1>
+          <p>
+            <a href="#reports"
+              >CSV import, exports, print reports and switching away</a
+            >
+          </p>
           <p class="muted">
             Your herd stays on this device. A verified backup keeps your options
             open.
@@ -247,8 +259,8 @@
                   max="365"
                   required /></label
               ><small
-                >Preference is stored now. Reminder prompts arrive in a later
-                phase.</small
+                >Reminders appear after saved work, then when unbacked changes
+                exist and this interval has passed.</small
               >
               <div class="actions">
                 <button id="save-settings" type="submit">Save settings</button>
@@ -257,7 +269,7 @@
           </article>
         </div>
         <p class="muted">
-          No cloud copy. No automatic sync. This Phase 3 build does not yet
+          No cloud copy. No automatic sync. This Phase 5 build does not yet
           install or cache itself for offline reopening.
         </p>
       </section>

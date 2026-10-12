@@ -65,5 +65,24 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
     document.querySelector("[data-tab=animals]").getAttribute("aria-current"),
     "page",
   );
+  assert.equal($("backup-reminder").hidden, false);
+  location.hash = "#reports";
+  await until(
+    () =>
+      !$("ownership").hidden &&
+      $("ownership").querySelector("#report-print-area table"),
+  );
+  assert.equal($("placeholder").hidden, true);
+  assert.match($("ownership").textContent, /Switching away/);
+  assert.match($("ownership").textContent, /CSV import/);
+  location.hash = "#animals/new";
+  await until(() => $("herd").querySelector("[name=farmId]"));
+  $("herd").querySelector("[name=farmId]").value = "Unsaved draft";
+  window.dispatchEvent(new dom.window.Event("pageshow"));
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  assert.equal($("herd").querySelector("[name=farmId]").value, "Unsaved draft");
+  $("backup-snooze").click();
+  await until(() => $("backup-reminder").hidden);
+  assert.equal($("herd").querySelector("[name=farmId]").value, "Unsaved draft");
   dom.window.close();
 });
