@@ -9,7 +9,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "0.4.0";
+export const APP_VERSION = "0.5.0";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -439,6 +439,7 @@ export async function openRepository({
   downloadedBackup = false,
   onBlocked,
   onVersionChange,
+  onBeforeUpgrade,
 } = {}) {
   let db = await openRaw(
     factory,
@@ -475,6 +476,17 @@ export async function openRepository({
   const oldVersion = db.version;
   const snapshot = await transaction(db, "readonly", (s) => s);
   try {
+    // Called before snapshotting or opening the versionchange transaction.
+    // The caller can display ownership guidance or defer the upgrade without writes.
+    if (onBeforeUpgrade)
+      check(
+        (await onBeforeUpgrade({
+          fromVersion: oldVersion,
+          toVersion: targetVersion,
+          snapshot: structuredClone(snapshot),
+        })) !== false,
+        "Schema upgrade deferred. Back up and verify existing records before continuing.",
+      );
     for (let v = oldVersion + 1; v <= targetVersion; v++) {
       check(steps[v], `Missing sequential migration v${v}`);
       check(
