@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <meta name="theme-color" content="#1a1f16" />
+    <title>Manley Farms Herd Records</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <header>
+      <div>
+        <span class="eyebrow">MANLEY FARMS</span><strong>Herd Records</strong>
+      </div>
+      <span class="badge">Local records · Phase 2</span>
+    </header>
+    <nav aria-label="Main navigation">
+      <a href="#dashboard" data-tab="dashboard">Dashboard</a
+      ><a href="#animals" data-tab="animals">Animals</a
+      ><a href="#events" data-tab="events">Events</a
+      ><a href="#reports" data-tab="reports">Reports</a
+      ><a href="#backup" data-tab="backup">Backup &amp; Settings</a>
+    </nav>
+    <main id="main" tabindex="-1">
+      <p id="status" role="status" aria-live="polite">Opening local records…</p>
+      <section id="recovery" class="notice" hidden>
+        <h1>Recovery mode</h1>
+        <p id="recovery-message"></p>
+        <p>
+          No automatic reset has been performed. Keep this browser profile.
+          Download the existing records and pre-migration snapshot, then reopen
+          with a compatible source release.
+        </p>
+        <div class="actions">
+          <button id="raw-export">Download recovery records</button
+          ><button id="migration-export" class="secondary">
+            Download pre-migration snapshot
+          </button>
+        </div>
+      </section>
+      <section id="gate" hidden>
+        <div class="heading">
+          <span class="eyebrow">YOUR RECORDS. YOUR RESPONSIBILITY.</span>
+          <h1>Before you start</h1>
+        </div>
+        <div class="notice">
+          <strong>Local development build</strong>
+          <p>
+            Draft for a lawyer's review. Not legal advice. No legal or clinical
+            launch review has occurred.
+          </p>
+        </div>
+        <div class="card" id="intro"></div>
+        <details class="card">
+          <summary>Read full Terms of Use and Disclaimer</summary>
+          <div id="full-terms" class="terms-copy"></div>
+        </details>
+        <div class="card">
+          <label class="check"
+            ><input type="checkbox" id="accept-check" /><span
+              id="accept-label"
+            ></span></label
+          ><button id="accept" disabled>Acknowledge and start</button>
+          <p>
+            <a href="terms.txt">Read full terms</a> ·
+            <a href="source.html">Source and license</a> ·
+            <a href="#backup">Export or recover existing records</a>
+          </p>
+          <small id="terms-version"></small>
+        </div>
+      </section>
+      <section id="placeholder" hidden>
+        <span class="eyebrow">DURABLE FOUNDATION</span>
+        <h1 id="placeholder-title">Dashboard</h1>
+        <div class="card">
+          <h2>The foundation is ready.</h2>
+          <p id="placeholder-copy"></p>
+          <a class="button" href="#backup">Open Backup &amp; Settings</a>
+        </div>
+        <div class="notice">
+          <strong>No withdrawal calculations in this build</strong>
+          <p>
+            Verify original records and instructions. Herd workflows and health
+            calculations are planned for later phases.
+          </p>
+        </div>
+      </section>
+      <section id="backup" hidden>
+        <div class="heading">
+          <span class="eyebrow">KEEP A COPY OUTSIDE THIS BROWSER</span>
+          <h1>Backup &amp; Settings</h1>
+          <p class="muted">
+            Your herd stays on this device. A verified backup keeps your options
+            open.
+          </p>
+        </div>
+        <div id="gate-notice" class="notice" hidden>
+          Export, verification and recovery are available before acknowledgment.
+          <a href="#terms">Read and acknowledge the terms</a> to use settings.
+        </div>
+        <div class="grid">
+          <article class="card">
+            <span class="step">01 / KEEP</span>
+            <h2>Download a backup</h2>
+            <p>
+              A complete JSON copy includes archived records, original IDs and
+              correction history.
+            </p>
+            <button id="download">Download JSON backup</button>
+            <dl>
+              <dt>Export requested</dt>
+              <dd id="last-export">Never</dd>
+              <dt>Confirmed saved</dt>
+              <dd id="last-confirmed">Never</dd>
+            </dl>
+            <label class="check"
+              ><input id="saved-check" type="checkbox" /><span
+                >I saved a backup outside this browser.</span
+              ></label
+            ><button id="confirm-saved" class="secondary" disabled>
+              Confirm saved backup
+            </button>
+          </article>
+          <article class="card">
+            <span class="step">02 / CHECK</span>
+            <h2>Verify a backup</h2>
+            <p>
+              Check the file's structure, checksum, counts and references.
+              Verification does not change your live records.
+            </p>
+            <label for="verify-file">Select a JSON backup</label
+            ><input
+              id="verify-file"
+              type="file"
+              accept=".json,application/json"
+            />
+            <p id="verify-result" role="status">No file selected.</p>
+          </article>
+          <article class="card wide">
+            <span class="step">03 / RECOVER</span>
+            <h2>Restore from a backup</h2>
+            <p>
+              Preview before changing anything. Replace uses the selected
+              dataset. Merge keeps identical records and asks you to resolve
+              every conflict.
+            </p>
+            <div class="fields">
+              <label
+                >Backup file<input
+                  id="restore-file"
+                  type="file"
+                  accept=".json,application/json" /></label
+              ><label
+                >Restore method<select id="restore-mode">
+                  <option value="replace">Replace current dataset</option>
+                  <option value="merge">Merge with current dataset</option>
+                </select></label
+              >
+            </div>
+            <div class="actions">
+              <button id="preview" disabled>Preview restore</button
+              ><button id="cancel" class="secondary">Cancel preview</button>
+            </div>
+            <div id="preview-panel" hidden>
+              <h3>Restore preview</h3>
+              <div id="counts" class="counts"></div>
+              <p id="preview-summary"></p>
+              <div id="conflicts"></div>
+              <label class="check" id="warning-label" hidden
+                ><input id="warnings-check" type="checkbox" /><span
+                  id="warnings-text"
+                ></span
+              ></label>
+              <div id="replace-safety" class="notice">
+                <h3>Keep your current records first</h3>
+                <p>
+                  Download this exact pre-restore snapshot, then select the
+                  saved file to verify it before replacement.
+                </p>
+                <button id="safety-download" class="secondary">
+                  Download current records</button
+                ><label
+                  >Verify the saved current-records backup<input
+                    id="safety-file"
+                    type="file"
+                    accept=".json,application/json"
+                /></label>
+                <p id="safety-result">
+                  Current-records backup has not been verified.
+                </p>
+              </div>
+              <button id="commit" disabled>Commit reviewed restore</button>
+            </div>
+          </article>
+          <article class="card">
+            <h2>Device storage</h2>
+            <p id="storage">Checking storage…</p>
+            <button id="persist" class="secondary">
+              Request persistent storage
+            </button>
+            <p class="muted">
+              A grant can reduce eviction risk. It does not replace backups.
+              Clearing site data, private browsing or device loss can erase
+              records.
+            </p>
+          </article>
+          <article class="card">
+            <h2>Operation settings</h2>
+            <form id="settings">
+              <label
+                >Operation name<input
+                  id="operation-name"
+                  required
+                  maxlength="200" /></label
+              ><label
+                >Farm time zone<input
+                  id="time-zone"
+                  required
+                  placeholder="America/Los_Angeles"
+              /></label>
+              <div class="fields">
+                <label
+                  >Weight unit<select id="weight-unit">
+                    <option value="lb">lb</option>
+                    <option value="kg">kg</option>
+                  </select></label
+                ><label
+                  >Theme<select id="theme">
+                    <option value="dark">Farm dark</option>
+                    <option value="sunlight">Sunlight</option>
+                    <option value="system">System</option>
+                  </select></label
+                >
+              </div>
+              <label
+                >Backup reminder interval (days)<input
+                  id="reminder-days"
+                  type="number"
+                  min="1"
+                  max="365"
+                  required /></label
+              ><small
+                >Preference is stored now. Reminder prompts arrive in a later
+                phase.</small
+              >
+              <div class="actions">
+                <button id="save-settings" type="submit">Save settings</button>
+              </div>
+            </form>
+          </article>
+        </div>
+        <p class="muted">
+          No cloud copy. No automatic sync. This Phase 2 shell does not yet
+          install or cache itself for offline reopening.
+        </p>
+      </section>
+    </main>
+    <footer>
+      Recordkeeping only. Not veterinary or legal advice. Verify withdrawal
+      instructions and keep backups. Provided as is.
+      <a href="terms.txt">Terms and disclaimer</a> ·
+      <a href="source.html">Source and license</a>.
+    </footer>
+    <noscript
+      ><p>
+        JavaScript is required for local IndexedDB records.
+        <a href="terms.txt">Read terms</a> and <a href="LICENSE">license</a>.
+      </p></noscript
+    >
+  </body>
+</html>
