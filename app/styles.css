@@ -576,3 +576,85 @@ html[data-theme="sunlight"] #status.error {
     min-width: 120px;
   }
 }
+
+/* Herd workflows: fit narrow field screens without hiding entry controls. */
+#herd {
+  min-width: 0;
+}
+#herd .fields > *,
+#herd fieldset,
+#herd .calf-area {
+  min-width: 0;
+}
+#herd pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 0.9rem;
+}
+#herd .calf-area,
+#herd .fields > details,
+#herd .fields > fieldset {
+  grid-column: 1 / -1;
+}
+#herd .sticky {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+  background: var(--card);
+  border-top: 1px solid var(--line);
+}
+#herd .sticky p {
+  margin: 4px 0;
+}
+#herd .sticky .actions {
+  margin: 8px 0;
+}
+#herd label.check,
+.check {
+  min-height: 48px;
+  align-items: center;
+}
+#herd input,
+#herd select,
+#herd textarea {
+  font-size: 16px;
+  max-width: 100%;
+}
+#herd form > button {
+  margin: 8px 8px 0 0;
+}
+#herd h1:focus {
+  outline: none;
+}
+#herd dd {
+  overflow-wrap: anywhere;
+}
+#herd .stats {
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+@media (max-width: 400px) {
+  #herd .sticky .actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  #herd .sticky .actions > a {
+    grid-column: 1 / -1;
+  }
+  #herd .card {
+    padding: 12px;
+  }
+}
+html[data-theme="sunlight"] .button.secondary {
+  color: var(--ink);
+}
+html[data-theme="sunlight"]
+  :is(a, button, input, select, textarea, summary):focus-visible {
+  outline-color: #174721;
+}
+@media (max-height: 400px) {
+  /* Leave room for fields when an on-screen keyboard reduces the viewport. */
+  #herd .sticky {
+    position: static;
+  }
+}

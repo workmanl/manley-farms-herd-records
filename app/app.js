@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+import { HerdUI } from "./lib/herd-ui.js";
 import { openRepository, recoverySnapshot } from "./lib/database.js";
 import {
   exportBackup,
@@ -15,6 +16,7 @@ import {
   TERMS_VERSION,
 } from "./lib/terms-copy.js";
 const $ = (id) => document.getElementById(id);
+let herd;
 let repo,
   accepted = false,
   snapshot,
@@ -85,36 +87,26 @@ async function refresh() {
 }
 function route() {
   if (!repo) return;
-  const tab = location.hash.slice(1) || "dashboard";
+  const path = location.hash.slice(1) || "dashboard";
+  const tab = path.split("/")[0];
+  const herdTab = ["dashboard", "animals", "groups", "events"].includes(tab);
+  $("herd").hidden = !accepted || !herdTab || !!repo.recovery;
+  if (!$("herd").hidden) herd.render(snapshot, path);
   const backup = tab === "backup";
   $("gate").hidden = accepted || backup || !!repo.recovery;
   $("backup").hidden = !backup || !!repo.recovery;
   $("placeholder").hidden =
-    !accepted || backup || !!repo.recovery || tab === "terms";
+    !accepted || backup || herdTab || !!repo.recovery || tab === "terms";
   if (tab === "terms" && !repo.recovery) $("gate").hidden = false;
   $("gate-notice").hidden = accepted;
   for (const link of document.querySelectorAll("[data-tab]")) {
-    if (link.dataset.tab === tab) link.setAttribute("aria-current", "page");
+    if (link.dataset.tab === (tab === "groups" ? "animals" : tab))
+      link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
-  const titles = {
-    dashboard: "Dashboard",
-    animals: "Animals",
-    events: "Events",
-    reports: "Reports",
-  };
-  $("placeholder-title").textContent = titles[tab] || "Dashboard";
+  $("placeholder-title").textContent = "Reports";
   $("placeholder-copy").textContent =
-    {
-      dashboard:
-        "Herd summaries and withdrawal holds will arrive with the health workflows.",
-      animals:
-        "Animal records, parentage, groups and search are planned for Phase 3.",
-      events:
-        "Calving, weights, breeding and movements are planned for Phase 3.",
-      reports:
-        "Printable treatment logs, calving books and animal cards are planned for a later phase.",
-    }[tab] || "Use Backup & Settings to manage your local records.";
+    "Printable treatment logs, calving books and animal cards are planned for a later phase.";
 }
 async function bookkeeping(field) {
   const s = await repo.snapshot();
@@ -434,7 +426,10 @@ on("migration-export", "click", async () => {
   download(saved, filename("pre-migration"));
   message("Pre-migration snapshot download requested.");
 });
-window.addEventListener("hashchange", route);
+herd = new HerdUI($("herd"), { repository: () => repo, refresh, message });
+window.addEventListener("hashchange", () => {
+  void run(refresh);
+});
 await run(async () => {
   repo = await openRepository({
     onBlocked: message,
