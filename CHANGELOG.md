@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0 / 2026-10-12 / schema 1 / local only
+
+- Added canonical CSV exports for every entity and full sets, a bundled dictionary, templates, mapped multi-table import previews, explicit conflict decisions and atomic commits.
+- Added advanced full CSV set restoration through existing merge/replace safety checks.
+- Added backup reminders on launch/resume/save, configurable intervals, one-day snooze and atomic saved-backup confirmation against requested contents.
+- Made Reports functional with treatment, calving and animal previews, report-only print styling, repeated disclaimer footer, and a locally bundled switching guide.
+- 345 Node tests pass. Schema remains 1, with no runtime dependencies or remote assets. Browser/print checks and commits are handed off to Claude. No push or deployment.
+
 ## 0.4.0 / 2026-10-12 / schema 1 / local only
 
 - Added treatment/vaccination entry, separate meat and milk instructions, open/closed courses and previewed atomic batches.

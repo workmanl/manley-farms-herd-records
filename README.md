@@ -1,8 +1,8 @@
 # Manley Farms Herd Records
 
-Free, local cattle records for one operation per browser profile. This repository contains **Phase 4, health and the withdrawal dashboard**, version 0.4.0, schema 1. Treatment entry, courses, batch treatments, audited corrections, meat/milk calculations and departure previews extend the existing herd workflows and Backup & Settings. It is local only. CSV and printable reports remain Phase 5 work.
+Free, local cattle records for one operation per browser profile. This repository contains **Phase 5, ownership and reports**, version 0.5.0, schema 1. CSV exports and imports, backup reminders, treatment/calving/animal print reports and the switching-away guide build on the existing herd, health and backup layers. It is local only.
 
-**285 Node tests pass**, including all 20 withdrawal oracle cases. Phase 4 browser checks and local commits are handed off to Claude; neither was attempted in this sandbox. Earlier browser evidence is in [render-check evidence](docs/screens/README.md) and the Phase 3 report. Nothing was pushed or deployed.
+**345 Node tests pass**, including all 20 withdrawal oracle cases and 60 new ownership/report tests. Browser checks, print checks and local commits are handed off to Claude and were not attempted in this phase. Nothing was pushed or deployed. See the [Phase 5 report](docs/phase5-report.md).
 
 ## Free forever
 
@@ -52,22 +52,30 @@ Treatment corrections and voids preserve original values with a reason and hold 
 
 Replacement preserves imported terms receipts as history but clears active acceptance. Merge preserves only this browser's active acceptance and combines historical receipts. Imported backup receipts are cleared in active metadata. Metadata adjustments have separate revision rows. The synthetic fixture, restored at its fixed evaluation clock, needs no metadata adjustment and round-trips exactly.
 
+Reminders appear after the first saved work, then when unbacked changes exist and the configured interval (default seven days) has passed. They are checked on launch, resume and after saves. Backup now requests a JSON download; Snooze delays the reminder one day. Confirming a saved backup checks that the downloaded content still matches live records. Verification stays read-only.
+
 Keep an additional copy in a second location under your control. Rehearse restoration in a spare browser profile. Do not clear a failing browser's storage. Recovery mode is read-only and offers raw-record and pre-migration downloads for investigation with a compatible source release. Raw recovery artifacts are deliberately labeled separately from verified backup envelopes.
 
 ## Switching away
 
-Keep a verified full JSON backup and this runnable source checkout. Restore on another local/static origin and compare counts and sample IDs before adopting that working copy. CSV export/import, printed reports and the complete switching guide are later-phase work. JSON is the current authoritative lossless format. No universal third-party importer compatibility is promised.
+Open **Reports** for the locally bundled five-step switching guide, CSV tools and print previews. Export all 14 CSV tables, the scope manifest and the full data dictionary into one folder. Retain immutable IDs and foreign keys. The export uses quoted UTF-8 cells and reversible apostrophe formula protection. Standalone entity exports include an explicit scope manifest and are not complete backups.
+
+For CSV import, choose one or more related tables, map columns, choose formula protection, dates, decimal convention and missing units, and preview. Review generated IDs, every row error, duplicates, same-ID conflicts, current-identity snapshot choices and prospective holds. Re-preview decisions, check the confirmation and commit once. New animal imports generate their identifier mirrors; corrections to existing identifiers or memberships require their related history rows in the same staged set. Full canonical sets, including operation, metadata and revisions, use the advanced merge/replace restore path and the existing safety-backup gate. Unknown parent links remain errors or explicit external references.
+
+Print the treatment log, calving book by dates/season label, and individual animal card from accessible previews. Reports retain unknown holds and departure warnings. The treatment report uses landscape print styling; all reports contain the supplied disclaimer footer. Browser pagination and repeated-footer acceptance are pending Claude's print checks.
+
+Keep a verified full JSON backup and this runnable source checkout. Copy exports to two locations under your control, compare counts and sample records, and rehearse restoration in a spare browser profile yearly. Back up after major work sessions and keep quarterly CSV archives. Map animals before dependent events in the destination system and reconcile parentage, weights and withdrawal instructions. Serve a retained release archive over HTTPS or localhost to restore JSON. No universal third-party importer compatibility is promised.
 
 ## Data and tests
 
-See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) [Phase 3 report](docs/phase3-report.md) and [Phase 4 report](docs/phase4-report.md).
+See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) [Phase 3 report](docs/phase3-report.md) [Phase 4 report](docs/phase4-report.md) and [Phase 5 report](docs/phase5-report.md).
 
 ```sh
 npm ci
 npm test
 ```
 
-`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. Phase 4 adds the 20-case withdrawal oracle, boundary/DST/leap-day tests, health transactions, injected batch-write rollback, sticky clocks, sale previews and rendered health/filter controls. The test-only v2 migration is never imported by the deployable app.
+`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. Phase 4 adds the 20-case withdrawal oracle, boundary/DST/leap-day tests, health transactions, injected batch-write rollback, sticky clocks, sale previews and rendered health/filter controls. Phase 5 adds all-entity CSV round trips, mapping/conflict/atomicity checks, reminder timing with injected clocks, backup confirmation races, report assembly, print-footer packaging and rendered import/report controls. The test-only v2 migration is never imported by the deployable app.
 
 To repeat the requested render checks when Chromium can launch:
 
@@ -81,7 +89,7 @@ npx -y playwright@latest screenshot --browser chromium --viewport-size '1280,900
 
 Use plain ES modules, accessible HTML, local assets and synthetic data. Add migration and rollback fixtures for schema changes. Do not attach real herd records to public bug reports. Clinical changes require producer and qualified veterinary/BQA review before release. A public repository, verified contact route and public issue templates are not yet established.
 
-Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 4 report](docs/phase4-report.md) for intended local commits and the browser handoff.
+Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 5 report](docs/phase5-report.md) for intended local commits and the browser/print handoff.
 
 ## License and warranty
 
