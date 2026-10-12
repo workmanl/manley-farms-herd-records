@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+import { HealthUI } from "./health-ui.js";
+import { isHold } from "./withdrawal.js";
 import { isUUID } from "./validation.js";
 import {
   commitWorkflow,
@@ -95,6 +97,7 @@ const details = (title, text) => {
 export class HerdUI {
   constructor(root, { repository, refresh, message }) {
     this.root = root;
+    this.health = new HealthUI(this, { el, link, button, field, details });
     this.repository = repository;
     this.refresh = refresh;
     this.message = message;
@@ -114,6 +117,7 @@ export class HerdUI {
     this.root.replaceChildren();
     const [tab, id, action] = route.split("/");
     if (tab === "dashboard") this.dashboard();
+    else if (tab === "health") this.health.route(id, action);
     else if (tab === "groups") id ? this.groupForm(id) : this.groups();
     else if (tab === "events") this.eventList();
     else if (tab === "animals") {
@@ -127,7 +131,8 @@ export class HerdUI {
           );
           return;
         }
-        if (action === "edit") this.animalForm(a);
+        if (action === "treatment") this.health.treatment(a);
+        else if (action === "edit") this.animalForm(a);
         else if (action === "calving") this.calvingForm(a);
         else if (action === "move") this.moveForm(a);
         else if (
@@ -165,6 +170,7 @@ export class HerdUI {
   }
   dashboard() {
     this.title("Your herd");
+    this.health.mount();
     const panel = el("section", undefined, "stats");
     for (const status of statuses) {
       const card = el("div", undefined, "stat");
@@ -188,15 +194,6 @@ export class HerdUI {
       link("Groups and pastures", "#groups"),
     );
     this.root.append(actions);
-    const notice = el("aside", undefined, "notice");
-    notice.append(
-      el("h2", "Withdrawal panel · Phase 4 placeholder"),
-      el(
-        "p",
-        "Meat and milk holds are not calculated in this build. Verify original records and instructions. Inactive animals retain their history.",
-      ),
-    );
-    this.root.append(notice);
     this.root.append(el("h2", "Recent activity"));
     this.history(events(this.s).slice(0, 5));
   }
@@ -207,9 +204,28 @@ export class HerdUI {
       link("Add animal", "#animals/new"),
       link("Groups and pastures", "#groups"),
       link("Batch move", "#animals/batch"),
+      link("Batch treatment", "#health/batch"),
     );
     this.root.append(actions);
-    const form = el("form", undefined, "card");
+    const form = el("form", undefined, "card animal-filters");
+    form.id = "animal-filter-panel";
+    const count = Object.entries(this.filters).filter(
+      ([key, value]) =>
+        !["page", "asOf", "pageSize"].includes(key) &&
+        value !== "" &&
+        value !== false &&
+        value !== undefined,
+    ).length;
+    const toggle = button(`Filters (${count})`, () => {
+      this.filtersOpen = !this.filtersOpen;
+      form.classList.toggle("filters-open", this.filtersOpen);
+      toggle.setAttribute("aria-expanded", String(this.filtersOpen));
+    });
+    toggle.className = "filter-toggle";
+    toggle.setAttribute("aria-controls", form.id);
+    toggle.setAttribute("aria-expanded", String(!!this.filtersOpen));
+    form.classList.toggle("filters-open", !!this.filtersOpen);
+    this.root.append(toggle);
     const grid = el("div", undefined, "fields");
     form.append(grid);
     const f = this.filters;
@@ -244,6 +260,17 @@ export class HerdUI {
       options: [
         ["", "All groups"],
         ...this.s.groups.map((g) => [g.id, g.name]),
+      ],
+    });
+    field(grid, "withdrawal", "Withdrawal state", f.withdrawal, {
+      options: [
+        ["", "All withdrawal states"],
+        ["meat-hold", "Meat hold (includes review)"],
+        ["milk-hold", "Milk hold (includes review)"],
+        ["needs-review", "Needs review"],
+        ["elapsed", "Recorded interval elapsed"],
+        ["not-applicable", "Not applicable"],
+        ["no-recorded-interval", "No recorded interval"],
       ],
     });
     field(grid, "birthFrom", "Born on or after", f.birthFrom, { type: "date" });
@@ -327,9 +354,7 @@ export class HerdUI {
       ["Edit / correct", "edit"],
     ])
       actions.append(link(name, `#animals/${a.id}/${action}`));
-    const treatment = button("Treatment · Phase 4", () => {});
-    treatment.disabled = true;
-    actions.append(treatment);
+    actions.append(link("Treatment", `#animals/${a.id}/treatment`));
     this.root.append(actions);
     const identity = el("section", undefined, "card");
     identity.append(el("h2", "Identity and parentage"));
@@ -357,6 +382,16 @@ export class HerdUI {
     }
     identity.append(dl);
     this.root.append(identity);
+    this.health.mount(a.id);
+    for (const c of this.s.treatmentCourses.filter(
+      (c) => c.animalId === a.id && !c.voidedAt,
+    ))
+      this.root.append(
+        link(
+          `Review course: ${c.product} · ${c.state}`,
+          `#health/course/${c.id}`,
+        ),
+      );
     this.root.append(el("h2", "Average daily gain"));
     const weights = this.s.weights
       .filter((w) => w.animalId === a.id && !w.voidedAt)
@@ -435,7 +470,12 @@ export class HerdUI {
         el("p", summary),
       );
       if (r.notes) li.append(el("p", r.notes));
-      if (r.holdAcknowledgment) {
+      if (
+        r.holdAcknowledgment &&
+        [r.holdAcknowledgment.meatStatus, r.holdAcknowledgment.milkStatus].some(
+          isHold,
+        )
+      ) {
         const warning = el("aside", undefined, "notice");
         warning.append(
           el("strong", "Departure recorded with holds/review"),
@@ -678,6 +718,7 @@ export class HerdUI {
     this.root.append(
       link("Create group or pasture", "#groups/new"),
       link("Batch move", "#animals/batch"),
+      link("Batch treatment", "#health/batch"),
     );
     for (const g of this.s.groups) {
       const card = el("section", undefined, "card");
@@ -779,7 +820,7 @@ export class HerdUI {
       pregnancy: "Pregnancy check",
       movement: "Move/Sale and source records",
     };
-    const { body } = this.form(
+    const { body, form } = this.form(
       `${titles[action]} · ${a.farmId}`,
       action,
       { animalId: a.id },
@@ -903,20 +944,7 @@ export class HerdUI {
       field(body, "currency", "Currency (3 letters, only with amount)", "");
       field(body, "receiptReference", "Receipt reference", "");
       body.append(el("p", DEPARTURE_NOTICE, "notice"));
-      const treatments = this.s.treatments.filter((t) => t.animalId === a.id);
-      body.append(
-        el(
-          "p",
-          `${treatments.length} retained treatment records. All require manual review in this phase.`,
-        ),
-      );
-      for (const t of treatments)
-        body.append(
-          details(
-            `${t.administrationDate} · ${t.product}`,
-            JSON.stringify(t, null, 2),
-          ),
-        );
+      this.health.departure(body, form, a);
       field(
         body,
         "acknowledgeDeparture",

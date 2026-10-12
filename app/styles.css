@@ -658,3 +658,21 @@ html[data-theme="sunlight"]
     position: static;
   }
 }
+
+.filter-toggle {
+  display: none;
+}
+.withdrawal-panel {
+  margin-block: 1rem;
+}
+.withdrawal-panel h3 {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 650px) {
+  .filter-toggle {
+    display: inline-flex;
+  }
+  .animal-filters:not(.filters-open) {
+    display: none;
+  }
+}

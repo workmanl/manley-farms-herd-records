@@ -36,7 +36,7 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
       !$("herd").hidden && /Acknowledgment saved/.test($("status").textContent),
   );
   assert.match($("herd").textContent, /Your herd/);
-  assert.match($("herd").textContent, /Phase 4 placeholder/);
+  assert.match($("herd").textContent, /Meat hold/);
   location.hash = "#animals/new";
   await until(() => $("herd").querySelector("[name=farmId]"));
   $("herd").querySelector("[name=farmId]").value = "0001";

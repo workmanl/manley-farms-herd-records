@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+import { refreshHealth } from "./lib/health.js";
 import { HerdUI } from "./lib/herd-ui.js";
 import { openRepository, recoverySnapshot } from "./lib/database.js";
 import {
@@ -69,7 +70,7 @@ function theme(value) {
       : value;
 }
 async function refresh() {
-  snapshot = await repo.snapshot();
+  snapshot = await refreshHealth(repo);
   accepted = await hasAccepted(snapshot);
   const op = snapshot.operation[0],
     meta = snapshot.metadata[0];
@@ -89,7 +90,13 @@ function route() {
   if (!repo) return;
   const path = location.hash.slice(1) || "dashboard";
   const tab = path.split("/")[0];
-  const herdTab = ["dashboard", "animals", "groups", "events"].includes(tab);
+  const herdTab = [
+    "dashboard",
+    "animals",
+    "groups",
+    "events",
+    "health",
+  ].includes(tab);
   $("herd").hidden = !accepted || !herdTab || !!repo.recovery;
   if (!$("herd").hidden) herd.render(snapshot, path);
   const backup = tab === "backup";
@@ -456,3 +463,27 @@ await run(async () => {
     "Local database ready. Changes are saved only after a transaction completes.",
   );
 });
+
+// Update only derived panels during ticks/resume, retaining unsaved forms and focus.
+async function refreshVisibleHealth() {
+  if (!repo || repo.recovery || document.hidden || busy || herd.saving) return;
+  await run(async () => {
+    snapshot = await refreshHealth(repo);
+    herd.s = snapshot;
+    for (const panel of document.querySelectorAll(".withdrawal-panel"))
+      herd.health.update(panel);
+    for (const panel of document.querySelectorAll(".departure-preview"))
+      panel.refreshPreview();
+    // Source changes are also rejected against the opening snapshot at commit.
+  });
+}
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) void refreshVisibleHealth();
+});
+window.addEventListener("pageshow", () => {
+  void refreshVisibleHealth();
+});
+const healthTimer = setInterval(() => {
+  void refreshVisibleHealth();
+}, 60000);
+healthTimer.unref?.();
