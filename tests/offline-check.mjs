@@ -1,0 +1,34 @@
+// Real offline test: serve app/ at https://herd.test/tools/herd-records/ via context routing (covers SW fetches), install the SW, go offline, reload.
+import { chromium } from "playwright";
+import fs from "node:fs";
+import path from "node:path";
+const APP = process.argv[2], OUT = process.argv[3];
+const BASE = "https://herd.test/tools/herd-records/";
+const types = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".txt": "text/plain", ".json": "application/json", ".webmanifest": "application/manifest+json", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, serviceWorkers: "allow", ignoreHTTPSErrors: true });
+const log = [];
+await ctx.route("https://herd.test/**", (route) => {
+  const u = new URL(route.request().url());
+  let p = u.pathname.replace(/^\/tools\/herd-records\/?/, "");
+  if (p === "" || p.endsWith("/")) p += "index.html";
+  const f = path.join(APP, p);
+  if (!fs.existsSync(f)) return route.fulfill({ status: 404, body: "" });
+  route.fulfill({ status: 200, contentType: types[path.extname(f)] || "application/octet-stream", body: fs.readFileSync(f) });
+});
+await ctx.route((u) => !u.href.startsWith("https://herd.test/"), (r) => { log.push("external " + r.request().url()); r.abort(); });
+const page = await ctx.newPage();
+page.on("pageerror", (e) => log.push("pageerror " + e.message));
+await page.goto(BASE);
+const ok = await page.waitForFunction(() => navigator.serviceWorker && navigator.serviceWorker.controller !== null || document.body.innerText.match(/ready offline/i), null, { timeout: 30000 }).then(() => true).catch(() => false);
+await page.reload(); await page.waitForTimeout(3000);
+const ready = await page.evaluate(() => ({ controlled: !!navigator.serviceWorker.controller, text: (document.body.innerText.match(/[^\n]*offline[^\n]*/i) || [""])[0] }));
+console.log("SW installed:", ok, ready);
+await ctx.setOffline(true);
+await page.reload().catch((e) => log.push("offline reload error " + e.message));
+await page.waitForTimeout(1500);
+const offline = await page.evaluate(() => ({ title: document.title, hasNav: !!document.querySelector("nav"), body: document.body.innerText.slice(0, 120) })).catch((e) => ({ error: e.message }));
+console.log("OFFLINE reload:", offline);
+await page.screenshot({ path: `${OUT}/offline-390.png`, fullPage: false });
+await browser.close();
+console.log(log.length ? log.join("\n") : "no errors, no external requests");

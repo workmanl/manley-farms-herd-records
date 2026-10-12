@@ -86,5 +86,5 @@ test("no runtime dependency, build step, remote connection or HTML injection sin
     source,
     /innerHTML|eval\(|fetch\(|XMLHttpRequest|WebSocket/,
   );
-  assert.match(read("app/index.html"), /connect-src 'none'/);
+  assert.match(read("app/index.html"), /connect-src 'self'; worker-src 'self'; manifest-src 'self'/);
 });

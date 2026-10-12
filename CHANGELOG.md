@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.0 / 2026-10-12 / schema 1 / local only
+
+- Local manifest, regular/maskable icons, cached field help, hash-verified shell and truthful offline status.
+- Online-only update checks, staged-release prompt, cross-tab dirty/draft veto, migration backup receipt and retained recovery behavior.
+- Accessible sunlight error colors, shared contrast tokens, focus/error association, reduced motion and paged withdrawal lists.
+- Deterministic twenty-year fixture, separate Node scale suite, transfer progress, grouped relational queries, bounded recent activity and indexed ordinary weight saves.
+- No runtime dependencies, schema change, browser acceptance, push or deployment.
+
 ## 0.5.0 / 2026-10-12 / schema 1 / local only
 
 - Added canonical CSV exports for every entity and full sets, a bundled dictionary, templates, mapped multi-table import previews, explicit conflict decisions and atomic commits.

@@ -1,0 +1,23 @@
+TAP version 13
+# fixtureLoad 27720ms
+# launchToDashboard 2976ms
+# commonSearch 3ms
+# saveP95 0.337ms
+# fullBackup 4418ms
+# fullRestore 38668ms
+# roundTripVerification 5842ms
+# Subtest: twenty-year fixture: launch, search, p95 committed save and lossless full backup/restore
+ok 1 - twenty-year fixture: launch, search, p95 committed save and lossless full backup/restore
+  ---
+  duration_ms: 79952.766334
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 80284.310625
