@@ -8,7 +8,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "0.2.0";
+export const APP_VERSION = "0.3.0";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
