@@ -1,5 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 // Form commands build related rows; the Phase 2 repository owns validation and commit.
+import { prepareHealth, healthBasis } from "./health.js";
+import {
+  departurePreview,
+  departureText,
+  DEPARTURE_NOTICE,
+  evaluateWithdrawal,
+  isHold,
+} from "./withdrawal.js";
+export { DEPARTURE_NOTICE };
 import { common } from "./database.js";
 import { normalize, requireThat as check, isDate } from "./validation.js";
 export const EASE = [
@@ -10,8 +19,6 @@ export const EASE = [
   ["4", "4 · Surgical delivery"],
   ["5", "5 · Abnormal presentation"],
 ];
-export const DEPARTURE_NOTICE =
-  "Withdrawal calculations are not available until Phase 4. Meat and milk status need review. Verify original treatment records and instructions. Recording this departure does not authorize slaughter or milk sale.";
 const nullable = (v) => (v === undefined || v === null || v === "" ? null : v);
 const number = (v) => (nullable(v) === null ? null : Number(v));
 const fields = (data, names) =>
@@ -45,6 +52,16 @@ export function prepareWorkflow(
   input,
   now = new Date().toISOString(),
 ) {
+  if (
+    [
+      "treatment",
+      "batch-treatment",
+      "treatment-void",
+      "course",
+      "clock-review",
+    ].includes(action)
+  )
+    return prepareHealth(s, action, input, now);
   const changes = [];
   const add = (store, record) => {
     changes.push({ store, record, expectedRevision: null });
@@ -360,19 +377,18 @@ export function prepareWorkflow(
           input.destination?.trim(),
           "Enter the intended destination, or explicitly enter Unknown.",
         );
+        const preview = departurePreview(s, a.id, input.date, now);
         holdAcknowledgment = {
           recordedAt: now,
           evaluatedAt: now,
           operator: "Local operator",
           intendedDestination: input.destination,
           eventTimeBasis: "date-only-conservative",
-          meatStatus: "needs-review",
-          milkStatus: "needs-review",
-          treatmentIds: s.treatments
-            .filter((t) => t.animalId === a.id)
-            .map((t) => t.id),
+          meatStatus: preview.event.meat.status,
+          milkStatus: preview.event.milk.status,
+          treatmentIds: preview.treatmentIds,
           noticeVersion: "departure-1",
-          text: DEPARTURE_NOTICE,
+          text: departureText(preview),
         };
       }
       result = add("movements", {
@@ -411,6 +427,7 @@ export function prepareWorkflow(
     result,
     options: {
       reason,
+      ...(action === "movement" ? { expectedHealth: healthBasis(s) } : {}),
       acknowledgeDuplicateTags: input.acknowledgeDuplicateTags === true,
       acknowledgeParentSex: input.acknowledgeParentSex === true,
     },
@@ -460,12 +477,31 @@ export function adg(first, second, unit = "lb") {
 export function searchAnimals(s, filters = {}) {
   const f = filters,
     query = normalize(f.query || "");
+  const withdrawal = f.withdrawal
+    ? new Map(
+        evaluateWithdrawal(s, {
+          now: f.now || new Date().toISOString(),
+        }).animals.map((r) => [r.animal.id, r]),
+      )
+    : null;
   const former = new Map();
   for (const i of s.identifiers)
     if (!i.voidedAt)
       former.set(i.animalId, [...(former.get(i.animalId) || []), i.value]);
   const rows = s.animals
     .filter((a) => {
+      if (withdrawal) {
+        const row = withdrawal.get(a.id);
+        const matches =
+          f.withdrawal === "meat-hold"
+            ? isHold(row.meat.status)
+            : f.withdrawal === "milk-hold"
+              ? isHold(row.milk.status)
+              : f.withdrawal === "needs-review"
+                ? row.needsReview
+                : [row.meat.status, row.milk.status].includes(f.withdrawal);
+        if (!matches) return false;
+      }
       if (
         f.status
           ? a.status !== f.status

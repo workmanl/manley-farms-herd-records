@@ -529,7 +529,7 @@ test("purchase and cull decision retain active status; departures preserve all h
   assert.equal(s.animals[0].status, "sold");
   assert.equal(s.weights.length, 1);
   assert.equal(s.movements.length, 3);
-  assert.equal(m.holdAcknowledgment.meatStatus, "needs-review");
+  assert.equal(m.holdAcknowledgment.meatStatus, "no-recorded-interval");
   assert.ok(events(s, { animalId: a.id }).some((e) => e.store === "weights"));
   assert.equal(searchAnimals(s).total, 0);
   assert.equal(searchAnimals(s, { includeInactive: true }).total, 1);
@@ -867,4 +867,32 @@ test("500-animal query pages without losing counts or leading-zero IDs", () => {
   assert.equal(page.rows.length, 25);
   assert.equal(page.rows.at(-1).farmId, "0499");
   assert.equal(searchAnimals(s, { query: "0000" }).total, 1);
+});
+
+test("withdrawal filters use the shared engine, include review in holds and honor inactive inclusion", async () => {
+  const fs = await import("node:fs");
+  const s = JSON.parse(
+    fs.readFileSync(new URL("./fixtures/sample-herd.json", import.meta.url)),
+  ).stores;
+  const options = { now: "2026-10-12T12:00:00.000Z", includeInactive: true };
+  assert.equal(
+    searchAnimals(s, { ...options, withdrawal: "meat-hold" }).total,
+    6,
+  );
+  assert.equal(
+    searchAnimals(s, { ...options, withdrawal: "milk-hold" }).total,
+    1,
+  );
+  assert.equal(
+    searchAnimals(s, { ...options, withdrawal: "needs-review" }).total,
+    5,
+  );
+  assert.equal(
+    searchAnimals(s, {
+      ...options,
+      includeInactive: false,
+      withdrawal: "meat-hold",
+    }).total,
+    5,
+  );
 });

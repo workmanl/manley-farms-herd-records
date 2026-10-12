@@ -332,6 +332,12 @@ export function validateRecord(type, r) {
       }
       rule(r.meat, "meat");
       rule(r.milk, "milk");
+      for (const commodity of ["meat", "milk"])
+        if (r[commodity].directedReleaseAt && r.administrationAt)
+          check(
+            r[commodity].directedReleaseAt >= r.administrationAt,
+            "directed release precedes administration",
+          );
       break;
     }
     case "breedings":
@@ -691,6 +697,13 @@ export function validateDataset(
         (t) => t.courseId === c.id && !t.voidedAt,
       );
       const final = maps.treatments.get(c.finalAdministrationId);
+      for (const dose of doses)
+        for (const commodity of ["meat", "milk"])
+          if (dose[commodity].directedReleaseAt && final.administrationAt)
+            check(
+              dose[commodity].directedReleaseAt >= final.administrationAt,
+              "directed release precedes final administration",
+            );
       check(
         doses.includes(final) &&
           doses.every(

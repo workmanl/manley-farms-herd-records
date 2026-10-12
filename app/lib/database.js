@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+import { clockState } from "./withdrawal.js";
 import { indexes, STORES } from "./contract.js";
 import {
   validateDataset,
@@ -8,7 +9,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "0.3.0";
+export const APP_VERSION = "0.4.0";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -220,6 +221,32 @@ export class Repository {
   snapshot() {
     return transaction(this.db, "readonly", (s) => s);
   }
+  observeClock(now) {
+    return transaction(this.db, "readwrite", (before, tx) => {
+      check(!this.recovery, "Recovery mode is read-only.");
+      const m = before.metadata[0],
+        state = clockState(m, now);
+      if (
+        m.lastObservedClockAt === state.lastObservedClockAt &&
+        m.clockReviewRequired === state.reviewRequired
+      )
+        return before;
+      const next = structuredClone(before);
+      next.metadata[0] = {
+        ...m,
+        updatedAt: now,
+        revision: m.revision + 1,
+        lastObservedClockAt: state.lastObservedClockAt,
+        clockReviewRequired: state.reviewRequired,
+      };
+      validateDataset(next, {
+        acknowledgeDuplicateTags: true,
+        acknowledgeParentSex: true,
+      });
+      writeDifference(tx, before, next);
+      return next;
+    });
+  }
   async mutate(
     changes,
     {
@@ -229,6 +256,7 @@ export class Repository {
       acknowledgeDuplicateTags = false,
       acknowledgeParentSex = false,
       bookkeeping = false,
+      expectedHealth,
     } = {},
   ) {
     check(
@@ -236,6 +264,24 @@ export class Repository {
       "Recovery mode is read-only. Export existing records before recovery.",
     );
     return transaction(this.db, "readwrite", (before, tx) => {
+      if (expectedHealth) {
+        const actual = {
+          ...Object.fromEntries(
+            ["animals", "treatments", "treatmentCourses", "movements"].map(
+              (key) => [
+                key,
+                [...before[key]].sort((a, b) => a.id.localeCompare(b.id)),
+              ],
+            ),
+          ),
+          timeZone: before.operation[0].timeZone,
+          clockReviewRequired: before.metadata[0].clockReviewRequired,
+        };
+        check(
+          same(actual, expectedHealth),
+          "Treatment or departure records changed. Reload and review before saving.",
+        );
+      }
       const next = structuredClone(before);
       const touched = new Set();
       for (const change of changes) {
@@ -264,6 +310,19 @@ export class Repository {
               record.revision === prior.revision + 1,
             "immutable creation/revision mismatch",
           );
+          if (
+            store === "metadata" &&
+            ((prior.clockReviewRequired && !record.clockReviewRequired) ||
+              (prior.lastObservedClockAt &&
+                record.lastObservedClockAt < prior.lastObservedClockAt))
+          )
+            check(
+              !bookkeeping &&
+                record.clockReviewedAt &&
+                record.clockReviewedAt !== prior.clockReviewedAt &&
+                record.clockReviewReason,
+              "Clock reset requires an audited explicit review.",
+            );
           if (store === "metadata")
             check(
               prior.termsAcknowledgments.every((r, i) =>
