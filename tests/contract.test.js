@@ -69,8 +69,19 @@ test("deployable app has local assets, all five tabs, exact footer and full matc
 test("no runtime dependency, build step, remote connection or HTML injection sink", () => {
   const pkg = JSON.parse(read("package.json"));
   assert.equal(pkg.dependencies, undefined);
-  assert.deepEqual(Object.keys(pkg.devDependencies), ["fake-indexeddb"]);
-  const source = read("app/app.js");
+  assert.deepEqual(Object.keys(pkg.devDependencies), [
+    "fake-indexeddb",
+    "jsdom",
+  ]);
+  const source = [
+    "app/app.js",
+    ...fs
+      .readdirSync(new URL("../app/lib/", import.meta.url))
+      .filter((p) => p.endsWith(".js"))
+      .map((p) => "app/lib/" + p),
+  ]
+    .map(read)
+    .join("\n");
   assert.doesNotMatch(
     source,
     /innerHTML|eval\(|fetch\(|XMLHttpRequest|WebSocket/,

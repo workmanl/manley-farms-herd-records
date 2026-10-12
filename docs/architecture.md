@@ -1,4 +1,4 @@
-# Phase 2 architecture
+# Application architecture
 
 SPDX-License-Identifier: AGPL-3.0-only
 
@@ -6,15 +6,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 ## Modules
 
-| Module | Responsibility |
-|---|---|
-| `contract.js` | Frozen fields, types and exact index declarations transcribed from Phase 1 |
-| `validation.js` | Strict JSON shape, primitive, nested, relational and clinical instruction structure validation |
-| `database.js` | Initial v1 creation, transaction serialization, revision audit, transitions, upgrades and recovery |
-| `backup.js` | Canonical SHA-256 envelopes, read-only verification, private staged restore plans and atomic commits |
-| `terms-copy.js` | Exact first-run and full draft terms copy, checkbox label and stable hash input |
-| `terms.js` | Acceptance receipts, matching version/hash gate and storage capability reporting |
-| `app.js` | Accessible tab shell, safe text rendering and Backup & Settings controls |
+| Module          | Responsibility                                                                                           |
+| --------------- | -------------------------------------------------------------------------------------------------------- |
+| `contract.js`   | Frozen fields, types and exact index declarations transcribed from Phase 1                               |
+| `validation.js` | Strict JSON shape, primitive, nested, relational and clinical instruction structure validation           |
+| `database.js`   | Initial v1 creation, transaction serialization, revision audit, transitions, upgrades and recovery       |
+| `backup.js`     | Canonical SHA-256 envelopes, read-only verification, private staged restore plans and atomic commits     |
+| `terms-copy.js` | Exact first-run and full draft terms copy, checkbox label and stable hash input                          |
+| `terms.js`      | Acceptance receipts, matching version/hash gate and storage capability reporting                         |
+| `workflows.js`  | Phase 3 form commands, related-record staging, ADG, search/paging, history queries and local calf drafts |
+| `herd-ui.js`    | Safely rendered herd screens and labeled forms, shared workflow submission, recovery and save feedback   |
+| `app.js`        | Acknowledgment-gated tab routing, persisted app-wide theme and Backup & Settings controls                |
 
 ## Transaction boundary
 
@@ -51,3 +53,17 @@ The required first-run paragraphs and checkbox label match Phase 1. Hash input i
 The gate is a local official-interface acknowledgment, not authentication or a tamper-proof ledger. Imported acceptance never establishes a new operator's consent. Replacement clears active acceptance and appends an audit row if metadata changed. Merge retains local acceptance and preserves historical receipts.
 
 The main page's Content Security Policy permits only local assets and blocks connection requests, frames/objects through the default/object policies and form submissions. Imported text uses `textContent`, never `innerHTML`. No real herd data belongs in tests, screenshots or bug reports.
+
+## Phase 3 workflow boundary
+
+`prepareWorkflow(snapshot, action, input)` stages complete v1 rows and expected revisions. `commitWorkflow` awaits the existing repository mutation promise. Forms retain their opening snapshot for optimistic correction checks. No new IndexedDB stores or replacement persistence layer were added. All ordinary writes still pass the original relational validation and transaction code.
+
+Animal corrections close old identifiers, create new current identifiers, and reconcile dated memberships with the animal row in one commit. A linked calf birth-date or parentage correction also updates the calving, its twin and linked weights, retaining original snapshots and recording each prior/new row. Group moves freeze the selected IDs before commit. A historical departure derives status from the latest recorded departure, so entering older history does not overwrite a newer disposition.
+
+Events and animal cards query retained source rows, including identifiers, memberships, revisions, archived/voided rows and imported treatment history. Search normalizes text using the foundation's contract, includes all former identifiers, defaults to active animals and pages 25 results. Age is measured in calendar days relative to the farm-zone date; estimated DOB participates and unknown DOB does not match age/date filters.
+
+Calving drafts use localStorage under `manley-herd-draft-v1:<datasetId>:calving:<damId>`. Input/change events retain the full form, including a stable delivery UUID. Saving persists the draft before beginning the transaction and removes it only after completion. Reopening a draft whose delivery UUID already exists shows the committed delivery instead of submitting it twice. Corrupt drafts require explicit discard. Drafts are local convenience state, excluded from authoritative backups. There is one draft per dam; simultaneous unsaved editing of the same dam in separate tabs is not a collaborative editing feature.
+
+Phase 3 departures conservatively record both meat and milk as needs-review with the exact displayed placeholder notice and retained treatment IDs. This is not the Phase 4 clinical evaluator or a calculated event-time result. Phase 4 must add its current/event-time previews, clock rules and full withdrawal oracle without erasing these historical acknowledgments.
+
+The application has no runtime dependencies. jsdom is used only by Node tests to execute real form submissions, focus/error behavior, safe text rendering, routing and settings persistence. It cannot validate layout, touch keyboards, screen readers or browser IndexedDB implementations.

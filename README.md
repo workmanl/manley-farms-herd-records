@@ -1,8 +1,8 @@
 # Manley Farms Herd Records
 
-Free, local cattle records for one operation per browser profile. This repository contains **Phase 2, the durable foundation**, version 0.2.0, schema 1. It has not been pushed or deployed. Dashboard, Animals, Events and Reports are placeholders. Backup & Settings is implemented.
+Free, local cattle records for one operation per browser profile. This repository contains **Phase 3, the herd workflows**, version 0.3.0, schema 1. It is local only. Animals, calving, weights and ADG, breeding and pregnancy checks, groups, movements, Events, herd counts and Backup & Settings are implemented. Treatments, withdrawal calculations and Reports remain later-phase work.
 
-Requested screenshots at 390×844 and 1280×900 could not be captured because this workspace blocks Chromium startup. See [render-check evidence](docs/screens/README.md). No screenshot or browser visual verification is claimed.
+Phase 2 browser evidence is in [render-check evidence](docs/screens/README.md). Phase 3 has passing Node storage and DOM interaction tests; its browser layout and device checks remain for the next local session. Chromium and Git commits were not attempted in this sandbox, as requested.
 
 ## Free forever
 
@@ -24,11 +24,11 @@ The first ordinary use requires the unchecked acknowledgment to be selected and 
 
 All assets and data logic are local, but this phase has no service worker, manifest, install flow or offline cache guarantee. It does not display “Ready offline.” Those arrive in Phase 6. Serving the files locally works without an internet connection.
 
-Requires ES modules, IndexedDB, Web Crypto, `structuredClone`, and modern `Intl` APIs including `supportedValuesOf`. Chromium, Safari, Firefox and Edge are intended targets. Real-browser, installed-context and physical-device acceptance remains outstanding. Automated storage tests use Node.js and fake-indexeddb, not an actual browser engine.
+Requires ES modules, IndexedDB, Web Crypto, `structuredClone`, and modern `Intl` APIs including `supportedValuesOf`. Chromium, Safari, Firefox and Edge are intended targets. Real-browser, installed-context and physical-device acceptance remains outstanding. Automated tests use Node.js, fake-indexeddb and jsdom, not an actual browser rendering engine.
 
 ## Privacy and storage
 
-Records live in IndexedDB `manley_herd_records`. A separate `manley_herd_records_recovery` database retains the most recent pre-migration snapshot. No herd fields are uploaded, no analytics are included, and a Content Security Policy blocks outgoing connection requests from the app shell. Serving the page still involves ordinary local or hosting asset requests.
+Records live in IndexedDB `manley_herd_records`. Unsaved calf drafts use versioned, dataset-and-dam-scoped localStorage keys. Drafts are separate from committed records and are not included in JSON backups. A separate `manley_herd_records_recovery` database retains the most recent pre-migration snapshot. No herd fields are uploaded, no analytics are included, and a Content Security Policy blocks outgoing connection requests from the app shell. Serving the page still involves ordinary local or hosting asset requests.
 
 Data is not encrypted by the app. Device/profile access and other scripts with the same origin can expose it. Browser clearing, private mode, eviction, device loss and software errors can destroy records. Persistent-storage permission reduces some eviction risk; it does not guarantee retention. There is no cloud recovery copy or automatic sync.
 
@@ -38,7 +38,7 @@ This is a recordkeeping tool, not veterinary, legal or regulatory advice. It has
 
 Records stay in your browser on your device unless you export them. You are responsible for verified backups outside the browser. There is no cloud recovery copy or guarantee against data loss. See the bundled [Terms of Use and Disclaimer](app/terms.txt) for storage limits, assumption of risk, warranty and liability notices.
 
-Phase 2 preserves and validates treatment fields and correction evidence. It does not display withdrawal calculations, counts, countdowns or clearance claims. Clinical workflows, time-dependent departure warnings and the full withdrawal oracle belong to Phase 4. Do not treat a successful backup validation as clinical review.
+The foundation preserves and validates treatment fields and correction evidence. Phase 3 departure entry records an explicit notice acknowledgment with both commodities marked needs-review because the evaluator is not implemented yet. It does not display withdrawal calculations, counts, countdowns or clearance claims. Clinical workflows, time-dependent departure warnings and the full withdrawal oracle belong to Phase 4. Do not treat a successful backup validation as clinical review.
 
 ## Back up, verify and restore
 
@@ -58,14 +58,14 @@ Keep a verified full JSON backup and this runnable source checkout. Restore on a
 
 ## Data and tests
 
-See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json) and [Phase 2 report](docs/phase2-report.md).
+See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) and [Phase 3 report](docs/phase3-report.md).
 
 ```sh
 npm ci
 npm test
 ```
 
-Only `fake-indexeddb` is a devDependency. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. The test-only v2 migration is never imported by the deployable app.
+`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. The test-only v2 migration is never imported by the deployable app.
 
 To repeat the requested render checks when Chromium can launch:
 
@@ -79,10 +79,10 @@ npx -y playwright@latest screenshot --browser chromium --viewport-size '1280,900
 
 Use plain ES modules, accessible HTML, local assets and synthetic data. Add migration and rollback fixtures for schema changes. Do not attach real herd records to public bug reports. Clinical changes require producer and qualified veterinary/BQA review before release. A public repository, verified contact route and public issue templates are not yet established.
 
-Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [local completion commands](docs/local-completion.md) for the requested commits blocked by this workspace's read-only `.git` permission.
+Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 3 report](docs/phase3-report.md) for intended local commits and the browser handoff.
 
 ## License and warranty
 
 Copyright (C) 2026 Scott Manley. Code and covered project documentation are licensed under **AGPL-3.0-only**. See [LICENSE](LICENSE), especially sections 15 and 16 on warranty and liability. The software is provided as is to the extent permitted by law. The official app is free and donation-supported. The license permits commercial use subject to its terms. Your herd records remain yours.
 
-The complete, unmodified GNU AGPL v3 text is also bundled in `app/LICENSE`. System font fallbacks are used; no font or artwork license is implied. `fake-indexeddb` is Apache-2.0 licensed development tooling and is not bundled in the deployed app.
+The complete, unmodified GNU AGPL v3 text is also bundled in `app/LICENSE`. System font fallbacks are used; no font or artwork license is implied. `fake-indexeddb` (Apache-2.0) and `jsdom` (MIT) are development tooling and are not bundled in the deployed app.

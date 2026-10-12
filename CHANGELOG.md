@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 / 2026-10-12 / schema 1 / local only
+
+- Added animal create/correct, former identifiers, pedigree links/references, dated memberships, search, filters and paging on the Phase 2 transaction layer.
+- Added atomic calf/twin/stillbirth entry, interruption recovery and linked birth corrections, weights and unit-aware calendar-day ADG, breeding and pregnancy checks.
+- Added group/pasture create/rename/archive, individual and batch moves, source/cull/sale/death/departure records, full dated history and Events filters.
+- Added current herd counts, explicit Phase 4 treatment/withdrawal placeholders, sticky field actions, validation/save focus and sunlight contrast fixes.
+- Extended Node coverage with workflow, DOM form and shell integration tests. Runtime remains dependency-free; jsdom is development-only.
+- No Chromium launch, Git commit, push or deployment attempted. See docs/phase3-report.md for results and local handoff.
+
 ## 0.2.0 / 2026-10-12 / schema 1 / local only
 
 - Added the 14-store IndexedDB foundation with exact indexes, strict structural/relational validation, atomic writes and optimistic revision checks across tabs.
