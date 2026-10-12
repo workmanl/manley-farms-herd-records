@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 / 2026-10-12 / schema 1 / local only
+
+- Added treatment/vaccination entry, separate meat and milk instructions, open/closed courses and previewed atomic batches.
+- Added the pure withdrawal engine, all 20 oracle cases, visible-minute/resume refresh, sticky audited clock review and overlapping dashboard counts.
+- Added reviewed treatment correction/void flows, contributing history, current/event-time departure previews and audited recomputation of Phase 3 placeholders.
+- Connected animal Treatment actions and withdrawal filtering; collapsed phone filters through 650px with active counts.
+- 285 Node tests pass. No runtime dependency, schema change, remote asset, browser launch, Git write, push or deployment. See docs/phase4-report.md for handoff.
+
 ## 0.3.0 / 2026-10-12 / schema 1 / local only
 
 - Added animal create/correct, former identifiers, pedigree links/references, dated memberships, search, filters and paging on the Phase 2 transaction layer.

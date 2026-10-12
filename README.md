@@ -1,8 +1,8 @@
 # Manley Farms Herd Records
 
-Free, local cattle records for one operation per browser profile. This repository contains **Phase 3, the herd workflows**, version 0.3.0, schema 1. It is local only. Animals, calving, weights and ADG, breeding and pregnancy checks, groups, movements, Events, herd counts and Backup & Settings are implemented. Treatments, withdrawal calculations and Reports remain later-phase work.
+Free, local cattle records for one operation per browser profile. This repository contains **Phase 4, health and the withdrawal dashboard**, version 0.4.0, schema 1. Treatment entry, courses, batch treatments, audited corrections, meat/milk calculations and departure previews extend the existing herd workflows and Backup & Settings. It is local only. CSV and printable reports remain Phase 5 work.
 
-Phase 2 browser evidence is in [render-check evidence](docs/screens/README.md). Phase 3 has passing Node storage and DOM interaction tests; its browser layout and device checks remain for the next local session. Chromium and Git commits were not attempted in this sandbox, as requested.
+**285 Node tests pass**, including all 20 withdrawal oracle cases. Phase 4 browser checks and local commits are handed off to Claude; neither was attempted in this sandbox. Earlier browser evidence is in [render-check evidence](docs/screens/README.md) and the Phase 3 report. Nothing was pushed or deployed.
 
 ## Free forever
 
@@ -38,7 +38,9 @@ This is a recordkeeping tool, not veterinary, legal or regulatory advice. It has
 
 Records stay in your browser on your device unless you export them. You are responsible for verified backups outside the browser. There is no cloud recovery copy or guarantee against data loss. See the bundled [Terms of Use and Disclaimer](app/terms.txt) for storage limits, assumption of risk, warranty and liability notices.
 
-The foundation preserves and validates treatment fields and correction evidence. Phase 3 departure entry records an explicit notice acknowledgment with both commodities marked needs-review because the evaluator is not implemented yet. It does not display withdrawal calculations, counts, countdowns or clearance claims. Clinical workflows, time-dependent departure warnings and the full withdrawal oracle belong to Phase 4. Do not treat a successful backup validation as clinical review.
+The dashboard leads with separate Meat hold, Milk hold and Needs review counts. Counts overlap and retain sold/archived animals. It shows “Recorded interval elapsed,” never a clearance claim. Expand an animal to inspect contributing treatments. Record each commodity's instructions explicitly; blank is not zero, and zero needs confirmation. Date-only entries, open courses, unknowns, prohibited use and unresolved conditions require review. A detected backward clock change stays flagged until an audited operator review.
+
+Treatment corrections and voids preserve original values with a reason and hold review. Batch treatment previews fixed recipients, then saves their individual records in one transaction. Before a departure, inspect current and conservative event-time results, record the intended destination and acknowledge the notice. Historical departure warnings remain in history. Phase 3 placeholders are recomputed with their original acknowledgment retained in revision history. See [Phase 4 report](docs/phase4-report.md) for interpretations and validation. Backup verification is not clinical review.
 
 ## Back up, verify and restore
 
@@ -58,14 +60,14 @@ Keep a verified full JSON backup and this runnable source checkout. Restore on a
 
 ## Data and tests
 
-See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) and [Phase 3 report](docs/phase3-report.md).
+See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) [Phase 3 report](docs/phase3-report.md) and [Phase 4 report](docs/phase4-report.md).
 
 ```sh
 npm ci
 npm test
 ```
 
-`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. The test-only v2 migration is never imported by the deployable app.
+`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. Phase 4 adds the 20-case withdrawal oracle, boundary/DST/leap-day tests, health transactions, injected batch-write rollback, sticky clocks, sale previews and rendered health/filter controls. The test-only v2 migration is never imported by the deployable app.
 
 To repeat the requested render checks when Chromium can launch:
 
@@ -79,7 +81,7 @@ npx -y playwright@latest screenshot --browser chromium --viewport-size '1280,900
 
 Use plain ES modules, accessible HTML, local assets and synthetic data. Add migration and rollback fixtures for schema changes. Do not attach real herd records to public bug reports. Clinical changes require producer and qualified veterinary/BQA review before release. A public repository, verified contact route and public issue templates are not yet established.
 
-Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 3 report](docs/phase3-report.md) for intended local commits and the browser handoff.
+Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 4 report](docs/phase4-report.md) for intended local commits and the browser handoff.
 
 ## License and warranty
 
