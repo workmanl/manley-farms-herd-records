@@ -47,7 +47,8 @@ export function exactKeys(object, keys, path) {
     object &&
       typeof object === "object" &&
       !Array.isArray(object) &&
-      same(Object.keys(object).sort(), [...keys].sort()),
+      Object.keys(object).length === keys.length &&
+      keys.every((k) => Object.hasOwn(object, k)),
     `${path}: missing or unknown fields`,
   );
 }
@@ -58,6 +59,7 @@ const statuses = [
   "not-applicable",
   "no-recorded-interval",
 ];
+const validZones = new Set();
 function primitive(value, descriptor, path) {
   let { type, note } = descriptor;
   if (type.endsWith("?")) {
@@ -97,7 +99,10 @@ function primitive(value, descriptor, path) {
       break;
     case "Zone":
       try {
-        new Intl.DateTimeFormat("en", { timeZone: value });
+        if (!validZones.has(value)) {
+          new Intl.DateTimeFormat("en", { timeZone: value });
+          validZones.add(value);
+        }
         ok = typeof value === "string" && !/^[+-]/.test(value);
       } catch {}
       break;
@@ -140,12 +145,18 @@ function primitive(value, descriptor, path) {
   }
   check(ok, `${path}: invalid ${type}`);
 }
+const shapes = Object.fromEntries(
+  Object.entries(models).map(([type, fields]) => {
+    const full = STORES.includes(type)
+      ? { ...models.Common, ...fields }
+      : fields;
+    return [type, { keys: Object.keys(full), entries: Object.entries(full) }];
+  }),
+);
 export function shape(type, record, path = type) {
-  const fields = STORES.includes(type)
-    ? { ...models.Common, ...models[type] }
-    : models[type];
-  exactKeys(record, Object.keys(fields), path);
-  for (const [key, desc] of Object.entries(fields))
+  const fields = shapes[type];
+  exactKeys(record, fields.keys, path);
+  for (const [key, desc] of fields.entries)
     primitive(record[key], desc, `${path}.${key}`);
   if (STORES.includes(type))
     check(record.revision >= 1, `${path}: revision must be positive`);
@@ -562,6 +573,19 @@ export function validateDataset(
             "hold treatment belongs to another animal",
           );
     }
+  const groupBy = (rows, key) => {
+    const map = new Map();
+    for (const row of rows) {
+      const k = row[key];
+      if (!map.has(k)) map.set(k, []);
+      map.get(k).push(row);
+    }
+    return map;
+  };
+  const identifiersByAnimal = groupBy(stores.identifiers, "animalId"),
+    membershipsByAnimal = groupBy(stores.memberships, "animalId"),
+    movementsByAnimal = groupBy(stores.movements, "animalId"),
+    treatmentsByCourse = groupBy(stores.treatments, "courseId");
   const visited = new Set(),
     visiting = new Set();
   function visit(a) {
@@ -583,7 +607,7 @@ export function validateDataset(
         warnings.push(`Review parent sex: ${a.farmId}`);
         check(acknowledgeParentSex, "parent sex requires review");
       }
-    const ids = stores.identifiers.filter(
+    const ids = (identifiersByAnimal.get(a.id) || []).filter(
       (i) => i.animalId === a.id && !i.validTo && !i.voidedAt,
     );
     for (const [type, key] of [
@@ -599,7 +623,7 @@ export function validateDataset(
         "current identifier must mirror animal",
       );
     }
-    const memberships = stores.memberships
+    const memberships = (membershipsByAnimal.get(a.id) || [])
       .filter((m) => m.animalId === a.id && !m.voidedAt)
       .sort((a, b) => a.startDate.localeCompare(b.startDate));
     for (let i = 1; i < memberships.length; i++)
@@ -617,7 +641,7 @@ export function validateDataset(
             current[0].pastureSnapshot === a.pasture,
       "current group/pasture must mirror membership",
     );
-    const departures = stores.movements
+    const departures = (movementsByAnimal.get(a.id) || [])
       .filter(
         (m) =>
           m.animalId === a.id &&
@@ -635,7 +659,7 @@ export function validateDataset(
       );
     if (
       !departures.length &&
-      stores.movements.some(
+      (movementsByAnimal.get(a.id) || []).some(
         (m) => m.animalId === a.id && !m.voidedAt && m.type === "cull-decision",
       ) &&
       a.status !== "archived"
@@ -693,7 +717,7 @@ export function validateDataset(
     }
   for (const c of stores.treatmentCourses)
     if (c.finalAdministrationId) {
-      const doses = stores.treatments.filter(
+      const doses = (treatmentsByCourse.get(c.id) || []).filter(
         (t) => t.courseId === c.id && !t.voidedAt,
       );
       const final = maps.treatments.get(c.finalAdministrationId);

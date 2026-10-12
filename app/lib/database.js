@@ -9,7 +9,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "0.5.0";
+export const APP_VERSION = "0.6.0";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -133,7 +133,9 @@ export function revision(
   validateRecord("revisions", row);
   return row;
 }
-export function writeDifference(tx, before, after) {
+export function writeDifference(tx, before, after, onProgress = () => {}) {
+  let completed = 0;
+  const total = Object.values(after).reduce((n, rows) => n + rows.length, 0);
   for (const name of STORES) {
     const oldRows = new Map(before[name].map((r) => [r.id, r]));
     const newRows = new Map(after[name].map((r) => [r.id, r]));
@@ -142,7 +144,17 @@ export function writeDifference(tx, before, after) {
     for (const [id, row] of oldRows)
       if (!newRows.has(id) || !same(row, newRows.get(id))) store.delete(id);
     for (const [id, row] of newRows)
-      if (!oldRows.has(id) || !same(row, oldRows.get(id))) store.add(row);
+      if (!oldRows.has(id) || !same(row, oldRows.get(id))) {
+        const request = store.add(row);
+        request.onsuccess = () => {
+          completed++;
+          if (completed % 2000 === 0)
+            onProgress({
+              phase: "Writing staged records",
+              percent: Math.min(99, Math.round((completed / total) * 100)),
+            });
+        };
+      }
   }
 }
 // Current identifiers and primary group changes preserve the old interval rows.
@@ -219,32 +231,89 @@ export class Repository {
     this.db.close();
   }
   snapshot() {
+    this.openingSnapshot = null;
     return transaction(this.db, "readonly", (s) => s);
   }
   observeClock(now) {
-    return transaction(this.db, "readwrite", (before, tx) => {
-      check(!this.recovery, "Recovery mode is read-only.");
-      const m = before.metadata[0],
-        state = clockState(m, now);
-      if (
-        m.lastObservedClockAt === state.lastObservedClockAt &&
-        m.clockReviewRequired === state.reviewRequired
-      )
-        return before;
-      const next = structuredClone(before);
-      next.metadata[0] = {
-        ...m,
-        updatedAt: now,
-        revision: m.revision + 1,
-        lastObservedClockAt: state.lastObservedClockAt,
-        clockReviewRequired: state.reviewRequired,
+    this.openingSnapshot = null;
+    check(!this.recovery, "Recovery mode is read-only.");
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction("metadata", "readwrite");
+      let failure;
+      tx.oncomplete = () => resolve();
+      tx.onabort = () => reject(failure || tx.error);
+      const req = tx.objectStore("metadata").getAll();
+      req.onsuccess = () => {
+        try {
+          const m = req.result[0],
+            state = clockState(m, now);
+          if (
+            m.lastObservedClockAt === state.lastObservedClockAt &&
+            m.clockReviewRequired === state.reviewRequired
+          )
+            return;
+          const next = {
+            ...m,
+            updatedAt: now,
+            revision: m.revision + 1,
+            lastObservedClockAt: state.lastObservedClockAt,
+            clockReviewRequired: state.reviewRequired,
+          };
+          validateRecord("metadata", next);
+          tx.objectStore("metadata").put(next);
+        } catch (e) {
+          failure = e;
+          tx.abort();
+        }
       };
-      validateDataset(next, {
-        acknowledgeDuplicateTags: true,
-        acknowledgeParentSex: true,
-      });
-      writeDifference(tx, before, next);
-      return next;
+    });
+  }
+  // An independent non-birth weight has no reciprocal or uniqueness dependencies.
+  // Read all of its foreign keys in the same serialized transaction as the add.
+  async appendWeight(record) {
+    this.openingSnapshot = null;
+    check(!this.recovery, "Recovery mode is read-only.");
+    validateRecord("weights", record);
+    check(
+      record.type !== "birth" &&
+        record.calvingId === null &&
+        record.revision === 1 &&
+        record.id?.[14] === "4",
+      "Independent new weight required.",
+    );
+    check(
+      record.snapshots.some((s) => s.animalId === record.animalId),
+      "weights: missing involved animal snapshot",
+    );
+    return new Promise((resolve, reject) => {
+      const tx = this.db.transaction(
+        ["animals", "groups", "weights"],
+        "readwrite",
+      );
+      let failure;
+      tx.oncomplete = () => resolve(record);
+      tx.onabort = () =>
+        reject(failure || tx.error || Error("Weight transaction aborted."));
+      const refs = [
+        ["animals", record.animalId],
+        ...record.snapshots.flatMap((s) => [
+          ["animals", s.animalId],
+          ...(s.groupId ? [["groups", s.groupId]] : []),
+        ]),
+      ];
+      let remaining = refs.length;
+      for (const [store, id] of refs) {
+        const req = tx.objectStore(store).get(id);
+        req.onsuccess = () => {
+          try {
+            check(req.result, `missing ${store} reference: ${id}`);
+            if (--remaining === 0) tx.objectStore("weights").add(record);
+          } catch (e) {
+            failure = e;
+            tx.abort();
+          }
+        };
+      }
     });
   }
   async mutate(
@@ -259,6 +328,7 @@ export class Repository {
       expectedHealth,
     } = {},
   ) {
+    this.openingSnapshot = null;
     check(
       !this.recovery,
       "Recovery mode is read-only. Export existing records before recovery.",
@@ -440,6 +510,7 @@ export async function openRepository({
   onBlocked,
   onVersionChange,
   onBeforeUpgrade,
+  initialClock,
 } = {}) {
   let db = await openRaw(
     factory,
@@ -460,14 +531,37 @@ export async function openRepository({
   if (db.version === targetVersion) {
     const repo = new Repository(db, { onVersionChange });
     try {
-      (
+      const validate =
         steps[targetVersion]?.validate ||
         ((s) =>
           validateDataset(s, {
             acknowledgeDuplicateTags: true,
             acknowledgeParentSex: true,
-          }))
-      )(await repo.snapshot());
+          }));
+      if (initialClock) {
+        // One consistent launch read, validation and clock observation. The UI consumes
+        // this transaction's snapshot once, rather than reading all history twice.
+        repo.openingSnapshot = await transaction(db, "readwrite", (s, tx) => {
+          validate(s);
+          const m = s.metadata[0],
+            state = clockState(m, initialClock);
+          if (
+            m.lastObservedClockAt !== state.lastObservedClockAt ||
+            m.clockReviewRequired !== state.reviewRequired
+          ) {
+            s.metadata[0] = {
+              ...m,
+              updatedAt: initialClock,
+              revision: m.revision + 1,
+              lastObservedClockAt: state.lastObservedClockAt,
+              clockReviewRequired: state.reviewRequired,
+            };
+            validateRecord("metadata", s.metadata[0]);
+            tx.objectStore("metadata").put(s.metadata[0]);
+          }
+          return s;
+        });
+      } else validate(await repo.snapshot());
     } catch (e) {
       repo.recovery = "Validation failed: " + e.message;
     }
@@ -537,7 +631,13 @@ export async function openRepository({
       },
       onBlocked,
     );
-    return new Repository(db, { onVersionChange });
+    const migrated = new Repository(db, { onVersionChange });
+    try {
+      steps[targetVersion].validate(await migrated.snapshot());
+    } catch (error) {
+      migrated.recovery = `Post-migration verification failed: ${error.message}. Export recovery records and the pre-migration snapshot.`;
+    }
+    return migrated;
   } catch (error) {
     if (!db || db.version !== oldVersion)
       db = await openRaw(factory, name, undefined);

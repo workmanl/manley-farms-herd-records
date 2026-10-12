@@ -52,8 +52,14 @@ export async function envelope(stores, exportedAt = new Date().toISOString()) {
     },
   };
 }
-export async function exportBackup(repo, now) {
-  return envelope(await repo.snapshot(), now);
+export async function exportBackup(repo, now, onProgress = () => {}) {
+  onProgress({ phase: "Reading records", percent: 0 });
+  const stores = await repo.snapshot();
+  onProgress({ phase: "Validating and checksumming backup", percent: 40 });
+  await new Promise((resolve) => setTimeout(resolve, 0));
+  const backup = await envelope(stores, now);
+  onProgress({ phase: "Backup ready to save", percent: 100 });
+  return backup;
 }
 export async function verifyBackup(input) {
   let b;
@@ -147,10 +153,13 @@ export async function previewRestore(
   input,
   mode = "replace",
   decisions = {},
-  { now = new Date().toISOString() } = {},
+  { now = new Date().toISOString(), onProgress = () => {} } = {},
 ) {
   check(["replace", "merge"].includes(mode), "choose replace or merge");
+  onProgress({ phase: "Verifying backup", percent: 0 });
+  await new Promise((resolve) => setTimeout(resolve, 0));
   const { backup, warnings } = await verifyBackup(input);
+  onProgress({ phase: "Staging restore preview", percent: 40 });
   const local = await repo.snapshot();
   const incoming = backup.stores;
   const staged =
@@ -284,6 +293,7 @@ export async function previewRestore(
     mode,
     warnings: [...warnings],
   });
+  onProgress({ phase: "Restore preview ready", percent: 100 });
   return plan;
 }
 function unionReceipts(a, b) {
@@ -295,12 +305,19 @@ function unionReceipts(a, b) {
 export async function commitRestore(
   repo,
   plan,
-  { safetyBackup, downloadConfirmed = false, acknowledgeWarnings = false } = {},
+  {
+    safetyBackup,
+    downloadConfirmed = false,
+    acknowledgeWarnings = false,
+    onProgress = () => {},
+  } = {},
 ) {
   check(
     !repo.recovery,
     "Recovery mode is read-only. Export and reopen with a compatible app.",
   );
+  onProgress({ phase: "Checking restore safety", percent: 0 });
+  await new Promise((resolve) => setTimeout(resolve, 0));
   const staged = plans.get(plan);
   check(
     staged && staged.repo === repo && staged.ready,
@@ -331,9 +348,10 @@ export async function commitRestore(
       acknowledgeDuplicateTags: acknowledgeWarnings || !staged.warnings.length,
       acknowledgeParentSex: acknowledgeWarnings || !staged.warnings.length,
     });
-    writeDifference(tx, current, staged.staged);
+    writeDifference(tx, current, staged.staged, onProgress);
     return staged.staged;
   });
+  onProgress({ phase: "Restore committed", percent: 100 });
   plans.delete(plan);
   return result;
 }

@@ -286,8 +286,12 @@ export function placeholderCorrections(s, now) {
 }
 export async function refreshHealth(repo, now = new Date().toISOString()) {
   // A concurrent clock observation can conflict. Re-read rather than overwriting it.
-  await repo.observeClock(now);
-  let s = await repo.snapshot();
+  let s = repo.openingSnapshot;
+  repo.openingSnapshot = null;
+  if (!s) {
+    await repo.observeClock(now);
+    s = await repo.snapshot();
+  }
   const changes = placeholderCorrections(s, now);
   if (changes.length) {
     await repo.mutate(changes, {

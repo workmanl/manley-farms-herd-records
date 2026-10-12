@@ -36,6 +36,38 @@ export class HealthUI {
       [...section.querySelectorAll("details[open]")].map((d) => d.dataset.key),
     );
     const evaluation = evaluateWithdrawal(this.s, { now });
+    const pageRows = (rows, key, parent = section) => {
+      section.pages ||= {};
+      const pages = Math.max(1, Math.ceil(rows.length / 25));
+      const page = Math.min(section.pages[key] || 1, pages);
+      section.pages[key] = page;
+      if (rows.length > 25) {
+        const navigation = el("div", undefined, "actions");
+        const label = el(
+          "span",
+          `${key}: ${rows.length} animals, page ${page} of ${pages}`,
+        );
+        label.tabIndex = -1;
+        label.dataset.pageLabel = key;
+        navigation.append(label);
+        for (const [text, delta] of [
+          ["Previous", -1],
+          ["Next", 1],
+        ]) {
+          const b = this.button(`${text} ${key.toLowerCase()} page`, () => {
+            section.pages[key] = page + delta;
+            this.update(section, now);
+            [...section.querySelectorAll("[data-page-label]")]
+              .find((n) => n.dataset.pageLabel === key)
+              ?.focus();
+          });
+          b.disabled = page + delta < 1 || page + delta > pages;
+          navigation.append(b);
+        }
+        parent.append(navigation);
+      }
+      return rows.slice((page - 1) * 25, page * 25);
+    };
     const animalId = section.dataset.animalId;
     section.replaceChildren();
     if (!animalId) {
@@ -89,7 +121,7 @@ export class HealthUI {
       const matching = rows.filter(include);
       if (!matching.length)
         section.append(el("p", "No animals in this category."));
-      for (const row of matching) {
+      for (const row of pageRows(matching, category)) {
         const a = row.animal,
           card = el("article", undefined, "card");
         card.append(
@@ -155,7 +187,7 @@ export class HealthUI {
       const alerts = rows.filter((r) => r.departureAlert);
       if (alerts.length) {
         section.append(el("h2", "Departure alerts"));
-        for (const r of alerts)
+        for (const r of pageRows(alerts, "Departure alerts"))
           section.append(
             link(
               `${r.animal.farmId}: Departure recorded with holds/review`,
@@ -170,7 +202,7 @@ export class HealthUI {
       d.dataset.key = "elapsed";
       d.open = open.has("elapsed");
       d.append(el("summary", "Recorded interval elapsed"));
-      for (const r of elapsed)
+      for (const r of pageRows(elapsed, "Recorded interval elapsed", d))
         d.append(
           link(
             `${r.animal.farmId} · Meat: ${r.meat.label} · Milk: ${r.milk.label}`,

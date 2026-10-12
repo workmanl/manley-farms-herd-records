@@ -154,8 +154,20 @@ export function evaluateWithdrawal(
   const clockAlert = detectBackward
     ? clockState(s.metadata?.[0], now).reviewRequired
     : !!s.metadata?.[0]?.clockReviewRequired;
+  const byAnimal = new Map(),
+    coursesByAnimal = new Map(),
+    movementsByAnimal = new Map();
+  for (const [rows, map] of [
+    [s.treatments, byAnimal],
+    [s.treatmentCourses, coursesByAnimal],
+    [s.movements || [], movementsByAnimal],
+  ])
+    for (const row of rows) {
+      if (!map.has(row.animalId)) map.set(row.animalId, []);
+      map.get(row.animalId).push(row);
+    }
   const animals = s.animals.map((animal) => {
-    const treatments = s.treatments.filter(
+    const treatments = (byAnimal.get(animal.id) || []).filter(
       (t) => t.animalId === animal.id && !t.voidedAt,
     );
     const row = { animal };
@@ -171,7 +183,7 @@ export function evaluateWithdrawal(
         ),
       );
       // Empty open courses still hold, since neither applicability nor a final dose is known.
-      for (const c of s.treatmentCourses.filter(
+      for (const c of (coursesByAnimal.get(animal.id) || []).filter(
         (c) =>
           c.animalId === animal.id &&
           !c.voidedAt &&
@@ -217,7 +229,7 @@ export function evaluateWithdrawal(
       (c) => c.status === "needs-review",
     );
     row.departureAlert =
-      s.movements?.some(
+      (movementsByAnimal.get(animal.id) || []).some(
         (m) =>
           m.animalId === animal.id &&
           !m.voidedAt &&

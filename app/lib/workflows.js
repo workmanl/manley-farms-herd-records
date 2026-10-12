@@ -435,7 +435,13 @@ export function prepareWorkflow(
 }
 export async function commitWorkflow(repo, snapshot, action, input) {
   const plan = prepareWorkflow(snapshot, action, input);
-  await repo.mutate(plan.changes, plan.options);
+  if (
+    action === "weight" &&
+    plan.changes.length === 1 &&
+    plan.result.type !== "birth"
+  )
+    await repo.appendWeight(plan.result);
+  else await repo.mutate(plan.changes, plan.options);
   return plan.result;
 }
 export function adg(first, second, unit = "lb") {
@@ -555,7 +561,7 @@ export function searchAnimals(s, filters = {}) {
     rows: rows.slice((page - 1) * pageSize, page * pageSize),
   };
 }
-export function events(s, { animalId, type, from, to } = {}) {
+export function events(s, { animalId, type, from, to, limit } = {}) {
   const stores = [
     "animals",
     "identifiers",
@@ -580,11 +586,13 @@ export function events(s, { animalId, type, from, to } = {}) {
           ...(r.calves || []).map((c) => c.calfId),
           ...(r.snapshots || []).map((x) => x.animalId),
         ];
-  const rows = stores.flatMap((store) =>
-    s[store].map((record) => ({
-      store,
-      record,
-      date:
+  const rows = [];
+  const compare = (a, b) =>
+    b.date.localeCompare(a.date) || a.record.id.localeCompare(b.record.id);
+  for (const store of stores) {
+    if (type && store !== type) continue;
+    for (const record of s[store]) {
+      const date =
         record.date ||
         record.birthDate ||
         record.serviceDate ||
@@ -593,25 +601,28 @@ export function events(s, { animalId, type, from, to } = {}) {
         record.startDate ||
         record.validFrom ||
         record.changedAt ||
-        record.createdAt,
-      animalIds:
+        record.createdAt;
+      if ((from && date.slice(0, 10) < from) || (to && date.slice(0, 10) > to))
+        continue;
+      if (
+        limit &&
+        rows.length >= limit &&
+        compare({ date, record }, rows.at(-1)) >= 0
+      )
+        continue;
+      const animalIds =
         store === "revisions"
           ? involved(record.entityType, record.newValues)
-          : involved(store, record),
-    })),
-  );
-  return rows
-    .filter(
-      (e) =>
-        (!type || e.store === type) &&
-        (!animalId || e.animalIds.includes(animalId)) &&
-        (!from || e.date.slice(0, 10) >= from) &&
-        (!to || e.date.slice(0, 10) <= to),
-    )
-    .sort(
-      (a, b) =>
-        b.date.localeCompare(a.date) || a.record.id.localeCompare(b.record.id),
-    );
+          : involved(store, record);
+      if (animalId && !animalIds.includes(animalId)) continue;
+      rows.push({ store, record, date, animalIds });
+      if (limit) {
+        rows.sort(compare);
+        if (rows.length > limit) rows.pop();
+      }
+    }
+  }
+  return limit ? rows : rows.sort(compare);
 }
 // Small, versioned, dataset-scoped local form drafts. These are not herd records or backups.
 export function draftStore(storage, datasetId) {

@@ -195,7 +195,7 @@ export class HerdUI {
     );
     this.root.append(actions);
     this.root.append(el("h2", "Recent activity"));
-    this.history(events(this.s).slice(0, 5));
+    this.history(events(this.s, { limit: 5 }));
   }
   animals() {
     this.title("Animals");
@@ -545,6 +545,20 @@ export class HerdUI {
     const status = el("p", "Not saved.");
     status.setAttribute("role", "status");
     status.setAttribute("aria-live", "polite");
+    status.id = `form-status-${crypto.randomUUID()}`;
+    form.setAttribute("aria-describedby", status.id);
+    form.addEventListener(
+      "invalid",
+      (e) => {
+        e.target.setAttribute("aria-invalid", "true");
+        e.target.setAttribute("aria-describedby", status.id);
+        status.textContent = `Check ${e.target.labels?.[0]?.textContent || "the highlighted field"}: ${e.target.validationMessage}`;
+      },
+      true,
+    );
+    form.addEventListener("input", (e) =>
+      e.target.removeAttribute("aria-invalid"),
+    );
     status.tabIndex = -1;
     const sticky = el("div", undefined, "sticky");
     sticky.append(status);
@@ -582,6 +596,11 @@ export class HerdUI {
         controls.forEach((c) => (c.disabled = true));
         await commitWorkflow(this.repository(), baseSnapshot, action, data);
         committed = true;
+        document.dispatchEvent(
+          new document.defaultView.CustomEvent("herd-saved", {
+            detail: { form },
+          }),
+        );
         let cleanup = "";
         if (draft)
           try {
@@ -603,6 +622,8 @@ export class HerdUI {
           ? `Saved on this device, but the view could not refresh: ${error.message}. Reload before entering it again.`
           : `Not saved: ${error.message}`;
         this.message(status.textContent, true);
+        for (const control of form.querySelectorAll("input,select,textarea"))
+          control.setAttribute("aria-describedby", status.id);
         status.focus();
       } finally {
         this.saving = false;

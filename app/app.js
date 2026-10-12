@@ -1,3 +1,11 @@
+import {
+  startPWA,
+  trackEdits,
+  MIGRATION_RECEIPT,
+  SCHEMA_VERSION,
+} from "./lib/pwa.js";
+import { sha256 } from "./lib/backup.js";
+import { canonical } from "./lib/validation.js";
 // SPDX-License-Identifier: AGPL-3.0-only
 import { refreshHealth } from "./lib/health.js";
 import { HerdUI } from "./lib/herd-ui.js";
@@ -17,6 +25,7 @@ import {
   TERMS_VERSION,
 } from "./lib/terms-copy.js";
 const $ = (id) => document.getElementById(id);
+const edits = trackEdits(document);
 import { OwnershipUI } from "./lib/ownership-ui.js";
 import {
   backupReminder,
@@ -53,7 +62,7 @@ function download(value, name) {
 const filename = (prefix = "herd") =>
   `${prefix}-${(snapshot?.operation[0].name || "records").replace(/[^a-z0-9]+/gi, "-")}-${new Date().toISOString().replace(/[:.]/g, "-")}-schema1.json`;
 async function run(fn) {
-  if (busy) return;
+  if (busy || document.body.inert) return;
   busy = true;
   try {
     await fn();
@@ -182,9 +191,9 @@ async function preview() {
   plan = await previewRestore(
     repo,
     restoreInput,
-    (csvRestore = false),
     $("restore-mode").value,
     decisions,
+    { onProgress: showProgress },
   );
   $("preview-panel").hidden = false;
   $("counts").replaceChildren();
@@ -317,7 +326,7 @@ on("accept", "click", async () => {
   message("Acknowledgment saved on this device.");
 });
 on("download", "click", async () => {
-  const b = await exportBackup(repo);
+  const b = await exportBackup(repo, undefined, showProgress);
   requestedBackup = backupContent(b.stores);
   download(b, filename());
   await bookkeeping("lastExportAttemptAt");
@@ -371,7 +380,7 @@ on("cancel", "click", async () => {
   message("Restore preview canceled. No records changed.");
 });
 on("safety-download", "click", async () => {
-  const b = await exportBackup(repo);
+  const b = await exportBackup(repo, undefined, showProgress);
   download(b, filename("before-restore"));
   message(
     "Current-records backup download requested. Select the saved file below to verify it.",
@@ -399,6 +408,7 @@ $("warnings-check").onchange = updateCommit;
 on("commit", "click", async () => {
   await commitRestore(repo, plan, {
     safetyBackup,
+    onProgress: showProgress,
     downloadConfirmed: !!safetyBackup,
     acknowledgeWarnings: $("warnings-check").checked,
   });
@@ -435,6 +445,9 @@ on("settings", "submit", async () => {
     { reason: "Update operation settings" },
   );
   await refresh();
+  document.dispatchEvent(
+    new window.CustomEvent("herd-saved", { detail: { form: $("settings") } }),
+  );
   message("Settings saved with correction history.");
 });
 on("raw-export", "click", async () => {
@@ -468,7 +481,7 @@ function showReminder() {
   $("backup-reminder-text").textContent = reminder?.text || "";
 }
 on("backup-now", "click", async () => {
-  const b = await exportBackup(repo);
+  const b = await exportBackup(repo, undefined, showProgress);
   requestedBackup = backupContent(b.stores);
   download(b, filename());
   await bookkeeping("lastExportAttemptAt", { preserveView: true });
@@ -503,10 +516,21 @@ window.addEventListener("hashchange", () => {
 });
 await run(async () => {
   repo = await openRepository({
+    initialClock: new Date().toISOString(),
     onBlocked: message,
-    onBeforeUpgrade: () => {
-      message(backupReminder(snapshot, { reason: "schema-upgrade" }).text);
-      return false;
+    targetVersion: SCHEMA_VERSION,
+    downloadedBackup: !!localStorage.getItem(MIGRATION_RECEIPT),
+    onBeforeUpgrade: async ({ snapshot: before, toVersion }) => {
+      const receipt = JSON.parse(
+        localStorage.getItem(MIGRATION_RECEIPT) || "null",
+      );
+      if (
+        !receipt ||
+        receipt.schema !== toVersion ||
+        receipt.hash !== (await snapshotHash(before))
+      )
+        return false;
+      return true;
     },
     onVersionChange: () => {
       message(
@@ -538,6 +562,7 @@ async function refreshVisibleHealth() {
     !repo ||
     repo.recovery ||
     document.hidden ||
+    document.body.inert ||
     busy ||
     herd.saving ||
     ownership.saving
@@ -548,7 +573,7 @@ async function refreshVisibleHealth() {
     herd.s = snapshot;
     showReminder();
     for (const panel of document.querySelectorAll(".withdrawal-panel"))
-      herd.health.update(panel);
+      if (!panel.contains(document.activeElement)) herd.health.update(panel);
     for (const panel of document.querySelectorAll(".departure-preview"))
       panel.refreshPreview();
     // Source changes are also rejected against the opening snapshot at commit.
@@ -564,3 +589,57 @@ const healthTimer = setInterval(() => {
   void refreshVisibleHealth();
 }, 60000);
 healthTimer.unref?.();
+
+async function snapshotHash(s) {
+  const ordered = Object.fromEntries(
+    Object.entries(s).map(([k, rows]) => [
+      k,
+      [...rows].sort((a, b) => a.id.localeCompare(b.id)),
+    ]),
+  );
+  return sha256(canonical(ordered));
+}
+void startPWA({
+  edits,
+  document,
+  window,
+  navigator,
+  storage: localStorage,
+  isBusy: () => busy || herd.saving || ownership.saving || !!plan,
+  closeRepository: () => repo?.close(),
+  verifyMigration: async (version, schema, file) => {
+    const current = await repo.snapshot(),
+      hash = await snapshotHash(current);
+    if (file) {
+      const { backup } = await verifyBackup(await file.text());
+      if ((await snapshotHash(backup.stores)) !== hash)
+        throw Error(
+          "Backup differs from current records. Download and verify a fresh backup.",
+        );
+      localStorage.setItem(
+        MIGRATION_RECEIPT,
+        JSON.stringify({ version, schema, hash }),
+      );
+    }
+    const receipt = JSON.parse(
+      localStorage.getItem(MIGRATION_RECEIPT) || "null",
+    );
+    if (
+      receipt?.version !== version ||
+      receipt?.schema !== schema ||
+      receipt?.hash !== hash
+    )
+      throw Error("Download and verify a current backup before this update.");
+    return true;
+  },
+}).catch(() => {
+  $("offline-status").textContent =
+    "Offline preparation unavailable. Keep this tab open and retry online.";
+});
+
+function showProgress({ phase, percent }) {
+  $("transfer-progress").hidden = false;
+  $("transfer-progress-label").hidden = false;
+  $("transfer-progress").value = percent;
+  $("transfer-progress-label").textContent = `${phase}: ${percent}%`;
+}

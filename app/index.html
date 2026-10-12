@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta name="theme-color" content="#1a1f16" />
     <title>Manley Farms Herd Records</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="icons/herd-192.png" />
     <link rel="stylesheet" href="styles.css" />
     <script type="module" src="app.js"></script>
   </head>
@@ -18,7 +20,7 @@
       <div>
         <span class="eyebrow">MANLEY FARMS</span><strong>Herd Records</strong>
       </div>
-      <span class="badge">Local records · Phase 5</span>
+      <span class="badge">Local records · Phase 6</span>
     </header>
     <nav aria-label="Main navigation">
       <a href="#dashboard" data-tab="dashboard">Dashboard</a
@@ -32,9 +34,36 @@
       <button id="backup-now" type="button">Backup now</button>
       <button id="backup-snooze" type="button">Snooze for one day</button>
     </aside>
+    <aside id="pwa-panel" class="no-print" aria-label="Offline and updates">
+      <p id="offline-status" role="status">
+        Offline preparation not checked yet.
+      </p>
+      <details>
+        <summary>Install and field help</summary>
+        <p id="install-guidance"></p>
+        <a href="help.html">Read the offline field guide</a>
+      </details>
+      <p id="update-status" role="status"></p>
+      <button id="pwa-update" hidden>Update when ready</button>
+      <div id="update-backup" hidden>
+        <p>
+          Download JSON in Backup &amp; Settings, save it outside this browser,
+          then select it here.
+        </p>
+        <label
+          >Verify saved update backup<input
+            id="update-backup-file"
+            type="file"
+            accept=".json,application/json"
+        /></label>
+      </div>
+    </aside>
     <main id="main" tabindex="-1">
       <section id="ownership" hidden></section>
       <p id="status" role="status" aria-live="polite">Opening local records…</p>
+      <label id="transfer-progress-label" for="transfer-progress" hidden
+        >Backup and restore progress</label
+      ><progress id="transfer-progress" max="100" value="0" hidden></progress>
       <section id="recovery" class="notice" hidden>
         <h1>Recovery mode</h1>
         <p id="recovery-message"></p>
@@ -188,8 +217,9 @@
               <label class="check" id="warning-label" hidden
                 ><input id="warnings-check" type="checkbox" /><span
                   id="warnings-text"
-                ></span
-              ></label>
+                  >I reviewed the restore warnings.</span
+                ></label
+              >
               <div id="replace-safety" class="notice">
                 <h3>Keep your current records first</h3>
                 <p>
@@ -225,7 +255,7 @@
           </article>
           <article class="card">
             <h2>Operation settings</h2>
-            <form id="settings">
+            <form id="settings" aria-describedby="status">
               <label
                 >Operation name<input
                   id="operation-name"
@@ -269,8 +299,8 @@
           </article>
         </div>
         <p class="muted">
-          No cloud copy. No automatic sync. This Phase 5 build does not yet
-          install or cache itself for offline reopening.
+          No cloud copy. No automatic sync. Wait for Ready offline before
+          leaving signal. Keep external backups.
         </p>
       </section>
     </main>
