@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Private vulnerability report
+    url: https://github.com/workmanl/manley-farms-herd-records/security/advisories/new
+    about: Use GitHub Security Advisories. Do not post vulnerabilities or herd records publicly.
+  - name: Offline field guide
+    url: https://manleyfarms.com/tools/herd-records/help.html
+    about: Installation, backups and recovery guidance.

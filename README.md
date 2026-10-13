@@ -1,78 +1,82 @@
 # Manley Farms Herd Records
 
-Free, local cattle records for one operation per browser profile. This repository contains **Phase 6, offline and field finish**, version 0.6.0, schema 1. The PWA shell, verified offline readiness, coordinated updates, field accessibility fixes and scale benchmarks build on the existing herd, health and ownership layers. Local only.
+Free cattle records that work offline after the first verified download. Keep animal identity, parentage, calving, weights, breeding, treatments and departures, with separate recorded meat and milk withdrawal holds.
 
-Node verification and measured performance are recorded in the [Phase 6 report](docs/phase6-report.md). Browser checks, physical-device acceptance and local commits are assigned to Claude and Scott. No browser checks, commits, push or deployment were attempted in this phase.
+**Public beta 1.0.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
+
+[Open Herd Records](https://manleyfarms.com/tools/herd-records/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
+
+This checkout prepares the release locally. Publication and deployment are separate handoff steps; the live link above is the intended public destination.
+
+![Herd dashboard from an empty test dataset](docs/screens/phase5/dashboard-390.png)
+
+The screenshot shows an empty test dataset from an earlier development phase, not a clinical review or a current beta browser check.
 
 ## Free forever
 
-The official app is intended to remain free and donation-supported, with no account, subscription, paid tier or herd-size gate. No donation link or public source URL has been invented for this local build. AGPL permits commercial use and charging for compliant forks. Your herd records remain yours.
+The official tool is free forever: no account, subscription, paid tier, trial or herd-size charge. Donations are optional and never gate any function. [Support Manley Farms](https://buy.stripe.com/bJefZg26S8Ry99qePt8Ra03). This existing donation link is also used on the Manley Farms Tools page. AGPL permits charging for compliant forks; the official pledge does not remove that freedom.
 
-## Run locally
+## Launch, install and go offline
 
-No build step, runtime package install, CDN, backend or remote asset is required. Serve the deployable `app/` directory:
+1. Open the app while connected, read the terms and acknowledge the limits. Wait for **Ready offline** before leaving signal.
+2. On iPhone/iPad Safari use Share > Add to Home Screen. On Android Chrome use Install app or Add to Home screen. On desktop Chrome/Edge use the install control; Mac Safari may offer Add to Dock. Installation is optional.
+3. Reopen without signal and verify your records and a saved backup. Browser and installed contexts may hold separate databases. See the [offline field guide](app/help.html).
+
+Entry, history, exports and report preparation work offline once the shell is ready. First use and update downloads require a connection. Notifications while closed are not promised. Do not activate an update over unsaved forms or calf drafts. Schema-changing updates require a newly saved and verified backup. Recovery preserves records and offers exports; never clear storage to fix an update.
+
+## Operation fit and browser support
+
+Cow-calf records include twins, calving assistance and linked birth weights. Stocker/backgrounder records include groups, pasture changes, actual weights, average daily gain and batch treatment. Small seedstock operations get basic parentage and lifetime history. No registry/genetic evaluation, drug selection, dose advice, cost-of-gain model or complete dairy system is included. One operation lives in each browser profile, with no software head-count gate.
+
+Core browser use targets current Safari on iPhone/iPad and Mac, Chrome on Android and desktop, Edge and Firefox. Installation support varies. These are support targets, not proof that every device passed. Physical-device performance, assistive technology, sunlight and multi-device field acceptance remain gates. The [Phase 6 report](docs/phase6-report.md) separates Node benchmarks from browser evidence and contains the device checklist.
+
+## Privacy and storage limits
+
+Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. The web host receives ordinary page and asset requests. Optional source and donation links navigate only when chosen and include no herd context.
+
+Records are not encrypted by the app. Device/profile access and other scripts on the same website origin can expose them. Different browsers, profiles and installed contexts may hold separate copies. Clearing site data, private browsing, eviction, device loss, storage limits or software errors can destroy records. Persistent storage can reduce eviction risk, but does not guarantee retention. Manley Farms has no recovery copy.
+
+## Withdrawal and responsibility
+
+This is recordkeeping, not veterinary, legal or regulatory advice. There is no drug database. Supply separate meat and milk instructions from the actual product label or your veterinarian. You remain responsible for withdrawal compliance, accurate entries and following those instructions.
+
+The dashboard shows Meat hold, Milk hold and Needs review. Counts overlap and retain sold/archived animals. Repeated administrations and overlapping treatments control recorded release times. Unknowns, date-only administration, open courses, prohibited use and unresolved conditions require review. Blank is never zero; explicit zero requires instruction confirmation. A backward clock change remains flagged until audited review.
+
+**Recorded interval elapsed never means safe for slaughter or milk.** A countdown is arithmetic from your inputs and device time, not clearance, residue testing or compliance certification. Inspect contributing treatments and independently verify the actual history before decisions. Corrections retain prior values and reasons; departure acknowledgment never authorizes slaughter or milk sale.
+
+The app is provided as is, without warranty to the extent permitted by law. You assume the described risks; liability is limited subject to mandatory rights. Read the complete [Terms of Use and Disclaimer](app/terms.txt) and [AGPL warranty/liability provisions](LICENSE).
+
+## Back up, verify and restore
+
+1. In **Backup & Settings**, download JSON and save it outside the browser. A requested download does not prove a file was saved. Confirm saved only after saving it.
+2. Select the saved file under **Verify a backup**. It checks structure, checksum, counts, IDs and references without changing live records. Checksums detect alteration, not authenticity.
+3. Choose Replace or Merge and preview. Cancellation and preview make no record changes. Replacement requires downloading and verifying the exact current dataset first.
+4. Merge skips identical records and requires explicit decisions for every conflict. No timestamp wins automatically. Clinical corrections require a reason and hold review. A failed transaction or stale preview preserves committed data.
+5. Keep copies in two places and rehearse restoration in a spare profile. Back up before changing devices, clearing storage or installing schema changes. Reminders default to seven days when unbacked changes exist.
+
+Imported acknowledgment receipts remain history but do not establish a new operator’s acceptance. Recovery exports are labeled separately from verified backup envelopes. JSON is the authoritative lossless restoration format.
+
+## Switching away and reports
+
+In **Reports**, follow the bundled switching guide. Export all 14 CSV tables, scope manifest and dictionary, plus verified JSON and printable reports. Retain stable IDs and foreign keys; map animals before dependent events in the destination system and reconcile parentage, weights and withdrawal instructions. CSV exports use quoted UTF-8 and documented reversible formula protection. Filtered exports are not complete backups.
+
+CSV import supports mapping, preview, row errors and explicit conflicts before one confirmed commit. Treatment logs, calving books and animal cards can be printed or saved as PDF. These help organize records for review; they do not certify BQA compliance. Keep the complete runnable source archive so you can host elsewhere even if the original site becomes unavailable. Rehearse restoration yearly; no universal third-party importer is promised.
+
+## Local hosting and data documentation
+
+No runtime package installation or build step is required. Serve the complete `app/` directory over HTTPS or localhost:
 
 ```sh
 node scripts/serve.mjs
 ```
 
-Open <http://127.0.0.1:8765/tools/herd-records/>. Use a stable localhost port and browser profile to retain the same origin and records. Double-clicking `index.html` with a `file://` URL is unsupported. Hosting elsewhere requires HTTPS and the complete `app/` directory unchanged.
+Open <http://127.0.0.1:8765/tools/herd-records/>. Keep the same origin, port and browser profile to access the same records. Opening with `file://` is unsupported. For a fork’s different directory path, run `HERD_BASE_PATH=/your/path/ node scripts/build-pwa.mjs` and align the host directory with the manifest scope. Regenerate the inventory after any app asset edit.
 
-The first ordinary use requires the unchecked acknowledgment to be selected and its receipt to commit locally. The bundled copy is **a draft for a lawyer's review, not legal advice or approved production terms**. Terms, source/license, export and recovery remain accessible without acceptance. The acknowledgment does not restrict the AGPL license grant.
+[Data dictionary](docs/data-dictionary.md) · [Architecture](docs/architecture.md) · [Synthetic fixture](tests/fixtures/sample-herd.json)
 
-## Offline readiness and browser support
+## Tests and contributions
 
-All assets are local, with system fonts. Wait for **Ready offline**, which requires an installed worker and a complete hash-verified shell. The field guide is cached too. Install guidance covers iOS Safari, Android Chrome and desktop browsers. Installation is optional; verify records separately in browser and installed contexts.
-
-Updates stage every asset before offering **Update when ready**. All open Herd Records tabs must confirm no dirty form, draft or active operation. A schema update requires a saved, verified current backup. No cache is automatically deleted, including old Herd Records releases. Browser storage can still evict caches independently.
-
-After editing app files, run `npm run pwa:inventory` to regenerate release hashes. This is release maintenance, not a runtime build requirement. Forks can set `HERD_BASE_PATH=/your/path/ node scripts/build-pwa.mjs`. The generated manifest path must match the hosting directory. Copy the complete app directory; do not combine releases. A mismatched or interrupted upload fails the hash check and preserves the installed version.
-
-Requires ES modules, IndexedDB, Web Crypto, `structuredClone`, and modern `Intl` APIs including `supportedValuesOf`. Chromium, Safari, Firefox and Edge are intended targets. Real-browser, installed-context and physical-device acceptance remains outstanding. Automated tests use Node.js, fake-indexeddb and jsdom, not an actual browser rendering engine.
-
-## Privacy and storage
-
-Records live in IndexedDB `manley_herd_records`. Unsaved calf drafts use versioned, dataset-and-dam-scoped localStorage keys. Drafts are separate from committed records and are not included in JSON backups. A separate `manley_herd_records_recovery` database retains the most recent pre-migration snapshot. No herd fields are uploaded, no analytics are included, and a Content Security Policy limits asset connections to the same origin. The only network fetch code is the static service-worker inventory download. Serving the page still involves ordinary local or hosting asset requests.
-
-Data is not encrypted by the app. Device/profile access and other scripts with the same origin can expose it. Browser clearing, private mode, eviction, device loss and software errors can destroy records. Persistent-storage permission reduces some eviction risk; it does not guarantee retention. There is no cloud recovery copy or automatic sync.
-
-## Withdrawal and disclaimer
-
-This is a recordkeeping tool, not veterinary, legal or regulatory advice. It has no drug database. Enter withdrawal instructions from the applicable label or your veterinarian and verify the actual records before making animal or product decisions. The app does not certify compliance or authorize slaughter or milk sale. It is not certified by BQA or any authority.
-
-Records stay in your browser on your device unless you export them. You are responsible for verified backups outside the browser. There is no cloud recovery copy or guarantee against data loss. See the bundled [Terms of Use and Disclaimer](app/terms.txt) for storage limits, assumption of risk, warranty and liability notices.
-
-The dashboard leads with separate Meat hold, Milk hold and Needs review counts. Counts overlap and retain sold/archived animals. It shows “Recorded interval elapsed,” never a clearance claim. Expand an animal to inspect contributing treatments. Record each commodity's instructions explicitly; blank is not zero, and zero needs confirmation. Date-only entries, open courses, unknowns, prohibited use and unresolved conditions require review. A detected backward clock change stays flagged until an audited operator review.
-
-Treatment corrections and voids preserve original values with a reason and hold review. Batch treatment previews fixed recipients, then saves their individual records in one transaction. Before a departure, inspect current and conservative event-time results, record the intended destination and acknowledge the notice. Historical departure warnings remain in history. Phase 3 placeholders are recomputed with their original acknowledgment retained in revision history. See [Phase 4 report](docs/phase4-report.md) for interpretations and validation. Backup verification is not clinical review.
-
-## Back up, verify and restore
-
-1. Open **Backup & Settings**, download JSON and save the file outside this browser. A download request is recorded separately from your explicit confirmation that a file was saved.
-2. Select the file under **Verify a backup**. It checks the exact envelope, checksum, counts, field types, IDs and references without changing any live store. Verification does not claim authenticity.
-3. To restore, select a file and choose **Replace** or **Merge**, then preview. No records change during preview or cancellation.
-4. Replacement requires downloading the exact current dataset and selecting that saved file for verification. It then commits the staged incoming dataset in one transaction. A stale preview, validation problem, quota or transaction failure leaves the original committed records intact.
-5. Merge skips identical records. For each conflict choose current or incoming explicitly, with a correction reason for incoming values and hold-review evidence for clinical changes. Revalidate the choices before committing. No timestamp wins automatically. Incompatible relationships remain blocking errors instead of being silently discarded or matched by tag.
-
-Replacement preserves imported terms receipts as history but clears active acceptance. Merge preserves only this browser's active acceptance and combines historical receipts. Imported backup receipts are cleared in active metadata. Metadata adjustments have separate revision rows. The synthetic fixture, restored at its fixed evaluation clock, needs no metadata adjustment and round-trips exactly.
-
-Reminders appear after the first saved work, then when unbacked changes exist and the configured interval (default seven days) has passed. They are checked on launch, resume and after saves. Backup now requests a JSON download; Snooze delays the reminder one day. Confirming a saved backup checks that the downloaded content still matches live records. Verification stays read-only.
-
-Keep an additional copy in a second location under your control. Rehearse restoration in a spare browser profile. Do not clear a failing browser's storage. Recovery mode is read-only and offers raw-record and pre-migration downloads for investigation with a compatible source release. Raw recovery artifacts are deliberately labeled separately from verified backup envelopes.
-
-## Switching away
-
-Open **Reports** for the locally bundled five-step switching guide, CSV tools and print previews. Export all 14 CSV tables, the scope manifest and the full data dictionary into one folder. Retain immutable IDs and foreign keys. The export uses quoted UTF-8 cells and reversible apostrophe formula protection. Standalone entity exports include an explicit scope manifest and are not complete backups.
-
-For CSV import, choose one or more related tables, map columns, choose formula protection, dates, decimal convention and missing units, and preview. Review generated IDs, every row error, duplicates, same-ID conflicts, current-identity snapshot choices and prospective holds. Re-preview decisions, check the confirmation and commit once. New animal imports generate their identifier mirrors; corrections to existing identifiers or memberships require their related history rows in the same staged set. Full canonical sets, including operation, metadata and revisions, use the advanced merge/replace restore path and the existing safety-backup gate. Unknown parent links remain errors or explicit external references.
-
-Print the treatment log, calving book by dates/season label, and individual animal card from accessible previews. Reports retain unknown holds and departure warnings. The treatment report uses landscape print styling; all reports contain the supplied disclaimer footer. Browser pagination and repeated-footer acceptance are pending Claude's print checks.
-
-Keep a verified full JSON backup and this runnable source checkout. Copy exports to two locations under your control, compare counts and sample records, and rehearse restoration in a spare browser profile yearly. Back up after major work sessions and keep quarterly CSV archives. Map animals before dependent events in the destination system and reconcile parentage, weights and withdrawal instructions. Serve a retained release archive over HTTPS or localhost to restore JSON. No universal third-party importer compatibility is promised.
-
-## Data and tests
-
-See the [data dictionary](docs/data-dictionary.md), [architecture](docs/architecture.md), [synthetic sample fixture](tests/fixtures/sample-herd.json), [Phase 2 report](docs/phase2-report.md) [Phase 3 report](docs/phase3-report.md) [Phase 4 report](docs/phase4-report.md) and [Phase 5 report](docs/phase5-report.md).
+Node.js 22 or newer is recommended. Development-only dependencies are fake-indexeddb and jsdom. Neither ships in the app.
 
 ```sh
 npm ci
@@ -80,26 +84,24 @@ npm test
 npm run test:scale
 ```
 
-`fake-indexeddb` and `jsdom` are development-only dependencies. Neither is imported by the app. Node.js 22 or newer is recommended for the test environment. Tests cover schema/index contracts, structural and relational constraints, atomic rollback, stale revisions, append-only corrections, migration success/failure, backup verification, merge/replace and acknowledgment receipts. Phase 3 tests also exercise rendered forms, pedigree-cycle rejection, calf drafts and twins, weight conversion, search/paging, dated batch moves, breeding/checks, departures and app-wide theme persistence. Phase 4 adds the 20-case withdrawal oracle, boundary/DST/leap-day tests, health transactions, injected batch-write rollback, sticky clocks, sale previews and rendered health/filter controls. Phase 5 adds all-entity CSV round trips, mapping/conflict/atomicity checks, reminder timing with injected clocks, backup confirmation races, report assembly, print-footer packaging and rendered import/report controls. The test-only v2 migration is never imported by the deployable app.
+The standard suite covers data integrity, atomic rollback, migrations/recovery, withdrawals, JSON/CSV round trips, rendered controls, PWA coordination, shell hashes and public release content. Scale tests are separate Node proxies with 10,000 lifetime animals, 500 active and 250,000 events. They do not establish phone performance. See [Phase 7 evidence and remaining gates](docs/phase7-report.md).
 
-To repeat the requested render checks when Chromium can launch:
+Read [CONTRIBUTING](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md). Report ordinary problems through [GitHub issues](https://github.com/workmanl/manley-farms-herd-records/issues), using synthetic or redacted examples. Never attach identifiable herd records. For vulnerabilities use the private route in [SECURITY](SECURITY.md). No proprietary relicensing CLA is required.
+
+## Release policy
+
+Run the tests, regenerate and verify the shell inventory, then package locally:
 
 ```sh
-npx -y playwright@latest install chromium
-npx -y playwright@latest screenshot --browser chromium --viewport-size '390,844' --wait-for-timeout 1200 --full-page 'http://127.0.0.1:8765/#backup' docs/screens/backup-390x844.png
-npx -y playwright@latest screenshot --browser chromium --viewport-size '1280,900' --wait-for-timeout 1200 --full-page 'http://127.0.0.1:8765/#backup' docs/screens/backup-1280x900.png
+node scripts/build-pwa.mjs
+npm test
+node scripts/release.mjs
 ```
 
-## Contributions, support and releases
+The packager verifies inventory hashes and writes static and source ZIPs in `dist/`, each with its own SHA256SUMS file plus a combined `SHA256SUMS`. The static archive contains the complete unchanged `app/` directory. Extract it and copy its contents to the hosting directory. The source archive excludes dependencies, output, repository metadata, local tooling and scale artifacts.
 
-Use plain ES modules, accessible HTML, local assets and synthetic data. Add migration and rollback fixtures for schema changes. Do not attach real herd records to public bug reports. Clinical changes require producer and qualified veterinary/BQA review before release. A public repository, verified contact route and public issue templates are not yet established.
+Clinical review, the multi-device field pilot, lawyer review of terms, staged browser/print/offline/update checks and restoration on another device/origin remain pre-launch gates. Resolve every data-loss or false-clearance defect before release. Replace `https://github.com/workmanl/manley-farms-herd-records` after repository creation, regenerate inventory, rerun tests and repackage so archives match the published source. Review, tag and publish matching source/static archives with schema compatibility in the changelog. Deploy only the tagged artifact, retain compatible prior assets, then verify the live version, offline readiness, exports and isolated cache scope. Website changes must return through the source repository.
 
-Future release gates include test completion, actual browser/device checks, clinical and attorney review, a tagged source archive, matching static assets and a changelog. No production readiness, deployment or browser certification is claimed here. See [Phase 6 report](docs/phase6-report.md) for intended local commits and the device handoff.
+## License and source
 
-## License and warranty
-
-Copyright (C) 2026 Scott Manley. Code and covered project documentation are licensed under **AGPL-3.0-only**. See [LICENSE](LICENSE), especially sections 15 and 16 on warranty and liability. The software is provided as is to the extent permitted by law. The official app is free and donation-supported. The license permits commercial use subject to its terms. Your herd records remain yours.
-
-The complete, unmodified GNU AGPL v3 text is also bundled in `app/LICENSE`. System font fallbacks are used; no font or artwork license is implied. `fake-indexeddb` (Apache-2.0) and `jsdom` (MIT) are development tooling and are not bundled in the deployed app.
-
-The scale suite generates 10,000 lifetime animals, 500 active and 250,000 events including revisions, then measures the production data paths with fake-indexeddb. It writes `docs/phase6-performance.json` and verifies exact backup checksum preservation after restore. Run it separately because it allocates hundreds of MB and takes about 80 seconds. To write the deterministic fixture for external profiling, use `node scripts/generate-scale.mjs /tmp/herd-twenty-year.json`; the output is raw stores, not a verified backup envelope.
+Copyright (C) 2026 Scott Manley. Original code and covered project documentation are **AGPL-3.0-only**. The complete unmodified license is in [LICENSE](LICENSE) and `app/LICENSE`. Modified network-interactive versions must offer corresponding source as the license requires. Your own herd records remain yours. Contributor Covenant text carries its own attribution below. System font fallbacks are used, with no remote fonts or runtime dependencies.

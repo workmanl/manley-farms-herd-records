@@ -313,6 +313,18 @@ test("app has zero external resource URLs, remote imports or record-request sink
   )) {
     let source = read(a.path).replaceAll("http://www.w3.org/2000/svg", "");
     if (a.path === "lib/csv-dictionary.js") continue;
+    if (a.path.endsWith(".html")) {
+      const document = new JSDOM(source).window.document;
+      // Static metadata, JSON-LD and explicit navigation links are not resource loads.
+      for (const node of document.querySelectorAll('script[src], img[src], iframe[src], link[rel="stylesheet"], link[rel="manifest"], link[rel="icon"], link[rel="apple-touch-icon"], link[rel="preload"], link[rel="preconnect"], link[rel="dns-prefetch"]')) {
+        const path = node.getAttribute("src") || node.getAttribute("href");
+        assert.doesNotMatch(path, /^(?:https?:)?\/\//i, a.path);
+        assert.ok(!path.startsWith("../") && !path.startsWith("/"), path);
+        assert.ok(fs.existsSync(new URL(path, root)), path);
+      }
+      for (const node of document.querySelectorAll('script[type="application/ld+json"], meta, a, link[rel="canonical"]')) node.remove();
+      source = document.documentElement.outerHTML;
+    }
     assert.doesNotMatch(
       source,
       /(?:https?:)?\/\/[^\s"'<>]+\.[a-z]{2,}/i,

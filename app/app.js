@@ -1,3 +1,4 @@
+import { updateIntroduction } from "./lib/landing.js";
 import {
   startPWA,
   trackEdits,
@@ -88,6 +89,7 @@ function theme(value) {
 }
 async function refresh() {
   snapshot = await refreshHealth(repo);
+  updateIntroduction($("public-intro"), snapshot);
   accepted = await hasAccepted(snapshot);
   const op = snapshot.operation[0],
     meta = snapshot.metadata[0];
@@ -509,6 +511,10 @@ ownership = new OwnershipUI($("ownership"), {
       "Complete CSV set validated. Choose Replace or Merge, then Preview to review the restore.",
     );
   },
+});
+$("open-herd-records").addEventListener("click", () => {
+  $("public-intro").open = false;
+  $("main").focus();
 });
 herd = new HerdUI($("herd"), { repository: () => repo, refresh, message });
 window.addEventListener("hashchange", () => {

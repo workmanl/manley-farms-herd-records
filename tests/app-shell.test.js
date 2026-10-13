@@ -26,6 +26,7 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   });
   await import("../app/app.js");
   const $ = (id) => document.getElementById(id);
+  assert.equal($("public-intro").open, true);
   assert.equal($("herd").hidden, true);
   assert.equal($("gate").hidden, false);
   $("accept-check").checked = true;
@@ -50,6 +51,8 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
       location.hash === "#animals" && /1 matching/.test($("herd").textContent),
   );
   assert.match($("status").textContent, /Saved/);
+  assert.equal($("public-intro").open, false);
+  assert.equal(document.querySelectorAll("#public-faq article").length, 8);
   location.hash = "#backup";
   await until(() => !$("backup").hidden);
   $("theme").value = "sunlight";

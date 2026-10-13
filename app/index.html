@@ -8,7 +8,128 @@
       content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta name="theme-color" content="#1a1f16" />
-    <title>Manley Farms Herd Records</title>
+    <title>Free Cattle Management Software | Manley Farms</title>
+    <meta name="description" content="Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription." />
+    <link rel="canonical" href="https://manleyfarms.com/tools/herd-records/" />
+    <meta property="og:title" content="Free Cattle Management Software | Manley Farms" />
+    <meta property="og:description" content="Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription." />
+    <meta property="og:url" content="https://manleyfarms.com/tools/herd-records/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Manley Farms" />
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://manleyfarms.com/tools/herd-records/#application",
+      "name": "Manley Farms Herd Records",
+      "url": "https://manleyfarms.com/tools/herd-records/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web browser",
+      "description": "Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "softwareVersion": "1.0.0-beta.1",
+      "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
+      "featureList": [
+        "Offline entry after verified shell download",
+        "Cattle identity and parentage records",
+        "Calving, weights and average daily gain",
+        "Breeding and pregnancy records",
+        "Entered meat and milk withdrawal tracking with unresolved holds",
+        "JSON backup verification and restore",
+        "CSV import and export",
+        "Printable treatment, calving and animal reports"
+      ],
+      "subjectOf": {
+        "@id": "https://manleyfarms.com/tools/herd-records/#source"
+      }
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "https://manleyfarms.com/tools/herd-records/#source",
+      "name": "Manley Farms Herd Records source",
+      "codeRepository": "https://github.com/workmanl/manley-farms-herd-records",
+      "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
+      "programmingLanguage": "JavaScript",
+      "version": "1.0.0-beta.1"
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is it really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. There is no trial, paid tier, account or herd-size charge. Donations are optional."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work without signal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, after the first download shows Ready offline. Entry, history, exports and report preparation work offline. First use needs a connection."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where are records stored?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In this browser’s local database on this device. Back them up before replacing a phone or clearing site data. The app does not upload herd fields or keep a cloud recovery copy."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it sync phones?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. Transfer a verified JSON backup manually and choose one working copy. Different browsers and installed contexts may hold separate records."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it calculate withdrawal?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It tracks entered meat and milk instructions from treatment records and flags unknowns. It does not choose withdrawal periods or certify an animal safe. Recorded interval elapsed never means safe for slaughter or milk."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I use the reports for BQA?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "They organize treatment details for review. Complete records and applicable program requirements still matter. Veterinarian/BQA clinical review of this beta has not been completed; it is not BQA certified or endorsed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What if Manley Farms closes?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Keep exports and a downloadable source release. The app can be hosted elsewhere without an account. Future hosting, support and maintenance are not guaranteed."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I leave?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Export all records as JSON and documented CSV files, plus printable reports, without a fee. Verify your JSON backup and keep the IDs and relationships when moving records."
+          }
+        }
+      ]
+    }
+  ]
+}
+    </script>
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="apple-touch-icon" href="icons/herd-192.png" />
     <link rel="stylesheet" href="styles.css" />
@@ -18,10 +139,47 @@
     <a class="skip" href="#main">Skip to content</a>
     <header>
       <div>
-        <span class="eyebrow">MANLEY FARMS</span><strong>Herd Records</strong>
+        <a class="site-brand" href="../../">Manley Farms</a><strong>Herd Records</strong>
       </div>
-      <span class="badge">Local records · Phase 6</span>
+      <span class="badge">Local records · 1.0.0-beta.1</span>
+      <div class="site-links" aria-label="Manley Farms links"><a href="../../">Home</a> <a href="../../dashboard/">Dashboard</a> <a href="../../blog/">Blog</a> <a href="../">Tools</a> <a href="../../products/">Products</a> <a href="../../about/">About</a></div>
     </header>
+    <details id="public-intro" class="public-intro no-print" open>
+      <summary>About Herd Records</summary>
+      <div class="landing-copy">
+        <nav class="breadcrumb" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">&gt;</span><a href="../">Tools</a><span aria-hidden="true">&gt;</span><span aria-current="page">Herd Records</span></nav>
+        <h1>Free cattle records that work offline</h1>
+        <p>Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription. Keep cattle history on your phone, tablet or computer, and move your records whenever you choose.</p>
+        <p class="notice">Public beta 1.0.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.</p>
+        <a class="button" id="open-herd-records" href="#dashboard">Open herd records</a>
+        <h2>See recorded meat and milk withdrawal holds</h2>
+        <p>Record each treatment and the separate meat and milk instructions from the product label or your veterinarian. The dashboard shows holds, controlling recorded dates and Needs review for unknown or unresolved instructions. There is no drug database or dose advice. Recorded interval elapsed never means safe for slaughter or milk. You remain responsible for withdrawal compliance and checking the actual treatment history.</p>
+        <h2>Records for your operation</h2>
+        <div class="grid">
+          <article class="card"><h3>Cow-calf</h3><p>Keep calf births, twins, dam and sire links, calving details, breeding, pregnancy checks, weights, treatments and departures.</p></article>
+          <article class="card"><h3>Stocker and backgrounder</h3><p>Track individual intake, pasture and group changes, weights and average daily gain, batch treatments and departures. No cost-of-gain model is included.</p></article>
+          <article class="card"><h3>Small seedstock</h3><p>Keep basic parentage and lifetime health and performance history. There is no breed-registry integration or genetic evaluation.</p></article>
+        </div>
+        <h2>Install in three steps</h2>
+        <ol><li>Open herd records while connected. Read and acknowledge the terms, then wait for Ready offline.</li><li>On iPhone or iPad Safari choose Share, then Add to Home Screen. On Android Chrome choose Install app or Add to Home screen. On desktop use the browser’s install control where available. Installation is optional.</li><li>Open the installed app, verify your herd and a saved backup, then try reopening without signal. Browser and installed contexts may have separate records. Read the <a href="help.html">offline field guide</a>.</li></ol>
+        <h2>Your records, your backups</h2>
+        <p>One operation lives in this browser profile’s IndexedDB database on this device. There is no account, cloud copy or automatic phone sync. The app does not upload herd fields; the host receives ordinary page and asset requests. Records are not encrypted by the app. Device access, same-origin scripts, private browsing, storage eviction, cleared site data or a lost phone can expose or erase them.</p>
+        <p>Download a full JSON backup, save it outside the browser and select it to verify. Keep a second copy and rehearse restoration. A requested download is not proof of a saved file. Export documented CSV files and printable reports to move elsewhere without a fee. Never clear storage to fix an update.</p>
+        <h2>Herd records questions, answered</h2>
+        <div id="public-faq">
+          <article><h3>Is it really free?</h3><p>Yes. There is no trial, paid tier, account or herd-size charge. Donations are optional.</p></article>
+          <article><h3>Does it work without signal?</h3><p>Yes, after the first download shows Ready offline. Entry, history, exports and report preparation work offline. First use needs a connection.</p></article>
+          <article><h3>Where are records stored?</h3><p>In this browser’s local database on this device. Back them up before replacing a phone or clearing site data. The app does not upload herd fields or keep a cloud recovery copy.</p></article>
+          <article><h3>Does it sync phones?</h3><p>No. Transfer a verified JSON backup manually and choose one working copy. Different browsers and installed contexts may hold separate records.</p></article>
+          <article><h3>Does it calculate withdrawal?</h3><p>It tracks entered meat and milk instructions from treatment records and flags unknowns. It does not choose withdrawal periods or certify an animal safe. Recorded interval elapsed never means safe for slaughter or milk.</p></article>
+          <article><h3>Can I use the reports for BQA?</h3><p>They organize treatment details for review. Complete records and applicable program requirements still matter. Veterinarian/BQA clinical review of this beta has not been completed; it is not BQA certified or endorsed.</p></article>
+          <article><h3>What if Manley Farms closes?</h3><p>Keep exports and a downloadable source release. The app can be hosted elsewhere without an account. Future hosting, support and maintenance are not guaranteed.</p></article>
+          <article><h3>Can I leave?</h3><p>Yes. Export all records as JSON and documented CSV files, plus printable reports, without a fee. Verify your JSON backup and keep the IDs and relationships when moving records.</p></article>
+        </div>
+        <p><a href="https://github.com/workmanl/manley-farms-herd-records">Source repository</a> · <a href="source.html">Source and license guide</a> · <a href="LICENSE">AGPL-3.0-only license</a> · <a href="terms.txt">Terms of Use and Disclaimer</a></p>
+        <p>This official tool is free forever. If it helps you, <a href="https://buy.stripe.com/bJefZg26S8Ry99qePt8Ra03" rel="noopener">an optional donation supports Manley Farms</a>.</p>
+      </div>
+    </details>
     <nav aria-label="Main navigation">
       <a href="#dashboard" data-tab="dashboard">Dashboard</a
       ><a href="#animals" data-tab="animals">Animals</a
@@ -85,10 +243,9 @@
           <h1>Before you start</h1>
         </div>
         <div class="notice">
-          <strong>Local development build</strong>
+          <strong>Public beta</strong>
           <p>
-            Draft for a lawyer's review. Not legal advice. No legal or clinical
-            launch review has occurred.
+            Public beta 1.0.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.
           </p>
         </div>
         <div class="card" id="intro"></div>
@@ -305,6 +462,8 @@
       </section>
     </main>
     <footer>
+      <div class="footer-links"><a href="../../">Home</a> · <a href="../">Tools</a> · <a href="../../blog/">Blog</a> · <a href="../../about/">About</a> · <a href="../../privacy/">Privacy</a> · <a href="../../disclaimer/">Disclaimer</a> · <a href="../../archive/">Archive</a></div>
+      <p>Manley Farms. Practical tools for modern growers. Built in the Pacific Northwest.</p>
       Recordkeeping only. Not veterinary or legal advice. Verify withdrawal
       instructions and keep backups. Provided as is.
       <a href="terms.txt">Terms and disclaimer</a> ·

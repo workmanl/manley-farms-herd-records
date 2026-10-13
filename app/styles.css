@@ -921,3 +921,17 @@ h3 {
     color: black;
   }
 }
+
+/* Self-contained site header and public introduction. */
+.site-brand { display: block; font-size: 1.25rem; font-weight: 700; }
+.site-links, .footer-links { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.site-links a, .footer-links a { display: inline-flex; min-height: 48px; align-items: center; }
+.public-intro { max-width: 1180px; margin: auto; padding: 16px 24px; }
+.public-intro > summary { min-height: 48px; cursor: pointer; }
+.landing-copy { padding-top: 16px; }
+.landing-copy > p { max-width: 75ch; }
+.breadcrumb { display: flex; flex-wrap: wrap; justify-content: flex-start; grid-template-columns: none; gap: 8px; padding: 0; align-items: center; margin-bottom: 16px; border: 0; }
+.breadcrumb > * { flex: 0 0 auto; width: auto; min-height: 0; text-align: left; }
+.breadcrumb a { border: 0; padding: 0; }
+#public-faq article { margin: 24px 0; }
+@media print { .public-intro, .site-links, .footer-links { display: none !important; } }

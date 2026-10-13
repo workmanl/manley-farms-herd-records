@@ -1,6 +1,8 @@
 Manley Farms Herd Records: Terms of Use and Disclaimer
 
-**Draft for lawyer review. Not legal advice.** Draft version 2026-10-12-draft-1. Effective date: to be set before publication.
+**Public beta.** Version 2026-10-13-beta-1. Effective date: October 13, 2026.
+
+This is public beta software. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. Defects may cause incorrect calculations or lost records. Independently verify all results before relying on them.
 
 #### 1. Purpose and scope
 
@@ -16,11 +18,11 @@ The app and its reports do not provide veterinary, legal or regulatory advice. T
 
 There is no drug database or automatic verification of withdrawal periods. You supply the product, dose, route, administration time, instructions and separate meat and milk withdrawal rules. Obtain those rules from the applicable label or your veterinarian's instructions for the actual use. Changes in use, dose, route, animal class or other conditions can matter. Do not infer a withdrawal period from a fictional example, another animal's record, or a blank field.
 
-A countdown is arithmetic on recorded inputs and the device clock. Missing or incorrect entries, open courses, repeated doses, time changes, unresolved instructions and software defects can affect the result. Non-time conditions require review. Prohibited use is not made permissible by waiting for a date or acknowledging a warning. A displayed elapsed interval does not establish residue absence, food safety, fitness for slaughter, permission to sell milk, or legal compliance. Verify the actual history and applicable instructions before making a decision.
+A countdown is arithmetic on recorded inputs and the device clock. Missing or incorrect entries, open courses, repeated doses, time changes, unresolved instructions and software defects can affect the result. Non-time conditions require review. Prohibited use is not made permissible by waiting for a date or acknowledging a warning. “Recorded interval elapsed” never means safe for slaughter or milk. A displayed elapsed interval does not establish residue absence, food safety, fitness for slaughter, permission to sell milk, or legal compliance. Verify the actual history and applicable instructions before making a decision.
 
 #### 4. Your responsibilities and compliance
 
-You are responsible for the accuracy and completeness of your records and for your animal care, treatment, movement and marketing decisions. Determine and satisfy all applicable federal, state, local and other requirements, including FDA drug residue requirements and animal identification and traceability obligations. Check BQA requirements if you participate in that program. Requirements vary and can change. A report can help organize information but is not a complete compliance program or official movement submission.
+You are responsible for withdrawal compliance and for following applicable product labels and veterinarian instructions. You are responsible for the accuracy and completeness of your records and for your animal care, treatment, movement and marketing decisions. Determine and satisfy all applicable federal, state, local and other requirements, including FDA drug residue requirements and animal identification and traceability obligations. Check BQA requirements if you participate in that program. Requirements vary and can change. A report can help organize information but is not a complete compliance program or official movement submission.
 
 Keep required source documents and obtain professional review when needed. Recording a sale or acknowledging a hold warning is a record of an event or notice. It does not authorize slaughter, milk sale, movement or any otherwise prohibited action.
 
@@ -50,7 +52,7 @@ No general help text, report label, voluntary support response or donation creat
 
 To the extent permitted by applicable law, and except where liability is required by law or expressly agreed in writing, Scott Manley, Manley Farms, copyright holders and contributors will not be liable for damages arising from use of or inability to use the app, documentation or reports. This includes direct, indirect, incidental, special and consequential damages, lost profits or revenue, animal or product losses, residue-related losses, business interruption, loss or corruption of records, and losses connected with reliance on calculations or instructions, even if the possibility of such damages was known.
 
-Some jurisdictions do not allow particular exclusions or limitations. These provisions apply only to the extent permitted in your jurisdiction. They do not exclude liability or rights that cannot lawfully be excluded, including any applicable protections concerning fraud, intentional misconduct, gross negligence, personal injury or statutory consumer rights. A court may apply narrower limits than this draft proposes. The AGPL liability provisions remain applicable to covered software.
+Some jurisdictions do not allow particular exclusions or limitations. These provisions apply only to the extent permitted in your jurisdiction. They do not exclude liability or rights that cannot lawfully be excluded, including any applicable protections concerning fraud, intentional misconduct, gross negligence, personal injury or statutory consumer rights. A court may apply narrower limits than these terms describe. The AGPL liability provisions remain applicable to covered software.
 
 #### 10. Availability, changes and versions
 
@@ -64,4 +66,8 @@ The complete AGPL-3.0 license accompanies the source release. Sections 15 and 16
 
 #### 12. Questions and corrections
 
-Before public release, add a verified contact route for questions about these notices and reports of software defects. Do not send identifiable herd records through public issue reports. Contact a veterinarian or relevant authority for clinical or regulatory questions. Contact details, contracting identity and any jurisdiction-specific terms require attorney review before publication.
+Contact the maintainers via GitHub for questions about these notices and software defects. Do not send identifiable herd records through public issue reports. Use private GitHub Security Advisories for vulnerabilities. Contact a veterinarian or relevant authority for clinical or regulatory questions.
+
+#### 13. Governing law and severability
+
+Manley Farms is a Washington State business. To the extent permitted by applicable law, these terms are governed by the laws of Washington State, United States, without regard to conflict-of-law rules. Mandatory protections and rights that apply in your jurisdiction remain in force. If a provision is found unenforceable, the remaining provisions continue to apply to the extent permitted by law. Nothing in this section restricts rights granted by the AGPL software license.

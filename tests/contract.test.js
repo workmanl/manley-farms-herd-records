@@ -46,11 +46,11 @@ test("deployable app has local assets, all five tabs, exact footer and full matc
   const html = read("app/index.html");
   for (const tab of ["dashboard", "animals", "events", "reports", "backup"])
     assert.ok(html.includes(`data-tab="${tab}"`));
+  // Navigation and canonical URLs are inert. Runtime assets must be bundled.
   for (const match of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
-    if (!match[1].startsWith("#")) {
-      assert.doesNotMatch(match[1], /^https?:/);
-      assert.ok(fs.existsSync(new URL("../app/" + match[1], import.meta.url)));
-    }
+    const path = match[1];
+    if (path.startsWith("#") || path.startsWith("../") || path === "REPO_URL" || /^https?:/.test(path)) continue;
+    assert.ok(fs.existsSync(new URL("../app/" + path, import.meta.url)), path);
   }
   assert.ok(
     html

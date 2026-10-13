@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.0-beta.1 / 2026-10-13 / schema 1 / public beta prepared locally
+
+- Static public introduction, honest beta notices, FAQ, canonical/Open Graph metadata and software/source structured data. Returning datasets collapse the introduction.
+- Finalized terms notices, Washington governing law, explicit withdrawal compliance responsibility and retained warranty, liability, risk and backup protections.
+- Repository contribution, security, conduct and issue/PR guidance; local static/source archive packaging and SHA-256 checksums.
+- Prepared Tools hub and sitemap snippets without changing the site checkout.
+- No schema change. Clinical review, multi-device field pilot and lawyer review remain incomplete. No deployment in this phase.
+
 ## 0.6.0 / 2026-10-12 / schema 1 / local only
 
 - Local manifest, regular/maskable icons, cached field help, hash-verified shell and truthful offline status.

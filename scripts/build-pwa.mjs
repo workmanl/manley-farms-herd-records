@@ -64,7 +64,8 @@ for (const path of files)
       .update(await readFile(new URL(path, root)))
       .digest("hex"),
   });
-const version = createHash("sha256")
+const { version: appVersion } = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
+const version = appVersion + ":" + createHash("sha256")
   .update(JSON.stringify(assets))
   .digest("hex")
   .slice(0, 20);
