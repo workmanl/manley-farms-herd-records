@@ -1,0 +1,2366 @@
+
+> manley-farms-herd-records@1.1.0-beta.1 test
+> node --test tests/*.test.js
+
+TAP version 13
+# Subtest: real app shell gates workflows, routes nested forms, saves and applies sunlight theme app-wide
+ok 1 - real app shell gates workflows, routes nested forms, saves and applies sunlight theme app-wide
+  ---
+  duration_ms: 330.229
+  type: 'test'
+  ...
+# Subtest: frozen data dictionary independently matches all implemented stores, fields and indexes
+ok 2 - frozen data dictionary independently matches all implemented stores, fields and indexes
+  ---
+  duration_ms: 1.957667
+  type: 'test'
+  ...
+# Subtest: bundled full terms are exact and hash input contains all required displayed copy
+ok 3 - bundled full terms are exact and hash input contains all required displayed copy
+  ---
+  duration_ms: 0.368583
+  type: 'test'
+  ...
+# Subtest: deployable app has local assets, all five tabs, exact footer and full matching license
+ok 4 - deployable app has local assets, all five tabs, exact footer and full matching license
+  ---
+  duration_ms: 3.791084
+  type: 'test'
+  ...
+# Subtest: no runtime dependency, build step, remote connection or HTML injection sink
+ok 5 - no runtime dependency, build step, remote connection or HTML injection sink
+  ---
+  duration_ms: 3.077875
+  type: 'test'
+  ...
+# Subtest: empty dashboard has three steps, seven quick actions and bounded animal search
+ok 6 - empty dashboard has three steps, seven quick actions and bounded animal search
+  ---
+  duration_ms: 133.712792
+  type: 'test'
+  ...
+# Subtest: dashboard counts and Today use evaluator including departed and unknown holds
+ok 7 - dashboard counts and Today use evaluator including departed and unknown holds
+  ---
+  duration_ms: 81.163958
+  type: 'test'
+  ...
+# Subtest: demo records have separate dataset IDs, writes cannot reach real herd, delete recreates only demo
+ok 8 - demo records have separate dataset IDs, writes cannot reach real herd, delete recreates only demo
+  ---
+  duration_ms: 506.132
+  type: 'test'
+  ...
+# Subtest: guided animal saves through the existing transaction path
+ok 9 - guided animal saves through the existing transaction path
+  ---
+  duration_ms: 28.835667
+  type: 'test'
+  ...
+# Subtest: guided calving saves through the existing transaction path
+ok 10 - guided calving saves through the existing transaction path
+  ---
+  duration_ms: 23.593792
+  type: 'test'
+  ...
+# Subtest: guided treatment saves through the existing transaction path
+ok 11 - guided treatment saves through the existing transaction path
+  ---
+  duration_ms: 38.783709
+  type: 'test'
+  ...
+# Subtest: guided weight saves through the existing transaction path
+ok 12 - guided weight saves through the existing transaction path
+  ---
+  duration_ms: 24.838792
+  type: 'test'
+  ...
+# Subtest: guided move saves through the existing transaction path
+ok 13 - guided move saves through the existing transaction path
+  ---
+  duration_ms: 15.133084
+  type: 'test'
+  ...
+# Subtest: guided breeding saves through the existing transaction path
+ok 14 - guided breeding saves through the existing transaction path
+  ---
+  duration_ms: 15.663625
+  type: 'test'
+  ...
+# Subtest: guided pregnancy saves through the existing transaction path
+ok 15 - guided pregnancy saves through the existing transaction path
+  ---
+  duration_ms: 18.761541
+  type: 'test'
+  ...
+# Subtest: guided movement saves through the existing transaction path
+ok 16 - guided movement saves through the existing transaction path
+  ---
+  duration_ms: 115.571
+  type: 'test'
+  ...
+# Subtest: guided required question stops Next and Back retains answers
+ok 17 - guided required question stops Next and Back retains answers
+  ---
+  duration_ms: 19.534333
+  type: 'test'
+  ...
+# Subtest: sample herd tells a linked story with current holds and Today tasks
+ok 18 - sample herd tells a linked story with current holds and Today tasks
+  ---
+  duration_ms: 107.025709
+  type: 'test'
+  ...
+# Subtest: home activity uses plain herd sentences while Events retains technical records
+ok 19 - home activity uses plain herd sentences while Events retains technical records
+  ---
+  duration_ms: 101.81125
+  type: 'test'
+  ...
+# Subtest: every animal picker and selected quick action has matching numbered progress
+ok 20 - every animal picker and selected quick action has matching numbered progress
+  ---
+  duration_ms: 99.665917
+  type: 'test'
+  ...
+# Subtest: demo banner and button groups use one block with secondary danger and explicit gaps
+ok 21 - demo banner and button groups use one block with secondary danger and explicit gaps
+  ---
+  duration_ms: 9.299916
+  type: 'test'
+  ...
+# Subtest: old three-animal demo upgrades through save paths without replacing animal IDs
+ok 22 - old three-animal demo upgrades through save paths without replacing animal IDs
+  ---
+  duration_ms: 100.261667
+  type: 'test'
+  ...
+# Subtest: demo hold dates stay relative to seeding time and elapsed intervals do not clear missing timing
+ok 23 - demo hold dates stay relative to seeding time and elapsed intervals do not clear missing timing
+  ---
+  duration_ms: 84.960167
+  type: 'test'
+  ...
+# Subtest: quick action copy uses plain words and retains the hold safety notice
+ok 24 - quick action copy uses plain words and retains the hold safety notice
+  ---
+  duration_ms: 10.164541
+  type: 'test'
+  ...
+# Subtest: dark CSS variables meet text and control contrast
+ok 25 - dark CSS variables meet text and control contrast
+  ---
+  duration_ms: 0.909459
+  type: 'test'
+  ...
+# Subtest: sunlight CSS variables meet text and control contrast
+ok 26 - sunlight CSS variables meet text and control contrast
+  ---
+  duration_ms: 0.239792
+  type: 'test'
+  ...
+# Subtest: field CSS supports focus, reduced motion, 320px reflow and uncapped zoom
+ok 27 - field CSS supports focus, reduced motion, 320px reflow and uncapped zoom
+  ---
+  duration_ms: 0.218917
+  type: 'test'
+  ...
+# Subtest: static controls have accessible names and progress is labeled; live regions stay polite
+ok 28 - static controls have accessible names and progress is labeled; live regions stay polite
+  ---
+  duration_ms: 101.938708
+  type: 'test'
+  ...
+# Subtest: deterministic scale generator retains exact event count, history and twenty-year dates
+ok 29 - deterministic scale generator retains exact event count, history and twenty-year dates
+  ---
+  duration_ms: 19.06525
+  type: 'test'
+  ...
+# Subtest: indexed ordinary weight save enforces foreign keys, shapes, duplicates, recovery and transaction completion
+ok 30 - indexed ordinary weight save enforces foreign keys, shapes, duplicates, recovery and transaction completion
+  ---
+  duration_ms: 30.062
+  type: 'test'
+  ...
+# Subtest: backup and restore progress completes only after successful committed transfer
+ok 31 - backup and restore progress completes only after successful committed transfer
+  ---
+  duration_ms: 38.044041
+  type: 'test'
+  ...
+# Subtest: bounded recent activity preserves full-history ordering
+ok 32 - bounded recent activity preserves full-history ordering
+  ---
+  duration_ms: 25.783625
+  type: 'test'
+  ...
+# Subtest: launch snapshot and clock are one validated transaction and consumed once
+ok 33 - launch snapshot and clock are one validated transaction and consumed once
+  ---
+  duration_ms: 30.819166
+  type: 'test'
+  ...
+# Subtest: exact v1 stores and all index flags/key paths
+ok 34 - exact v1 stores and all index flags/key paths
+  ---
+  duration_ms: 92.299292
+  type: 'test'
+  ...
+# Subtest: full sample fixture verify/export/restore preserves every field, ID and count
+ok 35 - full sample fixture verify/export/restore preserves every field, ID and count
+  ---
+  duration_ms: 106.671458
+  type: 'test'
+  ...
+# Subtest: verification never writes, including success
+ok 36 - verification never writes, including success
+  ---
+  duration_ms: 57.023875
+  type: 'test'
+  ...
+# Subtest: constraint: unique farm IDs across inactive animals
+ok 37 - constraint: unique farm IDs across inactive animals
+  ---
+  duration_ms: 3.43625
+  type: 'test'
+  ...
+# Subtest: constraint: normalized farm ID key
+ok 38 - constraint: normalized farm ID key
+  ---
+  duration_ms: 0.934458
+  type: 'test'
+  ...
+# Subtest: constraint: missing parent FK
+ok 39 - constraint: missing parent FK
+  ---
+  duration_ms: 3.212
+  type: 'test'
+  ...
+# Subtest: constraint: self pedigree cycle
+ok 40 - constraint: self pedigree cycle
+  ---
+  duration_ms: 1.473833
+  type: 'test'
+  ...
+# Subtest: constraint: indirect pedigree cycle
+ok 41 - constraint: indirect pedigree cycle
+  ---
+  duration_ms: 3.423125
+  type: 'test'
+  ...
+# Subtest: constraint: mutually exclusive parent reference
+ok 42 - constraint: mutually exclusive parent reference
+  ---
+  duration_ms: 0.489167
+  type: 'test'
+  ...
+# Subtest: constraint: birth date precision
+ok 43 - constraint: birth date precision
+  ---
+  duration_ms: 0.480667
+  type: 'test'
+  ...
+# Subtest: constraint: archive date required
+ok 44 - constraint: archive date required
+  ---
+  duration_ms: 1.060625
+  type: 'test'
+  ...
+# Subtest: constraint: identifier normalization
+ok 45 - constraint: identifier normalization
+  ---
+  duration_ms: 0.99575
+  type: 'test'
+  ...
+# Subtest: constraint: duplicate active RFID
+ok 46 - constraint: duplicate active RFID
+  ---
+  duration_ms: 4.287875
+  type: 'test'
+  ...
+# Subtest: constraint: RFID partial unique key
+ok 47 - constraint: RFID partial unique key
+  ---
+  duration_ms: 0.983
+  type: 'test'
+  ...
+# Subtest: constraint: current identifier mirror
+ok 48 - constraint: current identifier mirror
+  ---
+  duration_ms: 1.574708
+  type: 'test'
+  ...
+# Subtest: constraint: identifier date range
+ok 49 - constraint: identifier date range
+  ---
+  duration_ms: 0.347584
+  type: 'test'
+  ...
+# Subtest: constraint: identifier replacement reason
+ok 50 - constraint: identifier replacement reason
+  ---
+  duration_ms: 2.187334
+  type: 'test'
+  ...
+# Subtest: constraint: membership FK
+ok 51 - constraint: membership FK
+  ---
+  duration_ms: 3.766375
+  type: 'test'
+  ...
+# Subtest: constraint: membership date range
+ok 52 - constraint: membership date range
+  ---
+  duration_ms: 1.243375
+  type: 'test'
+  ...
+# Subtest: constraint: overlapping memberships
+ok 53 - constraint: overlapping memberships
+  ---
+  duration_ms: 3.655583
+  type: 'test'
+  ...
+# Subtest: constraint: membership current cache
+ok 54 - constraint: membership current cache
+  ---
+  duration_ms: 5.282458
+  type: 'test'
+  ...
+# Subtest: constraint: calving requires calf
+ok 55 - constraint: calving requires calf
+  ---
+  duration_ms: 0.58925
+  type: 'test'
+  ...
+# Subtest: constraint: calving ease scale
+ok 56 - constraint: calving ease scale
+  ---
+  duration_ms: 0.647584
+  type: 'test'
+  ...
+# Subtest: constraint: calving ease score
+ok 57 - constraint: calving ease score
+  ---
+  duration_ms: 0.756375
+  type: 'test'
+  ...
+# Subtest: constraint: calving calf duplicate
+ok 58 - constraint: calving calf duplicate
+  ---
+  duration_ms: 2.805958
+  type: 'test'
+  ...
+# Subtest: constraint: calf single birth event
+ok 59 - constraint: calf single birth event
+  ---
+  duration_ms: 10.416291
+  type: 'test'
+  ...
+# Subtest: constraint: calf birth date agreement
+ok 60 - constraint: calf birth date agreement
+  ---
+  duration_ms: 1.229416
+  type: 'test'
+  ...
+# Subtest: constraint: stillborn status
+ok 61 - constraint: stillborn status
+  ---
+  duration_ms: 1.180292
+  type: 'test'
+  ...
+# Subtest: constraint: birth weight reciprocal
+ok 62 - constraint: birth weight reciprocal
+  ---
+  duration_ms: 1.091667
+  type: 'test'
+  ...
+# Subtest: constraint: birth weight unique
+ok 63 - constraint: birth weight unique
+  ---
+  duration_ms: 1.144208
+  type: 'test'
+  ...
+# Subtest: constraint: weight positive
+ok 64 - constraint: weight positive
+  ---
+  duration_ms: 0.452958
+  type: 'test'
+  ...
+# Subtest: constraint: linked weight type
+ok 65 - constraint: linked weight type
+  ---
+  duration_ms: 0.4475
+  type: 'test'
+  ...
+# Subtest: constraint: snapshot required
+ok 66 - constraint: snapshot required
+  ---
+  duration_ms: 0.442375
+  type: 'test'
+  ...
+# Subtest: constraint: snapshot unique
+ok 67 - constraint: snapshot unique
+  ---
+  duration_ms: 0.428292
+  type: 'test'
+  ...
+# Subtest: constraint: snapshot FK
+ok 68 - constraint: snapshot FK
+  ---
+  duration_ms: 2.382958
+  type: 'test'
+  ...
+# Subtest: constraint: snapshot involved animal
+ok 69 - constraint: snapshot involved animal
+  ---
+  duration_ms: 3.15475
+  type: 'test'
+  ...
+# Subtest: constraint: course final required
+ok 70 - constraint: course final required
+  ---
+  duration_ms: 0.750333
+  type: 'test'
+  ...
+# Subtest: constraint: course latest dose
+ok 71 - constraint: course latest dose
+  ---
+  duration_ms: 1.282292
+  type: 'test'
+  ...
+# Subtest: constraint: course product match
+ok 72 - constraint: course product match
+  ---
+  duration_ms: 1.101375
+  type: 'test'
+  ...
+# Subtest: constraint: course animal match
+ok 73 - constraint: course animal match
+  ---
+  duration_ms: 1.018416
+  type: 'test'
+  ...
+# Subtest: constraint: dose paired
+ok 74 - constraint: dose paired
+  ---
+  duration_ms: 0.448667
+  type: 'test'
+  ...
+# Subtest: constraint: unknown dose documented
+ok 75 - constraint: unknown dose documented
+  ---
+  duration_ms: 0.435708
+  type: 'test'
+  ...
+# Subtest: constraint: route other text
+ok 76 - constraint: route other text
+  ---
+  duration_ms: 0.42675
+  type: 'test'
+  ...
+# Subtest: constraint: date-only no instant
+ok 77 - constraint: date-only no instant
+  ---
+  duration_ms: 0.4295
+  type: 'test'
+  ...
+# Subtest: constraint: timezone offset conflict
+ok 78 - constraint: timezone offset conflict
+  ---
+  duration_ms: 0.530667
+  type: 'test'
+  ...
+# Subtest: constraint: instant local date match
+ok 79 - constraint: instant local date match
+  ---
+  duration_ms: 0.476084
+  type: 'test'
+  ...
+# Subtest: constraint: negative duration
+ok 80 - constraint: negative duration
+  ---
+  duration_ms: 0.548625
+  type: 'test'
+  ...
+# Subtest: constraint: duration unit required
+ok 81 - constraint: duration unit required
+  ---
+  duration_ms: 0.524584
+  type: 'test'
+  ...
+# Subtest: constraint: zero requires confirmation
+ok 82 - constraint: zero requires confirmation
+  ---
+  duration_ms: 2.016208
+  type: 'test'
+  ...
+# Subtest: constraint: fractional millisecond interval
+ok 83 - constraint: fractional millisecond interval
+  ---
+  duration_ms: 0.585958
+  type: 'test'
+  ...
+# Subtest: constraint: non-duration no value
+ok 84 - constraint: non-duration no value
+  ---
+  duration_ms: 0.795709
+  type: 'test'
+  ...
+# Subtest: constraint: known source required
+ok 85 - constraint: known source required
+  ---
+  duration_ms: 0.489542
+  type: 'test'
+  ...
+# Subtest: constraint: directed release restriction
+ok 86 - constraint: directed release restriction
+  ---
+  duration_ms: 0.596834
+  type: 'test'
+  ...
+# Subtest: constraint: directed release vet required
+ok 87 - constraint: directed release vet required
+  ---
+  duration_ms: 0.589916
+  type: 'test'
+  ...
+# Subtest: constraint: partial resolution
+ok 88 - constraint: partial resolution
+  ---
+  duration_ms: 0.583958
+  type: 'test'
+  ...
+# Subtest: constraint: breeding exclusive date range
+ok 89 - constraint: breeding exclusive date range
+  ---
+  duration_ms: 0.756125
+  type: 'test'
+  ...
+# Subtest: constraint: AI service required
+ok 90 - constraint: AI service required
+  ---
+  duration_ms: 0.766375
+  type: 'test'
+  ...
+# Subtest: constraint: exposure ordering
+ok 91 - constraint: exposure ordering
+  ---
+  duration_ms: 0.793042
+  type: 'test'
+  ...
+# Subtest: constraint: pregnancy breeding same animal
+ok 92 - constraint: pregnancy breeding same animal
+  ---
+  duration_ms: 1.06575
+  type: 'test'
+  ...
+# Subtest: constraint: pregnancy other method
+ok 93 - constraint: pregnancy other method
+  ---
+  duration_ms: 0.820334
+  type: 'test'
+  ...
+# Subtest: constraint: pregnancy only due when pregnant
+ok 94 - constraint: pregnancy only due when pregnant
+  ---
+  duration_ms: 2.364583
+  type: 'test'
+  ...
+# Subtest: constraint: pregnancy gestation nonnegative
+ok 95 - constraint: pregnancy gestation nonnegative
+  ---
+  duration_ms: 0.816417
+  type: 'test'
+  ...
+# Subtest: constraint: movement weight pair
+ok 96 - constraint: movement weight pair
+  ---
+  duration_ms: 0.788041
+  type: 'test'
+  ...
+# Subtest: constraint: movement amount pair
+ok 97 - constraint: movement amount pair
+  ---
+  duration_ms: 0.824958
+  type: 'test'
+  ...
+# Subtest: constraint: movement currency precision
+ok 98 - constraint: movement currency precision
+  ---
+  duration_ms: 0.795416
+  type: 'test'
+  ...
+# Subtest: constraint: movement ISO currency
+ok 99 - constraint: movement ISO currency
+  ---
+  duration_ms: 0.787959
+  type: 'test'
+  ...
+# Subtest: constraint: purchase source explained
+ok 100 - constraint: purchase source explained
+  ---
+  duration_ms: 0.966333
+  type: 'test'
+  ...
+# Subtest: constraint: sale destination explained
+ok 101 - constraint: sale destination explained
+  ---
+  duration_ms: 0.974084
+  type: 'test'
+  ...
+# Subtest: constraint: sale acknowledgment
+ok 102 - constraint: sale acknowledgment
+  ---
+  duration_ms: 1.012209
+  type: 'test'
+  ...
+# Subtest: constraint: movement status
+ok 103 - constraint: movement status
+  ---
+  duration_ms: 4.509667
+  type: 'test'
+  ...
+# Subtest: constraint: cull decision active
+ok 104 - constraint: cull decision active
+  ---
+  duration_ms: 2.099875
+  type: 'test'
+  ...
+# Subtest: constraint: acknowledgment treatment FK
+ok 105 - constraint: acknowledgment treatment FK
+  ---
+  duration_ms: 1.158792
+  type: 'test'
+  ...
+# Subtest: constraint: revision immutable flags
+ok 106 - constraint: revision immutable flags
+  ---
+  duration_ms: 0.967834
+  type: 'test'
+  ...
+# Subtest: constraint: revision target
+ok 107 - constraint: revision target
+  ---
+  duration_ms: 1.022458
+  type: 'test'
+  ...
+# Subtest: constraint: revision sequence
+ok 108 - constraint: revision sequence
+  ---
+  duration_ms: 1.017042
+  type: 'test'
+  ...
+# Subtest: constraint: clinical review
+ok 109 - constraint: clinical review
+  ---
+  duration_ms: 1.200875
+  type: 'test'
+  ...
+# Subtest: constraint: revision cannot target revisions
+ok 110 - constraint: revision cannot target revisions
+  ---
+  duration_ms: 1.053084
+  type: 'test'
+  ...
+# Subtest: constraint: metadata singleton
+ok 111 - constraint: metadata singleton
+  ---
+  duration_ms: 1.098541
+  type: 'test'
+  ...
+# Subtest: constraint: operation singleton
+ok 112 - constraint: operation singleton
+  ---
+  duration_ms: 11.324417
+  type: 'test'
+  ...
+# Subtest: constraint: metadata literal
+ok 113 - constraint: metadata literal
+  ---
+  duration_ms: 1.5715
+  type: 'test'
+  ...
+# Subtest: constraint: metadata app semver
+ok 114 - constraint: metadata app semver
+  ---
+  duration_ms: 0.922291
+  type: 'test'
+  ...
+# Subtest: constraint: metadata clock review pair
+ok 115 - constraint: metadata clock review pair
+  ---
+  duration_ms: 0.899583
+  type: 'test'
+  ...
+# Subtest: constraint: metadata receipt active version
+ok 116 - constraint: metadata receipt active version
+  ---
+  duration_ms: 1.180583
+  type: 'test'
+  ...
+# Subtest: constraint: migration sequence
+ok 117 - constraint: migration sequence
+  ---
+  duration_ms: 0.988542
+  type: 'test'
+  ...
+# Subtest: constraint: backup reminder range
+ok 118 - constraint: backup reminder range
+  ---
+  duration_ms: 0.176375
+  type: 'test'
+  ...
+# Subtest: constraint: safe integer revision
+ok 119 - constraint: safe integer revision
+  ---
+  duration_ms: 0.185959
+  type: 'test'
+  ...
+# Subtest: constraint: valid Gregorian date
+ok 120 - constraint: valid Gregorian date
+  ---
+  duration_ms: 0.236042
+  type: 'test'
+  ...
+# Subtest: constraint: canonical UUID
+ok 121 - constraint: canonical UUID
+  ---
+  duration_ms: 0.165791
+  type: 'test'
+  ...
+# Subtest: constraint: unknown field
+ok 122 - constraint: unknown field
+  ---
+  duration_ms: 0.156625
+  type: 'test'
+  ...
+# Subtest: constraint: missing field
+ok 123 - constraint: missing field
+  ---
+  duration_ms: 0.156
+  type: 'test'
+  ...
+# Subtest: constraint: unknown enum
+ok 124 - constraint: unknown enum
+  ---
+  duration_ms: 0.159833
+  type: 'test'
+  ...
+# Subtest: constraint: nonfinite number
+ok 125 - constraint: nonfinite number
+  ---
+  duration_ms: 0.49375
+  type: 'test'
+  ...
+# Subtest: constraint: empty text
+ok 126 - constraint: empty text
+  ---
+  duration_ms: 0.153125
+  type: 'test'
+  ...
+# Subtest: constraint: unknown store
+ok 127 - constraint: unknown store
+  ---
+  duration_ms: 0.167541
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: operation
+ok 128 - all required fields and unknown keys: operation
+  ---
+  duration_ms: 2.291542
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: animals
+ok 129 - all required fields and unknown keys: animals
+  ---
+  duration_ms: 6.782333
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: identifiers
+ok 130 - all required fields and unknown keys: identifiers
+  ---
+  duration_ms: 6.658208
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: groups
+ok 131 - all required fields and unknown keys: groups
+  ---
+  duration_ms: 4.501708
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: memberships
+ok 132 - all required fields and unknown keys: memberships
+  ---
+  duration_ms: 4.439375
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: calvings
+ok 133 - all required fields and unknown keys: calvings
+  ---
+  duration_ms: 6.06575
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: weights
+ok 134 - all required fields and unknown keys: weights
+  ---
+  duration_ms: 6.528583
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: treatmentCourses
+ok 135 - all required fields and unknown keys: treatmentCourses
+  ---
+  duration_ms: 6.039958
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: treatments
+ok 136 - all required fields and unknown keys: treatments
+  ---
+  duration_ms: 15.624125
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: breedings
+ok 137 - all required fields and unknown keys: breedings
+  ---
+  duration_ms: 16.036291
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: pregnancyChecks
+ok 138 - all required fields and unknown keys: pregnancyChecks
+  ---
+  duration_ms: 45.148791
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: movements
+ok 139 - all required fields and unknown keys: movements
+  ---
+  duration_ms: 39.151083
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: revisions
+ok 140 - all required fields and unknown keys: revisions
+  ---
+  duration_ms: 27.012917
+  type: 'test'
+  ...
+# Subtest: all required fields and unknown keys: metadata
+ok 141 - all required fields and unknown keys: metadata
+  ---
+  duration_ms: 26.903584
+  type: 'test'
+  ...
+# Subtest: duplicate visual tags need explicit acknowledgment
+ok 142 - duplicate visual tags need explicit acknowledgment
+  ---
+  duration_ms: 2.390709
+  type: 'test'
+  ...
+# Subtest: parent sex changes require review while retaining pedigree
+ok 143 - parent sex changes require review while retaining pedigree
+  ---
+  duration_ms: 2.247417
+  type: 'test'
+  ...
+# Subtest: atomic batch rollback including attempted valid change
+ok 144 - atomic batch rollback including attempted valid change
+  ---
+  duration_ms: 93.855792
+  type: 'test'
+  ...
+# Subtest: IndexedDB write failure rolls back clearing and inserts
+ok 145 - IndexedDB write failure rolls back clearing and inserts
+  ---
+  duration_ms: 45.196291
+  type: 'test'
+  ...
+# Subtest: stale revisions across separate tab connections
+ok 146 - stale revisions across separate tab connections
+  ---
+  duration_ms: 10.312875
+  type: 'test'
+  ...
+# Subtest: corrections append complete history; direct revision mutation rejected
+ok 147 - corrections append complete history; direct revision mutation rejected
+  ---
+  duration_ms: 32.605917
+  type: 'test'
+  ...
+# Subtest: verify rejects corrupt/unsupported files with no live writes
+ok 148 - verify rejects corrupt/unsupported files with no live writes
+  ---
+  duration_ms: 41.655875
+  type: 'test'
+  ...
+# Subtest: valid checksum does not bypass schema, count or reference validation
+ok 149 - valid checksum does not bypass schema, count or reference validation
+  ---
+  duration_ms: 4.826125
+  type: 'test'
+  ...
+# Subtest: merge identical data skips; conflict has no timestamp winner
+ok 150 - merge identical data skips; conflict has no timestamp winner
+  ---
+  duration_ms: 52.356625
+  type: 'test'
+  ...
+# Subtest: restore preview cancel and stale commit have no effect
+ok 151 - restore preview cancel and stale commit have no effect
+  ---
+  duration_ms: 59.133667
+  type: 'test'
+  ...
+# Subtest: replace requires matching verified safety backup and download confirmation
+ok 152 - replace requires matching verified safety backup and download confirmation
+  ---
+  duration_ms: 17.903917
+  type: 'test'
+  ...
+# Subtest: disclaimer gate requires checked box and successful local audit receipt
+ok 153 - disclaimer gate requires checked box and successful local audit receipt
+  ---
+  duration_ms: 7.632708
+  type: 'test'
+  ...
+# Subtest: replacement keeps receipt history but resets active acceptance and backup receipts
+ok 154 - replacement keeps receipt history but resets active acceptance and backup receipts
+  ---
+  duration_ms: 74.60075
+  type: 'test'
+  ...
+# Subtest: storage availability and persistent grant are reported honestly
+ok 155 - storage availability and persistent grant are reported honestly
+  ---
+  duration_ms: 0.179375
+  type: 'test'
+  ...
+# Subtest: migration v1 to test-only v2 commits sequentially, retains durable snapshot and closes old tabs
+ok 156 - migration v1 to test-only v2 commits sequentially, retains durable snapshot and closes old tabs
+  ---
+  duration_ms: 8.097334
+  type: 'test'
+  ...
+# Subtest: failed migration rolls back schema and data, returns exportable read-only recovery
+ok 157 - failed migration rolls back schema and data, returns exportable read-only recovery
+  ---
+  duration_ms: 9.116625
+  type: 'test'
+  ...
+# Subtest: destructive migration requires downloaded backup; missing steps never reset
+ok 158 - destructive migration requires downloaded backup; missing steps never reset
+  ---
+  duration_ms: 6.969958
+  type: 'test'
+  ...
+# Subtest: newer database opens read-only recovery instead of downgrading
+ok 159 - newer database opens read-only recovery instead of downgrading
+  ---
+  duration_ms: 4.948209
+  type: 'test'
+  ...
+# Subtest: late migration transaction failure rolls back successful transformations
+ok 160 - late migration transaction failure rolls back successful transformations
+  ---
+  duration_ms: 9.539292
+  type: 'test'
+  ...
+# Subtest: restore private staged plan cannot be altered by caller
+ok 161 - restore private staged plan cannot be altered by caller
+  ---
+  duration_ms: 39.850959
+  type: 'test'
+  ...
+# Subtest: future imported clock is sticky review with original metadata retained in audit
+ok 162 - future imported clock is sticky review with original metadata retained in audit
+  ---
+  duration_ms: 18.030125
+  type: 'test'
+  ...
+# Subtest: new animal and identifier commit together; missing mirror rolls back
+ok 163 - new animal and identifier commit together; missing mirror rolls back
+  ---
+  duration_ms: 27.170125
+  type: 'test'
+  ...
+# Subtest: group change closes membership and updates animal atomically without changing historical snapshots
+ok 164 - group change closes membership and updates animal atomically without changing historical snapshots
+  ---
+  duration_ms: 22.369916
+  type: 'test'
+  ...
+# Subtest: clinical correction fails without holdReview; reviewed correction preserves prior rules
+ok 165 - clinical correction fails without holdReview; reviewed correction preserves prior rules
+  ---
+  duration_ms: 23.332625
+  type: 'test'
+  ...
+# Subtest: current RFID remains unique on sold and archived animals
+ok 166 - current RFID remains unique on sold and archived animals
+  ---
+  duration_ms: 2.683542
+  type: 'test'
+  ...
+# Subtest: NFC and ASCII normalization preserves identifier text and long leading-zero RFID
+ok 167 - NFC and ASCII normalization preserves identifier text and long leading-zero RFID
+  ---
+  duration_ms: 0.387459
+  type: 'test'
+  ...
+# Subtest: DST nonexistent time rejected and both explicit fall offsets accepted
+ok 168 - DST nonexistent time rejected and both explicit fall offsets accepted
+  ---
+  duration_ms: 0.388458
+  type: 'test'
+  ...
+# Subtest: bookkeeping cannot suppress terms or domain audit
+ok 169 - bookkeeping cannot suppress terms or domain audit
+  ---
+  duration_ms: 8.084708
+  type: 'test'
+  ...
+# Subtest: merge preserves target dataset and local acceptance while retaining incoming receipts
+ok 170 - merge preserves target dataset and local acceptance while retaining incoming receipts
+  ---
+  duration_ms: 43.480875
+  type: 'test'
+  ...
+# Subtest: nested unknown keys, null array elements, strict booleans and malformed UTC rejected
+ok 171 - nested unknown keys, null array elements, strict booleans and malformed UTC rejected
+  ---
+  duration_ms: 2.074375
+  type: 'test'
+  ...
+# Subtest: two concurrent corrections serialize and only one succeeds
+ok 172 - two concurrent corrections serialize and only one succeeds
+  ---
+  duration_ms: 19.623708
+  type: 'test'
+  ...
+# Subtest: transaction abort and quota-like failure cannot report success
+ok 173 - transaction abort and quota-like failure cannot report success
+  ---
+  duration_ms: 13.952292
+  type: 'test'
+  ...
+# Subtest: corrupt persisted records reopen in read-only recovery without reset
+ok 174 - corrupt persisted records reopen in read-only recovery without reset
+  ---
+  duration_ms: 2.157209
+  type: 'test'
+  ...
+# Subtest: identifier replacement retains ended history and requires a new reasoned row
+ok 175 - identifier replacement retains ended history and requires a new reasoned row
+  ---
+  duration_ms: 18.562959
+  type: 'test'
+  ...
+# Subtest: future completed doses cannot be saved, imported inconsistencies require visible review
+ok 176 - future completed doses cannot be saved, imported inconsistencies require visible review
+  ---
+  duration_ms: 23.993333
+  type: 'test'
+  ...
+# Subtest: batch preview confirmation, immutable recipient records, shared batch ID and atomic invalid member rollback
+ok 177 - batch preview confirmation, immutable recipient records, shared batch ID and atomic invalid member rollback
+  ---
+  duration_ms: 70.822833
+  type: 'test'
+  ...
+# Subtest: course stays held until latest final dose is selected and closed; void final reopens atomically
+ok 178 - course stays held until latest final dose is selected and closed; void final reopens atomically
+  ---
+  duration_ms: 69.974
+  type: 'test'
+  ...
+# Subtest: oracle 17: shortening correction and undo retain prior/new values, reason and holdReview
+ok 179 - oracle 17: shortening correction and undo retain prior/new values, reason and holdReview
+  ---
+  duration_ms: 35.630875
+  type: 'test'
+  ...
+# Subtest: oracle 18: void requires review, preserves history and reveals next controlling product
+ok 180 - oracle 18: void requires review, preserves history and reveals next controlling product
+  ---
+  duration_ms: 34.230875
+  type: 'test'
+  ...
+# Subtest: oracle 10: correction of date-only history requires review and preserves missing original time
+ok 181 - oracle 10: correction of date-only history requires review and preserves missing original time
+  ---
+  duration_ms: 24.312459
+  type: 'test'
+  ...
+# Subtest: blank is not zero; zero requires explicit confirmation; prohibited directed release and future entries rejected
+ok 182 - blank is not zero; zero requires explicit confirmation; prohibited directed release and future entries rejected
+  ---
+  duration_ms: 130.194292
+  type: 'test'
+  ...
+# Subtest: oracle 19: sale records event-time hold, current elapsed, destination and acknowledgment
+ok 183 - oracle 19: sale records event-time hold, current elapsed, destination and acknowledgment
+  ---
+  duration_ms: 120.274792
+  type: 'test'
+  ...
+# Subtest: stale batch or departure preview rejects concurrent treatment changes without writes
+ok 184 - stale batch or departure preview rejects concurrent treatment changes without writes
+  ---
+  duration_ms: 90.383375
+  type: 'test'
+  ...
+# Subtest: oracle 16: clock observation persists across relaunch and catch-up; reviewed reset is audited
+ok 185 - oracle 16: clock observation persists across relaunch and catch-up; reviewed reset is audited
+  ---
+  duration_ms: 30.772584
+  type: 'test'
+  ...
+# Subtest: Phase 3 placeholders recompute once with original acknowledgment retained in audit
+ok 186 - Phase 3 placeholders recompute once with original acknowledgment retained in audit
+  ---
+  duration_ms: 85.020958
+  type: 'test'
+  ...
+# Subtest: batch write failure after the first administration aborts the whole transaction
+ok 187 - batch write failure after the first administration aborts the whole transaction
+  ---
+  duration_ms: 33.561875
+  type: 'test'
+  ...
+# Subtest: clock sticky flag cannot be cleared by unaudited bookkeeping
+ok 188 - clock sticky flag cannot be cleared by unaudited bookkeeping
+  ---
+  duration_ms: 20.648292
+  type: 'test'
+  ...
+# Subtest: blank whitespace cannot become a confirmed zero and directed times require UTC
+ok 189 - blank whitespace cannot become a confirmed zero and directed times require UTC
+  ---
+  duration_ms: 0.184417
+  type: 'test'
+  ...
+# Subtest: clock alert survives closing and reopening the repository
+ok 190 - clock alert survives closing and reopening the repository
+  ---
+  duration_ms: 4.947916
+  type: 'test'
+  ...
+# Subtest: animal form submits text identifiers, required fields, labels and numeric input modes
+ok 191 - animal form submits text identifiers, required fields, labels and numeric input modes
+  ---
+  duration_ms: 145.441458
+  type: 'test'
+  ...
+# Subtest: pedigree cycle from rendered animal form is rejected and error receives focus
+ok 192 - pedigree cycle from rendered animal form is rejected and error receives focus
+  ---
+  duration_ms: 35.176625
+  type: 'test'
+  ...
+# Subtest: calf UI recovers draft, adds twin and commits once after date confirmation
+ok 193 - calf UI recovers draft, adds twin and commits once after date confirmation
+  ---
+  duration_ms: 42.909625
+  type: 'test'
+  ...
+# Subtest: rendered weight, breeding, pregnancy, group and movement forms commit correct fields
+ok 194 - rendered weight, breeding, pregnancy, group and movement forms commit correct fields
+  ---
+  duration_ms: 283.483292
+  type: 'test'
+  ...
+# Subtest: animal card and events render imported text safely and show all dated history
+ok 195 - animal card and events render imported text safely and show all dated history
+  ---
+  duration_ms: 48.542333
+  type: 'test'
+  ...
+# Subtest: UI does not announce saved before mutation resolves and double submit is ignored
+ok 196 - UI does not announce saved before mutation resolves and double submit is ignored
+  ---
+  duration_ms: 12.089208
+  type: 'test'
+  ...
+# Subtest: a post-commit refresh error reports committed records truthfully
+ok 197 - a post-commit refresh error reports committed records truthfully
+  ---
+  duration_ms: 20.417459
+  type: 'test'
+  ...
+# Subtest: interrupted committed draft is recognized, never silently submitted again
+ok 198 - interrupted committed draft is recognized, never silently submitted again
+  ---
+  duration_ms: 31.313458
+  type: 'test'
+  ...
+# Subtest: malformed calf draft offers explicit discard without overwriting it
+ok 199 - malformed calf draft offers explicit discard without overwriting it
+  ---
+  duration_ms: 29.639958
+  type: 'test'
+  ...
+# Subtest: rendered batch selection previews names and commits one dated move for all selected animals
+ok 200 - rendered batch selection previews names and commits one dated move for all selected animals
+  ---
+  duration_ms: 26.563041
+  type: 'test'
+  ...
+# Subtest: calving transaction abort leaves draft and announces failure, never success
+ok 201 - calving transaction abort leaves draft and announces failure, never success
+  ---
+  duration_ms: 13.552916
+  type: 'test'
+  ...
+# Subtest: phone Filters toggle exposes panel, active count excludes pagination, and clear resets
+ok 202 - phone Filters toggle exposes panel, active count excludes pagination, and clear resets
+  ---
+  duration_ms: 17.064042
+  type: 'test'
+  ...
+# Subtest: Treatment action opens complete form, saves instructions and renders holds/history safely
+ok 203 - Treatment action opens complete form, saves instructions and renders holds/history safely
+  ---
+  duration_ms: 50.240792
+  type: 'test'
+  ...
+# Subtest: batch treatment previews recipients and resets confirmation when selection changes
+ok 204 - batch treatment previews recipients and resets confirmation when selection changes
+  ---
+  duration_ms: 27.339875
+  type: 'test'
+  ...
+# Subtest: dashboard ticks update counts without live announcements and retain expanded contributors
+ok 205 - dashboard ticks update counts without live announcements and retain expanded contributors
+  ---
+  duration_ms: 33.534792
+  type: 'test'
+  ...
+# Subtest: sale form shows event/current arithmetic and date change invalidates acknowledgment
+ok 206 - sale form shows event/current arithmetic and date change invalidates acknowledgment
+  ---
+  duration_ms: 110.706
+  type: 'test'
+  ...
+# Subtest: CSV operation: complete record round trip and frozen template header
+ok 207 - CSV operation: complete record round trip and frozen template header
+  ---
+  duration_ms: 6.708375
+  type: 'test'
+  ...
+# Subtest: CSV animals: complete record round trip and frozen template header
+ok 208 - CSV animals: complete record round trip and frozen template header
+  ---
+  duration_ms: 3.784666
+  type: 'test'
+  ...
+# Subtest: CSV identifiers: complete record round trip and frozen template header
+ok 209 - CSV identifiers: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.815167
+  type: 'test'
+  ...
+# Subtest: CSV groups: complete record round trip and frozen template header
+ok 210 - CSV groups: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.115375
+  type: 'test'
+  ...
+# Subtest: CSV memberships: complete record round trip and frozen template header
+ok 211 - CSV memberships: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.251333
+  type: 'test'
+  ...
+# Subtest: CSV calvings: complete record round trip and frozen template header
+ok 212 - CSV calvings: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.227542
+  type: 'test'
+  ...
+# Subtest: CSV weights: complete record round trip and frozen template header
+ok 213 - CSV weights: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.228083
+  type: 'test'
+  ...
+# Subtest: CSV treatmentCourses: complete record round trip and frozen template header
+ok 214 - CSV treatmentCourses: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.22375
+  type: 'test'
+  ...
+# Subtest: CSV treatments: complete record round trip and frozen template header
+ok 215 - CSV treatments: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.892792
+  type: 'test'
+  ...
+# Subtest: CSV breedings: complete record round trip and frozen template header
+ok 216 - CSV breedings: complete record round trip and frozen template header
+  ---
+  duration_ms: 5.270334
+  type: 'test'
+  ...
+# Subtest: CSV pregnancyChecks: complete record round trip and frozen template header
+ok 217 - CSV pregnancyChecks: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.485667
+  type: 'test'
+  ...
+# Subtest: CSV movements: complete record round trip and frozen template header
+ok 218 - CSV movements: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.473166
+  type: 'test'
+  ...
+# Subtest: CSV revisions: complete record round trip and frozen template header
+ok 219 - CSV revisions: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.170125
+  type: 'test'
+  ...
+# Subtest: CSV metadata: complete record round trip and frozen template header
+ok 220 - CSV metadata: complete record round trip and frozen template header
+  ---
+  duration_ms: 0.099
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "00001"
+ok 221 - CSV text preserves "00001"
+  ---
+  duration_ms: 0.093125
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "000123456789012345678901"
+ok 222 - CSV text preserves "000123456789012345678901"
+  ---
+  duration_ms: 0.038291
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "Élodie 牛"
+ok 223 - CSV text preserves "Élodie 牛"
+  ---
+  duration_ms: 0.096541
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "a,b"
+ok 224 - CSV text preserves "a,b"
+  ---
+  duration_ms: 0.036709
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "two\\nlines\\r\\nthree"
+ok 225 - CSV text preserves "two\\nlines\\r\\nthree"
+  ---
+  duration_ms: 0.036125
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "\\"quote\\""
+ok 226 - CSV text preserves "\\"quote\\""
+  ---
+  duration_ms: 0.033583
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "=2+2"
+ok 227 - CSV text preserves "=2+2"
+  ---
+  duration_ms: 0.035542
+  type: 'test'
+  ...
+# Subtest: CSV text preserves " \\t+42"
+ok 228 - CSV text preserves " \\t+42"
+  ---
+  duration_ms: 0.034125
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "-formula"
+ok 229 - CSV text preserves "-formula"
+  ---
+  duration_ms: 0.032791
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "@SUM(A1)"
+ok 230 - CSV text preserves "@SUM(A1)"
+  ---
+  duration_ms: 0.039083
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "'001"
+ok 231 - CSV text preserves "'001"
+  ---
+  duration_ms: 0.033875
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "\\tstart"
+ok 232 - CSV text preserves "\\tstart"
+  ---
+  duration_ms: 0.045167
+  type: 'test'
+  ...
+# Subtest: CSV text preserves "\\nstart"
+ok 233 - CSV text preserves "\\nstart"
+  ---
+  duration_ms: 0.031667
+  type: 'test'
+  ...
+# Subtest: CSV full set preserves all 14 tables, archived, voided and revisions through validated restore
+ok 234 - CSV full set preserves all 14 tables, archived, voided and revisions through validated restore
+  ---
+  duration_ms: 127.47
+  type: 'test'
+  ...
+# Subtest: CSV scope manifest and dictionary are included, and filtered sets cannot restore
+ok 235 - CSV scope manifest and dictionary are included, and filtered sets cannot restore
+  ---
+  duration_ms: 1.823875
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "a,a\\n1,2"
+ok 236 - CSV rejects malformed or wrong-format input "a,a\\n1,2"
+  ---
+  duration_ms: 0.144
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "a,b\\n1"
+ok 237 - CSV rejects malformed or wrong-format input "a,b\\n1"
+  ---
+  duration_ms: 0.059916
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "a\\n\\"bad"
+ok 238 - CSV rejects malformed or wrong-format input "a\\n\\"bad"
+  ---
+  duration_ms: 0.046292
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "a\\n\\"ok\\"bad"
+ok 239 - CSV rejects malformed or wrong-format input "a\\n\\"ok\\"bad"
+  ---
+  duration_ms: 0.047209
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "a\\nx\\ry"
+ok 240 - CSV rejects malformed or wrong-format input "a\\nx\\ry"
+  ---
+  duration_ms: 0.050208
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input ""
+ok 241 - CSV rejects malformed or wrong-format input ""
+  ---
+  duration_ms: 0.13675
+  type: 'test'
+  ...
+# Subtest: CSV rejects malformed or wrong-format input "{\\"format\\":\\"manley-farm-records\\"}"
+ok 242 - CSV rejects malformed or wrong-format input "{\\"format\\":\\"manley-farm-records\\"}"
+  ---
+  duration_ms: 0.191959
+  type: 'test'
+  ...
+# Subtest: BOM accepted, blank null differs from false and zero, formula decode requires explicit mode
+ok 243 - BOM accepted, blank null differs from false and zero, formula decode requires explicit mode
+  ---
+  duration_ms: 0.202583
+  type: 'test'
+  ...
+# Subtest: Mapping, explicit dates and decimal units are converted, nonempty unmapped columns fail visibly
+ok 244 - Mapping, explicit dates and decimal units are converted, nonempty unmapped columns fail visibly
+  ---
+  duration_ms: 0.49525
+  type: 'test'
+  ...
+# Subtest: Animal import generates stable downloadable IDs and mirrors, never merges tags
+ok 245 - Animal import generates stable downloadable IDs and mirrors, never merges tags
+  ---
+  duration_ms: 15.967667
+  type: 'test'
+  ...
+# Subtest: Unknown parents remain errors; explicit external references import intact
+ok 246 - Unknown parents remain errors; explicit external references import intact
+  ---
+  duration_ms: 24.892375
+  type: 'test'
+  ...
+# Subtest: Same-ID identical imports skip; corrections are explicit and append prior/new history
+ok 247 - Same-ID identical imports skip; corrections are explicit and append prior/new history
+  ---
+  duration_ms: 89.817875
+  type: 'test'
+  ...
+# Subtest: Existing IDs cannot silently clear omitted columns, incoming duplicate IDs rejected
+ok 248 - Existing IDs cannot silently clear omitted columns, incoming duplicate IDs rejected
+  ---
+  duration_ms: 37.002625
+  type: 'test'
+  ...
+# Subtest: Clinical corrections require hold review, preserve unresolved rules and prior values
+ok 249 - Clinical corrections require hold review, preserve unresolved rules and prior values
+  ---
+  duration_ms: 55.307875
+  type: 'test'
+  ...
+# Subtest: Import confirmation, private plan, stale preview and mid-commit failure preserve atomicity
+ok 250 - Import confirmation, private plan, stale preview and mid-commit failure preserve atomicity
+  ---
+  duration_ms: 21.041125
+  type: 'test'
+  ...
+# Subtest: Missing historical snapshots need visible confirmation and staged converted values
+ok 251 - Missing historical snapshots need visible confirmation and staged converted values
+  ---
+  duration_ms: 50.16625
+  type: 'test'
+  ...
+# Subtest: Singleton and audit table imports require full set, and corrupt full counts reject
+ok 252 - Singleton and audit table imports require full set, and corrupt full counts reject
+  ---
+  duration_ms: 8.179333
+  type: 'test'
+  ...
+# Subtest: Reminder clock: first saved session, interval boundary, unbacked changes and snooze
+ok 253 - Reminder clock: first saved session, interval boundary, unbacked changes and snooze
+  ---
+  duration_ms: 7.05425
+  type: 'test'
+  ...
+# Subtest: Bookkeeping does not change backup content; actual records do
+ok 254 - Bookkeeping does not change backup content; actual records do
+  ---
+  duration_ms: 2.22375
+  type: 'test'
+  ...
+# Subtest: Treatment report ranges retain all holds, clinical fields and historical departure warnings
+ok 255 - Treatment report ranges retain all holds, clinical fields and historical departure warnings
+  ---
+  duration_ms: 0.936458
+  type: 'test'
+  ...
+# Subtest: Calving report season, dates, twins, units and ease legend; animal card full retained history
+ok 256 - Calving report season, dates, twins, units and ease legend; animal card full retained history
+  ---
+  duration_ms: 0.609
+  type: 'test'
+  ...
+# Subtest: Report preview is accessible text, footer exact, print isolated with repeated headers and landscape
+ok 257 - Report preview is accessible text, footer exact, print isolated with repeated headers and landscape
+  ---
+  duration_ms: 39.854708
+  type: 'test'
+  ...
+# Subtest: Reports UI renders working controls, safe previews, imports and offline switching guide
+ok 258 - Reports UI renders working controls, safe previews, imports and offline switching guide
+  ---
+  duration_ms: 18.372416
+  type: 'test'
+  ...
+# Subtest: Every ordinary entity imports together atomically with exact canonical rows, including reciprocal links
+ok 259 - Every ordinary entity imports together atomically with exact canonical rows, including reciprocal links
+  ---
+  duration_ms: 85.56325
+  type: 'test'
+  ...
+# Subtest: Historical import counts as new unbacked work despite old record timestamps
+ok 260 - Historical import counts as new unbacked work despite old record timestamps
+  ---
+  duration_ms: 5.56225
+  type: 'test'
+  ...
+# Subtest: Schema upgrade reminder happens before mutation and can defer with data retained
+ok 261 - Schema upgrade reminder happens before mutation and can defer with data retained
+  ---
+  duration_ms: 12.9485
+  type: 'test'
+  ...
+# Subtest: CSV mapping decisions retain generated IDs across previews and skip only selected rows
+ok 262 - CSV mapping decisions retain generated IDs across previews and skip only selected rows
+  ---
+  duration_ms: 18.984625
+  type: 'test'
+  ...
+# Subtest: Saved-backup confirmation checks the live content inside its write transaction
+ok 263 - Saved-backup confirmation checks the live content inside its write transaction
+  ---
+  duration_ms: 14.639834
+  type: 'test'
+  ...
+# Subtest: Advanced CSV restore rejects histories inconsistent with their current target
+ok 264 - Advanced CSV restore rejects histories inconsistent with their current target
+  ---
+  duration_ms: 2.401708
+  type: 'test'
+  ...
+# Subtest: Rendered CSV import maps columns, previews errors and commits only after explicit confirmation
+ok 265 - Rendered CSV import maps columns, previews errors and commits only after explicit confirmation
+  ---
+  duration_ms: 24.364208
+  type: 'test'
+  ...
+# Subtest: Decimal currency import retains precision and string type under explicit comma convention
+ok 266 - Decimal currency import retains precision and string type under explicit comma convention
+  ---
+  duration_ms: 0.130875
+  type: 'test'
+  ...
+# Subtest: manifest stable identity, deploy scope, standalone and regular/maskable local icons
+ok 267 - manifest stable identity, deploy scope, standalone and regular/maskable local icons
+  ---
+  duration_ms: 1.721417
+  type: 'test'
+  ...
+# Subtest: precache inventory exactly matches app files and current bytes including help and all imports
+ok 268 - precache inventory exactly matches app files and current bytes including help and all imports
+  ---
+  duration_ms: 2.891458
+  type: 'test'
+  ...
+# Subtest: offline ready requires installed worker AND a complete verified shell
+ok 269 - offline ready requires installed worker AND a complete verified shell
+  ---
+  duration_ms: 0.071958
+  type: 'test'
+  ...
+# Subtest: worker precaches only local static bytes; readiness detects deletion and corruption
+ok 270 - worker precaches only local static bytes; readiness detects deletion and corruption
+  ---
+  duration_ms: 83.532709
+  type: 'test'
+  ...
+# Subtest: worker scope isolation and cache-only navigation fallback leave sister app and requests alone
+ok 271 - worker scope isolation and cache-only navigation fallback leave sister app and requests alone
+  ---
+  duration_ms: 45.867041
+  type: 'test'
+  ...
+# Subtest: failed staged download does not activate or delete working caches
+ok 272 - failed staged download does not activate or delete working caches
+  ---
+  duration_ms: 2.9625
+  type: 'test'
+  ...
+# Subtest: dirty form, drafts, busy work and missing migration backup defer updates
+ok 273 - dirty form, drafts, busy work and missing migration backup defer updates
+  ---
+  duration_ms: 0.205542
+  type: 'test'
+  ...
+# Subtest: every scoped tab must acknowledge preparation; dirty veto unlocks without activation
+ok 274 - every scoped tab must acknowledge preparation; dirty veto unlocks without activation
+  ---
+  duration_ms: 70.98725
+  type: 'test'
+  ...
+# Subtest: unanimous clean tabs activate only a complete staged release
+ok 275 - unanimous clean tabs activate only a complete staged release
+  ---
+  duration_ms: 37.677959
+  type: 'test'
+  ...
+# Subtest: form edits remain dirty after failed submit and clear only after saved signal; persisted drafts block
+ok 276 - form edits remain dirty after failed submit and clear only after saved signal; persisted drafts block
+  ---
+  duration_ms: 75.402083
+  type: 'test'
+  ...
+# Subtest: install instructions cover iOS, Android, Firefox, desktop Safari and installed mode
+ok 277 - install instructions cover iOS, Android, Firefox, desktop Safari and installed mode
+  ---
+  duration_ms: 0.216375
+  type: 'test'
+  ...
+# Subtest: app has zero external resource URLs, remote imports or record-request sinks
+ok 278 - app has zero external resource URLs, remote imports or record-request sinks
+  ---
+  duration_ms: 79.208917
+  type: 'test'
+  ...
+# Subtest: PWA integration: offline startup uses cached status without fetching; dirty form never freezes or reloads
+ok 279 - PWA integration: offline startup uses cached status without fetching; dirty form never freezes or reloads
+  ---
+  duration_ms: 49.212083
+  type: 'test'
+  ...
+# Subtest: public beta version agrees across package, app, structured data and hash-derived worker release
+ok 280 - public beta version agrees across package, app, structured data and hash-derived worker release
+  ---
+  duration_ms: 131.970833
+  type: 'test'
+  ...
+# Subtest: JSON-LD FAQ matches every visible question and answer exactly
+ok 281 - JSON-LD FAQ matches every visible question and answer exactly
+  ---
+  duration_ms: 39.066084
+  type: 'test'
+  ...
+# Subtest: SEO identifies free beta software and source without ratings or nonexistent image
+ok 282 - SEO identifies free beta software and source without ratings or nonexistent image
+  ---
+  duration_ms: 43.612083
+  type: 'test'
+  ...
+# Subtest: final terms retain beta and protective clauses with no Draft or lawyer-review claim in terms
+ok 283 - final terms retain beta and protective clauses with no Draft or lawyer-review claim in terms
+  ---
+  duration_ms: 0.8125
+  type: 'test'
+  ...
+# Subtest: returning datasets collapse intro while static FAQ stays in the DOM; empty metadata does not
+ok 284 - returning datasets collapse intro while static FAQ stays in the DOM; empty metadata does not
+  ---
+  duration_ms: 23.275167
+  type: 'test'
+  ...
+# Subtest: release packager verifies shell, includes dotfiles, omits local/scale artifacts and preserves app bytes
+ok 285 - release packager verifies shell, includes dotfiles, omits local/scale artifacts and preserves app bytes
+  ---
+  duration_ms: 523.365125
+  type: 'test'
+  ...
+# Subtest: oracle 01: 48h one minute before release
+ok 286 - oracle 01: 48h one minute before release
+  ---
+  duration_ms: 3.150084
+  type: 'test'
+  ...
+# Subtest: oracle 02: Exact release boundary
+ok 287 - oracle 02: Exact release boundary
+  ---
+  duration_ms: 0.195917
+  type: 'test'
+  ...
+# Subtest: oracle 03: Repeat closed course
+ok 288 - oracle 03: Repeat closed course
+  ---
+  duration_ms: 0.255
+  type: 'test'
+  ...
+# Subtest: oracle 04: Open course
+ok 289 - oracle 04: Open course
+  ---
+  duration_ms: 0.219542
+  type: 'test'
+  ...
+# Subtest: oracle 05: Latest independent product
+ok 290 - oracle 05: Latest independent product
+  ---
+  duration_ms: 0.15875
+  type: 'test'
+  ...
+# Subtest: oracle 06: Independent meat and milk
+ok 291 - oracle 06: Independent meat and milk
+  ---
+  duration_ms: 0.694916
+  type: 'test'
+  ...
+# Subtest: oracle 07: Unknown overrides elapsed
+ok 292 - oracle 07: Unknown overrides elapsed
+  ---
+  duration_ms: 0.450208
+  type: 'test'
+  ...
+# Subtest: oracle 08: Confirmed zero and explicit NA
+ok 293 - oracle 08: Confirmed zero and explicit NA
+  ---
+  duration_ms: 0.194625
+  type: 'test'
+  ...
+# Subtest: oracle 09: Prohibited never times out
+ok 294 - oracle 09: Prohibited never times out
+  ---
+  duration_ms: 0.731958
+  type: 'test'
+  ...
+# Subtest: oracle 10: Date-only history
+ok 295 - oracle 10: Date-only history
+  ---
+  duration_ms: 9.483
+  type: 'test'
+  ...
+# Subtest: oracle 11: Milkings are not hours
+ok 296 - oracle 11: Milkings are not hours
+  ---
+  duration_ms: 0.154459
+  type: 'test'
+  ...
+# Subtest: oracle 12: Documented directed release
+ok 297 - oracle 12: Documented directed release
+  ---
+  duration_ms: 0.157792
+  type: 'test'
+  ...
+# Subtest: oracle 13: Spring DST elapsed hours
+ok 298 - oracle 13: Spring DST elapsed hours
+  ---
+  duration_ms: 0.054958
+  type: 'test'
+  ...
+# Subtest: oracle 14: Fall DST elapsed hours
+ok 299 - oracle 14: Fall DST elapsed hours
+  ---
+  duration_ms: 0.039584
+  type: 'test'
+  ...
+# Subtest: oracle 15: Leap day
+ok 300 - oracle 15: Leap day
+  ---
+  duration_ms: 0.038958
+  type: 'test'
+  ...
+# Subtest: oracle 16: Backward clock
+ok 301 - oracle 16: Backward clock
+  ---
+  duration_ms: 0.037
+  type: 'test'
+  ...
+# Subtest: oracle 17: Correction before review
+ok 302 - oracle 17: Correction before review
+  ---
+  duration_ms: 0.036875
+  type: 'test'
+  ...
+# Subtest: oracle 18: Reviewed void retains other product
+ok 303 - oracle 18: Reviewed void retains other product
+  ---
+  duration_ms: 0.039333
+  type: 'test'
+  ...
+# Subtest: oracle 19: Date-only sale persistent warning
+ok 304 - oracle 19: Date-only sale persistent warning
+  ---
+  duration_ms: 23.889333
+  type: 'test'
+  ...
+# Subtest: oracle 20: Longer earlier course instruction
+ok 305 - oracle 20: Longer earlier course instruction
+  ---
+  duration_ms: 0.0875
+  type: 'test'
+  ...
+# Subtest: oracle boundaries: sub-minute ceiling, equality, directed equality and after
+ok 306 - oracle boundaries: sub-minute ceiling, equality, directed equality and after
+  ---
+  duration_ms: 0.135
+  type: 'test'
+  ...
+# Subtest: missing zero confirmation, blank interval, prohibited shortcut and incomplete directed evidence stay unresolved
+ok 307 - missing zero confirmation, blank interval, prohibited shortcut and incomplete directed evidence stay unresolved
+  ---
+  duration_ms: 0.116292
+  type: 'test'
+  ...
+# Subtest: directed release before a relevant dose and explicit unresolved course conflict
+ok 308 - directed release before a relevant dose and explicit unresolved course conflict
+  ---
+  duration_ms: 0.063416
+  type: 'test'
+  ...
+# Subtest: DST input rejects gaps, requires offset, accepts both repeated instants and rejects invalid leap date
+ok 309 - DST input rejects gaps, requires offset, accepts both repeated instants and rejects invalid leap date
+  ---
+  duration_ms: 47.976
+  type: 'test'
+  ...
+# Subtest: clock flag remains sticky after catch-up, untreated and NA animals have no clinical hold
+ok 310 - clock flag remains sticky after catch-up, untreated and NA animals have no clinical hold
+  ---
+  duration_ms: 0.122708
+  type: 'test'
+  ...
+# Subtest: sold and archived holds continue; empty open course and future imported dose need review
+ok 311 - sold and archived holds continue; empty open course and future imported dose need review
+  ---
+  duration_ms: 0.112333
+  type: 'test'
+  ...
+# Subtest: 20-case fixture reconciliation and overlapping distinct animal categories
+ok 312 - 20-case fixture reconciliation and overlapping distinct animal categories
+  ---
+  duration_ms: 0.561458
+  type: 'test'
+  ...
+# Subtest: oracle 20: new longer milk-only interval changes milk independently
+ok 313 - oracle 20: new longer milk-only interval changes milk independently
+  ---
+  duration_ms: 0.093667
+  type: 'test'
+  ...
+# Subtest: historical departure excludes later-date treatment and compares event boundary exactly in farm zone
+ok 314 - historical departure excludes later-date treatment and compares event boundary exactly in farm zone
+  ---
+  duration_ms: 89.026541
+  type: 'test'
+  ...
+# Subtest: oracle 18: before void the ten-day product controls, afterwards history remains
+ok 315 - oracle 18: before void the ten-day product controls, afterwards history remains
+  ---
+  duration_ms: 0.1305
+  type: 'test'
+  ...
+# Subtest: animal create and correction preserve leading zeros, former farm/tag/RFID and revision reason
+ok 316 - animal create and correction preserve leading zeros, former farm/tag/RFID and revision reason
+  ---
+  duration_ms: 47.000458
+  type: 'test'
+  ...
+# Subtest: animal validation: missing farm ID
+ok 317 - animal validation: missing farm ID
+  ---
+  duration_ms: 12.151875
+  type: 'test'
+  ...
+# Subtest: animal validation: invalid sex
+ok 318 - animal validation: invalid sex
+  ---
+  duration_ms: 9.454875
+  type: 'test'
+  ...
+# Subtest: animal validation: unknown DOB with date
+ok 319 - animal validation: unknown DOB with date
+  ---
+  duration_ms: 8.07025
+  type: 'test'
+  ...
+# Subtest: animal validation: invalid date
+ok 320 - animal validation: invalid date
+  ---
+  duration_ms: 9.632583
+  type: 'test'
+  ...
+# Subtest: animal validation: parent FK
+ok 321 - animal validation: parent FK
+  ---
+  duration_ms: 9.311625
+  type: 'test'
+  ...
+# Subtest: animal validation: external and linked parent
+ok 322 - animal validation: external and linked parent
+  ---
+  duration_ms: 10.398083
+  type: 'test'
+  ...
+# Subtest: animal corrections require reason, reject stale revisions and pedigree cycles through the UI command
+ok 323 - animal corrections require reason, reject stale revisions and pedigree cycles through the UI command
+  ---
+  duration_ms: 18.055625
+  type: 'test'
+  ...
+# Subtest: duplicate visual tags require explicit review; duplicate RFID and farm IDs always reject
+ok 324 - duplicate visual tags require explicit review; duplicate RFID and farm IDs always reject
+  ---
+  duration_ms: 19.577542
+  type: 'test'
+  ...
+# Subtest: inconsistent parent sex requires explicit review
+ok 325 - inconsistent parent sex requires explicit review
+  ---
+  duration_ms: 8.432334
+  type: 'test'
+  ...
+# Subtest: twins share one atomic delivery with reciprocal weights and stillbirth retains identity
+ok 326 - twins share one atomic delivery with reciprocal weights and stillbirth retains identity
+  ---
+  duration_ms: 11.367792
+  type: 'test'
+  ...
+# Subtest: calving validation: unconfirmed date
+ok 327 - calving validation: unconfirmed date
+  ---
+  duration_ms: 8.214375
+  type: 'test'
+  ...
+# Subtest: calving validation: bad birth date
+ok 328 - calving validation: bad birth date
+  ---
+  duration_ms: 10.264459
+  type: 'test'
+  ...
+# Subtest: calving validation: ease out of range
+ok 329 - calving validation: ease out of range
+  ---
+  duration_ms: 10.158958
+  type: 'test'
+  ...
+# Subtest: calving validation: bad twin weight rolls back all calves
+ok 330 - calving validation: bad twin weight rolls back all calves
+  ---
+  duration_ms: 7.393125
+  type: 'test'
+  ...
+# Subtest: calving validation: missing weight unit
+ok 331 - calving validation: missing weight unit
+  ---
+  duration_ms: 8.370708
+  type: 'test'
+  ...
+# Subtest: calving validation: bad outcome
+ok 332 - calving validation: bad outcome
+  ---
+  duration_ms: 12.965333
+  type: 'test'
+  ...
+# Subtest: stillbirth without tag or weight, and died-after-birth outcomes retain unknown fields
+ok 333 - stillbirth without tag or weight, and died-after-birth outcomes retain unknown fields
+  ---
+  duration_ms: 9.502333
+  type: 'test'
+  ...
+# Subtest: weight commit: birth
+ok 334 - weight commit: birth
+  ---
+  duration_ms: 7.146042
+  type: 'test'
+  ...
+# Subtest: weight commit: weaning
+ok 335 - weight commit: weaning
+  ---
+  duration_ms: 4.547959
+  type: 'test'
+  ...
+# Subtest: weight commit: yearling
+ok 336 - weight commit: yearling
+  ---
+  duration_ms: 5.329875
+  type: 'test'
+  ...
+# Subtest: weight commit: other
+ok 337 - weight commit: other
+  ---
+  duration_ms: 5.211125
+  type: 'test'
+  ...
+# Subtest: weight rejects missing
+ok 338 - weight rejects missing
+  ---
+  duration_ms: 5.44575
+  type: 'test'
+  ...
+# Subtest: weight rejects zero
+ok 339 - weight rejects zero
+  ---
+  duration_ms: 5.740584
+  type: 'test'
+  ...
+# Subtest: weight rejects negative
+ok 340 - weight rejects negative
+  ---
+  duration_ms: 5.541667
+  type: 'test'
+  ...
+# Subtest: weight rejects unit
+ok 341 - weight rejects unit
+  ---
+  duration_ms: 5.112417
+  type: 'test'
+  ...
+# Subtest: weight rejects date
+ok 342 - weight rejects date
+  ---
+  duration_ms: 6.869958
+  type: 'test'
+  ...
+# Subtest: ADG: 400 to 460 over 30 days
+ok 343 - ADG: 400 to 460 over 30 days
+  ---
+  duration_ms: 0.959917
+  type: 'test'
+  ...
+# Subtest: ADG: mixed units
+ok 344 - ADG: mixed units
+  ---
+  duration_ms: 0.046542
+  type: 'test'
+  ...
+# Subtest: ADG: kg display
+ok 345 - ADG: kg display
+  ---
+  duration_ms: 0.025875
+  type: 'test'
+  ...
+# Subtest: ADG: negative gain
+ok 346 - ADG: negative gain
+  ---
+  duration_ms: 0.020875
+  type: 'test'
+  ...
+# Subtest: ADG: same day
+ok 347 - ADG: same day
+  ---
+  duration_ms: 0.024083
+  type: 'test'
+  ...
+# Subtest: ADG: missing endpoint
+ok 348 - ADG: missing endpoint
+  ---
+  duration_ms: 0.012292
+  type: 'test'
+  ...
+# Subtest: ADG: missing value
+ok 349 - ADG: missing value
+  ---
+  duration_ms: 0.012416
+  type: 'test'
+  ...
+# Subtest: ADG: reverse selections
+ok 350 - ADG: reverse selections
+  ---
+  duration_ms: 0.094791
+  type: 'test'
+  ...
+# Subtest: ADG: DST calendar days
+ok 351 - ADG: DST calendar days
+  ---
+  duration_ms: 0.022292
+  type: 'test'
+  ...
+# Subtest: AI and natural interval breeding plus linked pregnancy checks commit
+ok 352 - AI and natural interval breeding plus linked pregnancy checks commit
+  ---
+  duration_ms: 14.602292
+  type: 'test'
+  ...
+# Subtest: breeding rejects AI interval
+ok 353 - breeding rejects AI interval
+  ---
+  duration_ms: 7.61975
+  type: 'test'
+  ...
+# Subtest: breeding rejects both date and interval
+ok 354 - breeding rejects both date and interval
+  ---
+  duration_ms: 12.340459
+  type: 'test'
+  ...
+# Subtest: breeding rejects reversed interval
+ok 355 - breeding rejects reversed interval
+  ---
+  duration_ms: 7.970042
+  type: 'test'
+  ...
+# Subtest: breeding rejects no dates
+ok 356 - breeding rejects no dates
+  ---
+  duration_ms: 7.173042
+  type: 'test'
+  ...
+# Subtest: breeding rejects both sires
+ok 357 - breeding rejects both sires
+  ---
+  duration_ms: 7.120875
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects open with gestation
+ok 358 - pregnancy rejects open with gestation
+  ---
+  duration_ms: 7.207333
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects negative gestation
+ok 359 - pregnancy rejects negative gestation
+  ---
+  duration_ms: 6.661416
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects fractional gestation
+ok 360 - pregnancy rejects fractional gestation
+  ---
+  duration_ms: 7.262333
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects other method missing detail
+ok 361 - pregnancy rejects other method missing detail
+  ---
+  duration_ms: 5.515458
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects invalid date
+ok 362 - pregnancy rejects invalid date
+  ---
+  duration_ms: 8.384291
+  type: 'test'
+  ...
+# Subtest: pregnancy rejects bad result
+ok 363 - pregnancy rejects bad result
+  ---
+  duration_ms: 6.102625
+  type: 'test'
+  ...
+# Subtest: pregnancy check cannot link another dam breeding
+ok 364 - pregnancy check cannot link another dam breeding
+  ---
+  duration_ms: 14.589292
+  type: 'test'
+  ...
+# Subtest: groups create rename archive and atomic batch moves retain dated intervals and snapshots
+ok 365 - groups create rename archive and atomic batch moves retain dated intervals and snapshots
+  ---
+  duration_ms: 39.796834
+  type: 'test'
+  ...
+# Subtest: group validation: empty group
+ok 366 - group validation: empty group
+  ---
+  duration_ms: 3.03625
+  type: 'test'
+  ...
+# Subtest: group validation: group type
+ok 367 - group validation: group type
+  ---
+  duration_ms: 4.555375
+  type: 'test'
+  ...
+# Subtest: group validation: empty batch
+ok 368 - group validation: empty batch
+  ---
+  duration_ms: 3.071291
+  type: 'test'
+  ...
+# Subtest: purchase and cull decision retain active status; departures preserve all history and audit status
+ok 369 - purchase and cull decision retain active status; departures preserve all history and audit status
+  ---
+  duration_ms: 46.158416
+  type: 'test'
+  ...
+# Subtest: death preserves animal and sets dead
+ok 370 - death preserves animal and sets dead
+  ---
+  duration_ms: 49.270667
+  type: 'test'
+  ...
+# Subtest: other-departure preserves animal and sets culled
+ok 371 - other-departure preserves animal and sets culled
+  ---
+  duration_ms: 37.628458
+  type: 'test'
+  ...
+# Subtest: movement validation: no acknowledgment
+ok 372 - movement validation: no acknowledgment
+  ---
+  duration_ms: 4.0095
+  type: 'test'
+  ...
+# Subtest: movement validation: missing destination
+ok 373 - movement validation: missing destination
+  ---
+  duration_ms: 2.817625
+  type: 'test'
+  ...
+# Subtest: movement validation: amount without currency
+ok 374 - movement validation: amount without currency
+  ---
+  duration_ms: 36.7885
+  type: 'test'
+  ...
+# Subtest: movement validation: bad money precision
+ok 375 - movement validation: bad money precision
+  ---
+  duration_ms: 42.716
+  type: 'test'
+  ...
+# Subtest: movement validation: weight without unit
+ok 376 - movement validation: weight without unit
+  ---
+  duration_ms: 33.03775
+  type: 'test'
+  ...
+# Subtest: movement validation: invalid date
+ok 377 - movement validation: invalid date
+  ---
+  duration_ms: 2.902625
+  type: 'test'
+  ...
+# Subtest: movement validation: purchase without source
+ok 378 - movement validation: purchase without source
+  ---
+  duration_ms: 3.682917
+  type: 'test'
+  ...
+# Subtest: search filters compose, estimated DOB participates, unknown DOB is excluded and pages are bounded
+ok 379 - search filters compose, estimated DOB participates, unknown DOB is excluded and pages are bounded
+  ---
+  duration_ms: 12.553666
+  type: 'test'
+  ...
+# Subtest: events are chronological and filterable by type/date/animal including former identifiers and revisions
+ok 380 - events are chronological and filterable by type/date/animal including former identifiers and revisions
+  ---
+  duration_ms: 2.885458
+  type: 'test'
+  ...
+# Subtest: local draft survives interruption, isolates datasets and retains the delivery token through commit
+ok 381 - local draft survives interruption, isolates datasets and retains the delivery token through commit
+  ---
+  duration_ms: 3.9805
+  type: 'test'
+  ...
+# Subtest: failed calf transaction retains recoverable draft and no calf rows
+ok 382 - failed calf transaction retains recoverable draft and no calf rows
+  ---
+  duration_ms: 2.901416
+  type: 'test'
+  ...
+# Subtest: draft corruption and storage quota failure are explicit
+ok 383 - draft corruption and storage quota failure are explicit
+  ---
+  duration_ms: 0.124458
+  type: 'test'
+  ...
+# Subtest: farm date respects farm zone near UTC midnight
+ok 384 - farm date respects farm zone near UTC midnight
+  ---
+  duration_ms: 0.151292
+  type: 'test'
+  ...
+# Subtest: workflow promise waits for transaction completion
+ok 385 - workflow promise waits for transaction completion
+  ---
+  duration_ms: 1.490416
+  type: 'test'
+  ...
+# Subtest: calf birth corrections update delivery, twin and linked weights atomically with prior values
+ok 386 - calf birth corrections update delivery, twin and linked weights atomically with prior values
+  ---
+  duration_ms: 7.501333
+  type: 'test'
+  ...
+# Subtest: group rename requires reason and a bad member aborts an entire batch
+ok 387 - group rename requires reason and a bad member aborts an entire batch
+  ---
+  duration_ms: 5.467167
+  type: 'test'
+  ...
+# Subtest: historical departure does not overwrite a later departure status
+ok 388 - historical departure does not overwrite a later departure status
+  ---
+  duration_ms: 66.698959
+  type: 'test'
+  ...
+# Subtest: archive retains events, groups and identifiers; dated membership corrections close the prior interval
+ok 389 - archive retains events, groups and identifiers; dated membership corrections close the prior interval
+  ---
+  duration_ms: 4.6775
+  type: 'test'
+  ...
+# Subtest: ADG refuses different animals and voided measurements
+ok 390 - ADG refuses different animals and voided measurements
+  ---
+  duration_ms: 0.089334
+  type: 'test'
+  ...
+# Subtest: 500-animal query pages without losing counts or leading-zero IDs
+ok 391 - 500-animal query pages without losing counts or leading-zero IDs
+  ---
+  duration_ms: 0.353583
+  type: 'test'
+  ...
+# Subtest: withdrawal filters use the shared engine, include review in holds and honor inactive inclusion
+ok 392 - withdrawal filters use the shared engine, include review in holds and honor inactive inclusion
+  ---
+  duration_ms: 1.598291
+  type: 'test'
+  ...
+1..392
+# tests 392
+# suites 0
+# pass 392
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1932.540167

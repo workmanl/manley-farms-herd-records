@@ -1,0 +1,28 @@
+
+> manley-farms-herd-records@1.1.0-beta.1 test:scale
+> node --test tests/scale.perf.mjs
+
+TAP version 13
+# fixtureLoad 28649ms
+# launchToDashboard 2995ms
+# dashboardModel 688ms
+# commonSearch 16ms
+# saveP95 0.331ms
+# fullBackup 4400ms
+# fullRestore 36661ms
+# roundTripVerification 5166ms
+# Subtest: twenty-year fixture: launch, search, p95 committed save and lossless full backup/restore
+ok 1 - twenty-year fixture: launch, search, p95 committed save and lossless full backup/restore
+  ---
+  duration_ms: 78911.839084
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79099.74675

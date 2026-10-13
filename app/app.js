@@ -1,3 +1,4 @@
+import { openDemo, deleteDemo } from "./lib/demo.js";
 import { updateIntroduction } from "./lib/landing.js";
 import {
   startPWA,
@@ -103,6 +104,18 @@ async function refresh() {
   $("last-export").textContent = meta.lastExportAttemptAt || "Never";
   $("last-confirmed").textContent = meta.lastUserConfirmedBackupAt || "Never";
   $("save-settings").disabled = !accepted || !!repo.recovery;
+  let demoBanner = $("demo-banner");
+  if (!demoBanner) { demoBanner = document.createElement("aside"); demoBanner.id = "demo-banner"; $("main").prepend(demoBanner); }
+  demoBanner.hidden = !herd?.demoMode;
+  demoBanner.replaceChildren();
+  const demoTitle = document.createElement("strong"); demoTitle.textContent = "DEMO HERD: practice cattle only";
+  const demoCopy = document.createElement("p"); demoCopy.textContent = "Everything you save here stays separate from your real herd. Demo backups and exports are turned off.";
+  demoBanner.append(demoTitle, demoCopy);
+  if (herd?.demoMode) {
+    const leave = document.createElement("button"); leave.type = "button"; leave.textContent = "Return to my real herd"; leave.onclick = () => herd.demo(false); const actions = document.createElement("div"); actions.className = "actions";
+    const remove = document.createElement("button"); remove.type = "button"; remove.className = "secondary danger"; remove.textContent = "Delete demo herd"; remove.onclick = () => herd.demo("delete");
+    actions.append(leave, remove); demoBanner.append(actions);
+  }
   route();
   showReminder();
 }
@@ -120,10 +133,10 @@ function route() {
   $("herd").hidden = !accepted || !herdTab || !!repo.recovery;
   if (!$("herd").hidden) herd.render(snapshot, path);
   const backup = tab === "backup";
-  $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery;
+  $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery || !!herd?.demoMode;
   if (!$("ownership").hidden) ownership.render(snapshot);
   $("gate").hidden = accepted || backup || !!repo.recovery;
-  $("backup").hidden = !backup || !!repo.recovery;
+  $("backup").hidden = !backup || !!repo.recovery || !!herd?.demoMode;
   $("placeholder").hidden =
     !accepted ||
     backup ||
@@ -137,6 +150,12 @@ function route() {
     if (link.dataset.tab === (tab === "groups" ? "animals" : tab))
       link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
+  }
+  if (herd?.demoMode && ["backup", "reports"].includes(tab)) {
+    $("placeholder").hidden = false;
+    $("placeholder-title").textContent = "Practice records stay here";
+    $("placeholder-copy").textContent = "Demo backups, imports and exports are turned off so practice cattle cannot mix with your real herd. Return to Your herd to leave the demo, then use your real backup tools.";
+    return;
   }
   $("placeholder-title").textContent = "Page not found";
   $("placeholder-copy").textContent =
@@ -479,7 +498,7 @@ async function refreshReminder() {
 }
 function showReminder() {
   const reminder = snapshot && backupReminder(snapshot);
-  $("backup-reminder").hidden = !accepted || !!repo?.recovery || !reminder?.due;
+  $("backup-reminder").hidden = !accepted || !!repo?.recovery || !!herd?.demoMode || !reminder?.due;
   $("backup-reminder-text").textContent = reminder?.text || "";
 }
 on("backup-now", "click", async () => {
@@ -516,7 +535,25 @@ $("open-herd-records").addEventListener("click", () => {
   $("public-intro").open = false;
   $("main").focus();
 });
-herd = new HerdUI($("herd"), { repository: () => repo, refresh, message });
+let realRepo;
+herd = new HerdUI($("herd"), { repository: () => repo, refresh, message,
+  demo: (mode) => run(async () => {
+    if (herd.saving || edits.dirty()) throw new Error("Finish or cancel your form before switching herds.");
+    requestedBackup = null; resetPlan(); restoreInput = null;
+    if (mode === true) {
+      realRepo = repo;
+      repo = await openDemo();
+      herd.demoMode = true;
+    } else {
+      if (herd.demoMode) { repo.close(); repo = realRepo; }
+      herd.demoMode = false;
+      if (mode === "delete") await deleteDemo();
+    }
+    location.hash = "#dashboard";
+    await refresh();
+    message(herd.demoMode ? "Demo herd open. Real records are separate." : "Your real herd is open.");
+  })
+});
 window.addEventListener("hashchange", () => {
   void run(refresh);
 });
@@ -578,6 +615,7 @@ async function refreshVisibleHealth() {
     snapshot = await refreshHealth(repo);
     herd.s = snapshot;
     showReminder();
+    if ((location.hash === "#dashboard" || !location.hash) && !$("herd").contains(document.activeElement)) herd.render(snapshot, "dashboard");
     for (const panel of document.querySelectorAll(".withdrawal-panel"))
       if (!panel.contains(document.activeElement)) herd.health.update(panel);
     for (const panel of document.querySelectorAll(".departure-preview"))

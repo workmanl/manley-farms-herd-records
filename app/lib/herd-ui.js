@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
+import { drawDashboard } from "./dashboard.js";
+import { guideForm, pickerProgress } from "./guided-form.js";
 import { HealthUI } from "./health-ui.js";
 import { isHold } from "./withdrawal.js";
 import { isUUID } from "./validation.js";
@@ -95,8 +97,9 @@ const details = (title, text) => {
   return d;
 };
 export class HerdUI {
-  constructor(root, { repository, refresh, message }) {
+  constructor(root, { repository, refresh, message, demo }) {
     this.root = root;
+    this.demo = demo;
     this.health = new HealthUI(this, { el, link, button, field, details });
     this.repository = repository;
     this.refresh = refresh;
@@ -116,7 +119,10 @@ export class HerdUI {
     this.unit = snapshot.operation[0].weightUnit;
     this.root.replaceChildren();
     const [tab, id, action] = route.split("/");
-    if (tab === "dashboard") this.dashboard();
+    if (tab === "dashboard") {
+      if (id === "quick") this.quick(action, route.split("/")[3]);
+      else this.dashboard();
+    }
     else if (tab === "health") this.health.route(id, action);
     else if (tab === "groups") id ? this.groupForm(id) : this.groups();
     else if (tab === "events") this.eventList();
@@ -169,33 +175,44 @@ export class HerdUI {
     ];
   }
   dashboard() {
-    this.title("Your herd");
-    this.health.mount();
-    const panel = el("section", undefined, "stats");
-    for (const status of statuses) {
-      const card = el("div", undefined, "stat");
-      card.append(
-        el("strong", this.s.animals.filter((a) => a.status === status).length),
-        el("span", status),
-      );
-      panel.append(card);
+    drawDashboard(this, { el, link, button, field });
+  }
+  quick(action, animalId) {
+    if (action === "animal") this.animalForm();
+    else {
+      const animal = this.s.animals.find(a => a.id === animalId);
+      if (!animal) {
+        this.title(action === "calving" ? "Who is the mother?" : "Which animal?");
+        if (action === "breeding") this.root.append(link("Record a pregnancy check", "#dashboard/quick/pregnancy"));
+        const form = el("form", undefined, "card");
+        let count=2;
+        const first=this.s.animals.find(a=>a.status==='active');
+        if(first){const originalRoot=this.root;const preview=el('div');this.root=preview;try{this.quick(action,first.id);count=preview.querySelector('.progress-dots').children.length;}finally{this.root=originalRoot;}}
+        pickerProgress(form,count);
+        const query = field(form, "query", "Type a tag or name", "", {type:"search"});
+        const list = el("div", undefined, "animal-picker");
+        const update = () => {
+          list.replaceChildren();
+          const result = searchAnimals(this.s, {query:query.value, pageSize:25});
+          list.append(el("p", `${result.total} animals found. Showing up to 25. Type more to narrow the list.`));
+          for (const a of result.rows) list.append(link(`${a.visualTag || a.farmId} · ${a.farmId}`, `#dashboard/quick/${action}/${a.id}`));
+          if (!result.total) list.append(link("Add an animal first", "#dashboard/quick/animal"));
+        };
+        query.oninput = update;form.onsubmit=e=>e.preventDefault();form.append(list);this.root.append(form,link("Back to your herd", "#dashboard"));update();return;
+      }
+      if(action === "calving") this.calvingForm(animal);
+      else if(action === "treatment") this.health.treatment(animal);
+      else if(action === "move") this.moveForm(animal);
+      else if(["weight","breeding","pregnancy","movement"].includes(action)) this.eventForm(animal,action);
     }
-    this.root.append(
-      panel,
-      el(
-        "p",
-        `${this.s.animals.length} animals retained in this browser. Counts reflect current recorded status.`,
-      ),
-    );
-    const actions = el("div", undefined, "actions");
-    actions.append(
-      link("Add animal", "#animals/new"),
-      link("Find an animal", "#animals"),
-      link("Groups and pastures", "#groups"),
-    );
-    this.root.append(actions);
-    this.root.append(el("h2", "Recent activity"));
-    this.history(events(this.s, { limit: 5 }));
+    const form=this.root.querySelector("form");
+    if(form){
+      const last = events(this.s,{type:"memberships",limit:1})[0]?.record;
+      const group=form.elements.namedItem(action === "animal" ? "currentGroupId" : "groupId");
+      if(group && last && [...group.options].some(o=>o.value===last.groupId))group.value=last.groupId;
+      if(action === "breeding")form.elements.namedItem("serviceDate").value=this.today;
+      guideForm(form, {selection:action!=="animal"});
+    }
   }
   animals() {
     this.title("Animals");
@@ -339,6 +356,7 @@ export class HerdUI {
     this.root.append(actions);
   }
   card(a) {
+    this.recentAnimals = [a.id, ...(this.recentAnimals || []).filter(id => id !== a.id)].slice(0, 4);
     this.title(`${a.visualTag || "No visual tag"} · ${a.farmId}`);
     this.root.append(
       el("p", `${a.status} · ${a.sex} · ${a.breed || "Unknown breed"}`),
@@ -488,6 +506,8 @@ export class HerdUI {
         const a = this.s.animals.find((a) => a.id === id);
         if (a) links.append(link(a.farmId, `#animals/${id}`));
       }
+      if(e.store === "treatments" && !r.voidedAt) links.append(link("Undo with reviewed evidence", `#health/void/${r.id}`));
+      if(e.store === "animals") links.append(link("Correct animal", `#animals/${r.id}/edit`));
       li.append(links);
       li.append(
         details(

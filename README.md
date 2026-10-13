@@ -2,7 +2,7 @@
 
 Free cattle records that work offline after the first verified download. Keep animal identity, parentage, calving, weights, breeding, treatments and departures, with separate recorded meat and milk withdrawal holds.
 
-**Public beta 1.0.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
+**Public beta 1.1.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
 
 [Open Herd Records](https://manleyfarms.com/tools/herd-records/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
 
@@ -105,3 +105,7 @@ Clinical review, the multi-device field pilot, lawyer review of terms, staged br
 ## License and source
 
 Copyright (C) 2026 Scott Manley. Original code and covered project documentation are **AGPL-3.0-only**. The complete unmodified license is in [LICENSE](LICENSE) and `app/LICENSE`. Modified network-interactive versions must offer corresponding source as the license requires. Your own herd records remain yours. Contributor Covenant text carries its own attribution below. System font fallbacks are used, with no remote fonts or runtime dependencies.
+
+### Dashboard screenshots and review
+
+The 1.1 dashboard starts at Your herd with counts, seven guided quick actions, Today, animal search and recent activity. New users get three welcome steps and optional isolated sample cattle. Screenshot capture is pending Claude’s local browser review: capture populated and empty dashboards at 390px and 1280px, plus the sunlight theme and a guided treatment. Existing phase screenshots document previous versions.

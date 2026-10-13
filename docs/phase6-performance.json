@@ -6,12 +6,13 @@
   "events": 250000,
   "samples": 20,
   "times": {
-    "fixtureLoad": 27720,
-    "launchToDashboard": 2976,
-    "commonSearch": 3,
-    "saveP95": 0.337,
-    "fullBackup": 4418,
-    "fullRestore": 38668,
-    "roundTripVerification": 5842
+    "fixtureLoad": 28071,
+    "launchToDashboard": 3167,
+    "dashboardModel": 716,
+    "commonSearch": 17,
+    "saveP95": 0.334,
+    "fullBackup": 4330,
+    "fullRestore": 38448,
+    "roundTripVerification": 5357
   }
 }

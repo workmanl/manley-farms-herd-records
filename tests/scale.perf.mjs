@@ -1,3 +1,4 @@
+import { dashboardModel } from "../app/lib/dashboard.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { IDBFactory } from "fake-indexeddb";
@@ -52,6 +53,12 @@ test("twenty-year fixture: launch, search, p95 committed save and lossless full 
     const panel = evaluateWithdrawal(snapshot, { now: scaleClock });
     assert.equal(panel.animals.length, 10000);
     events(snapshot, { limit: 5 });
+  });
+  await timed("dashboardModel", () => {
+    const model = dashboardModel(snapshot, "2026-10-12", scaleClock);
+    assert.equal(model.active, 500);
+    assert.equal(model.evaluation.animals.length, 10000);
+    assert.ok(model.attention.length <= 8);
   });
   await timed("commonSearch", () => {
     assert.equal(searchAnimals(snapshot, { query: "SCALE-00042" }).total, 1);

@@ -51,3 +51,10 @@
 - Browser screenshots and local Git commits remain blocked by environment permissions. No push or deployment occurred. See the Phase 2 report for test counts and limitations.
 
 No animal entry, clinical dashboard, CSV, report generation, service worker or install flow is claimed in this release.
+
+## 1.1.0-beta.1 · 2026-10-13
+
+- Friendly Your herd dashboard with six tappable snapshot tiles, quick actions, Today checks, search, recent animals and activity.
+- Guided questions reuse existing forms, validation and transactional saves.
+- Separate, removable practice herd; real data and schema 1 retained.
+- Phone, tablet and desktop layouts with inline icons and sunlight theme support.
