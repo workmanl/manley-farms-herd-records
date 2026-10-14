@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.6.0-beta.1 (2026-10-13)
+
+- Show who is due to calve from dates the farmer saved. Ask how many days until she calves. Do not assume a gestation length.
+- Show three rows of family, each calf, and birth and weaning weights on the animal card.
+- Add Work a group: one shared day, then each animal. Treat and move use the old batch forms. Weigh, wean and sell save one animal at a time.
+- Add an inline weight line and group daily gain. No age-adjusted weights.
+- See docs/round-2-report.md. Not field tested. No schema change.
+
 ## 1.5.0-beta.1 (2026-10-13)
 
 - Add one original icon set on Home, the bottom bar, lists, Today and empty states.

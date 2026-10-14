@@ -1467,3 +1467,11 @@ button > svg,
   #herd .guided-form .sticky > p.guide-unsaved { display:none; }
   #herd .guided-form .sticky .actions > :is(button,a) { min-height:48px; height:48px; padding:4px; }
 }
+.pedigree, .weight-chart, .due-list, .chute-count { max-width: 100%; }
+.weight-chart svg { width: 100%; max-width: 100%; height: auto; display: block; }
+.pedigree-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.pedigree-row > * { flex: 1 1 8rem; min-width: 0; overflow-wrap: anywhere; }
+.pedigree .list-row, .due-list .list-row { flex-wrap: wrap; align-items: center; }
+.pedigree .list-row > p, .due-list .list-row > p { flex: 1 1 140px; min-width: 0; margin: 0; }
+.pedigree .list-row > a, .due-list .list-row > a { flex: 0 1 auto; max-width: 100%; white-space: normal; }
+.chute-count { margin: 8px 0; }

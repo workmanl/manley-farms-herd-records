@@ -7,6 +7,10 @@ import { HealthUI } from "./health-ui.js";
 import { isHold, evaluateWithdrawal } from "./withdrawal.js";
 import { icon } from "./icons.js";
 import { isUUID } from "./validation.js";
+import { dueRows, dueThisMonth, expectedFromDays } from "./calendar.js";
+import { pedigreeView } from "./pedigree.js";
+import { drawWeightChart, groupGain, weightPoints } from "./chart.js";
+import { chuteSaleInput, chuteWeightInput } from "./chute.js";
 import {
   commitWorkflow,
   searchAnimals,
@@ -26,6 +30,12 @@ const el = (tag, text, className) => {
 const link = (text, hash) => {
   const a = el("a", text, "button secondary");
   a.href = hash;
+  return a;
+};
+const familyLink = (cell) => {
+  if (!cell.href) return el("span", cell.name);
+  const a = el("a", cell.name, "row-link");
+  a.href = cell.href;
   return a;
 };
 const button = (text, action) => {
@@ -128,14 +138,14 @@ export class HerdUI {
     const [tab, id, action] = route.split("/");
     if (this.repository().moved && (
       (tab === 'dashboard' && id) ||
-      (tab === 'animals' && (['new','batch'].includes(id) || action)) ||
+      (tab === 'animals' && (['new','batch','chute'].includes(id) || action)) ||
       (tab === 'groups' && id) || (tab === 'health' && id)
     )) {
       this.title('Add new records at the new address');
       this.root.append(el('p','This old address is read-only. Save a copy, then restore it at herd.manleyfarms.com.'), link('View your herd','#dashboard'));
       return;
     }
-    if (tab === "add") { this.title("Add a record"); const grid=el("div",undefined,"quick-actions"); for(const [kind,label,glyph] of [["animal","Add an animal","plus"],["calving","Add a calf","calf"],["weight","Weigh","weight"],["treatment","Record a treatment","health"],["move","Move to a pasture or group","move"],["breeding","Breeding","breed"],["pregnancy","Pregnancy check","calendar"],["movement","Sold or died","sale"]]){const a=link("",`#dashboard/quick/${kind}`);a.className="button secondary quick-action";a.setAttribute("aria-label",label);a.append(icon(glyph),el("span",label));grid.append(a);} this.root.append(grid); const group=link("Work a group","#health/batch");group.className="button secondary";group.prepend(icon("group"));this.root.append(group); }
+    if (tab === "add") { this.title("Add a record"); const grid=el("div",undefined,"quick-actions"); for(const [kind,label,glyph] of [["animal","Add an animal","plus"],["calving","Add a calf","calf"],["weight","Weigh","weight"],["treatment","Record a treatment","health"],["move","Move to a pasture or group","move"],["breeding","Breeding","breed"],["pregnancy","Pregnancy check","calendar"],["movement","Sold or died","sale"]]){const a=link("",`#dashboard/quick/${kind}`);a.className="button secondary quick-action";a.setAttribute("aria-label",label);a.append(icon(glyph),el("span",label));grid.append(a);} this.root.append(grid); const group=link("Work a group","#animals/chute");group.className="button secondary";group.prepend(icon("group"));this.root.append(group); }
     else if (tab === "dashboard") {
       if (id === "quick") this.quick(action, route.split("/")[3]);
       else this.dashboard();
@@ -147,6 +157,8 @@ export class HerdUI {
     else if (tab === "animals") {
       if (id === "new") this.animalForm();
       else if (id === "batch") this.moveForm();
+      else if (id === "due") this.dueList();
+      else if (id === "chute") this.chuteScreen();
       else if (id) {
         const a = snapshot.animals.find((a) => a.id === id);
         if (!a) {
@@ -385,6 +397,289 @@ export class HerdUI {
     actions.append(prev, next);
     this.root.append(actions);
   }
+  dueList() {
+    this.title("Who is due");
+    const rows = dueRows(this.s, this.today);
+    const show = (title, list, empty) => {
+      this.root.append(el("h2", title));
+      const box = el("div", undefined, "due-list");
+      if (!list.length) {
+        const quiet = el("p", undefined, "empty-state");
+        quiet.append(icon("calendar"), el("span", empty));
+        box.append(quiet);
+      }
+      for (const row of list) {
+        const line = el("article", undefined, "list-row");
+        line.append(icon("calendar"), el("p", row.text), link("See this cow", row.href));
+        box.append(line);
+      }
+      this.root.append(box);
+    };
+    show("Due this month", dueThisMonth(rows, this.today), "No calf is due this month.");
+    show("All checks", rows, "No pregnancy check or breeding is saved.");
+  }
+  chuteScreen() {
+    if (this.chute) return this.chuteRun();
+    this.chutePick = this.chutePick || { ids: [] };
+    this.title("Work a group");
+    const picked = new Set(this.chutePick.ids);
+    const search = el("form", undefined, "card");
+    const query = field(search, "query", "Type a tag or scan", this.chutePick.query || "", { type: "search" });
+    const jump = el("button", "Find");
+    jump.type = "submit";
+    search.append(jump);
+    search.onsubmit = (e) => {
+      e.preventDefault();
+      const text = query.value.trim();
+      this.chutePick.query = text;
+      if (!text) return;
+      const exact = this.s.animals.find((a) => a.visualTag === text || a.farmId === text);
+      const hit = exact || searchAnimals(this.s, { query: text }).rows[0];
+      if (!hit) {
+        this.message("No animal matches that tag.", true);
+        return;
+      }
+      if (!picked.has(hit.id)) this.chutePick.ids.push(hit.id);
+      this.render(this.s, "animals/chute");
+    };
+    this.root.append(search);
+    const groupForm = el("form", undefined, "card");
+    const group = field(groupForm, "groupId", "Or pick a group", "", { options: this.groupOptions() });
+    const useGroup = el("button", "Use this group");
+    useGroup.type = "submit";
+    groupForm.append(useGroup);
+    groupForm.onsubmit = (e) => {
+      e.preventDefault();
+      if (!group.value) {
+        this.message("Pick a group first.", true);
+        return;
+      }
+      this.chutePick.ids = this.s.animals.filter((a) => a.status === "active" && a.currentGroupId === group.value).map((a) => a.id);
+      this.render(this.s, "animals/chute");
+    };
+    this.root.append(groupForm);
+    const list = el("div", undefined, "due-list");
+    const chosen = this.s.animals.filter((a) => picked.has(a.id));
+    if (!chosen.length) {
+      const quiet = el("p", undefined, "empty-state");
+      quiet.append(icon("animals"), el("span", "No animals picked yet."));
+      list.append(quiet);
+    }
+    for (const animal of chosen) {
+      const row = el("article", undefined, "list-row");
+      row.append(icon("tag"), el("p", `${animal.visualTag || animal.farmId} · ${animal.farmId}`));
+      row.append(button("Remove", () => {
+        this.chutePick.ids = this.chutePick.ids.filter((id) => id !== animal.id);
+        this.render(this.s, "animals/chute");
+      }));
+      list.append(row);
+    }
+    this.root.append(list, el("p", `${chosen.length} animals`, "chute-count"));
+    const jobs = el("div", undefined, "actions");
+    const start = (job, hash) => {
+      if (!this.chutePick.ids.length) {
+        this.message("Pick at least one animal.", true);
+        return;
+      }
+      if (hash) {
+        this.chuteIds = [...this.chutePick.ids];
+        location.hash = hash;
+        return;
+      }
+      this.chute = { ids: [...this.chutePick.ids], job, index: 0, shared: null, saved: 0 };
+      this.render(this.s, "animals/chute");
+    };
+    const jobButton = (text, glyph, action) => {
+      const control = button(text, action);
+      control.prepend(icon(glyph));
+      return control;
+    };
+    jobs.append(
+      jobButton("Treat", "health", () => start("treat", "#health/batch")),
+      jobButton("Move", "move", () => start("move", "#animals/batch")),
+      jobButton("Weigh", "weight", () => start("weigh")),
+      jobButton("Wean", "calf", () => start("wean")),
+      jobButton("Sell", "sale", () => start("sell")),
+    );
+    this.root.append(jobs);
+  }
+  chuteRun() {
+    const run = this.chute;
+    const total = run.ids.length;
+    const back = button("Back to the list", () => {
+      if (this.saving) return;
+      this.chute = null;
+      this.render(this.s, "animals/chute");
+    });
+    if (run.index >= total) {
+      this.title("Group work done");
+      this.root.append(el("p", `Saved ${run.saved} of ${total}.`, "chute-count"), back);
+      return;
+    }
+    const animal = this.s.animals.find((a) => a.id === run.ids[run.index]);
+    const label = animal ? (animal.visualTag && animal.visualTag !== animal.farmId ? `${animal.farmId} ${animal.visualTag}` : animal.farmId) : "Animal";
+    const titles = { sell: `Sell ${label}`, wean: `Wean ${label}`, weigh: `Weigh ${label}` };
+    this.title(titles[run.job] || `Weigh ${label}`);
+    this.root.append(el("p", `${run.index + 1} of ${total}`, "chute-count"));
+    const jump = el("form", undefined, "card");
+    const query = field(jump, "jump", "Type a tag or scan", "", { type: "search" });
+    const go = el("button", "Find");
+    go.type = "submit";
+    jump.append(go);
+    jump.onsubmit = (e) => {
+      e.preventDefault();
+      const text = query.value.trim();
+      const hit = this.s.animals.find((a) => run.ids.includes(a.id) && (a.visualTag === text || a.farmId === text));
+      if (!hit) {
+        this.message("That animal is not in this group.", true);
+        return;
+      }
+      run.index = run.ids.indexOf(hit.id);
+      this.render(this.s, "animals/chute");
+    };
+    this.root.append(jump, back);
+    if (!animal) {
+      this.root.append(el("p", "That animal is not in the herd."), button("Next animal", () => {
+        run.index += 1;
+        this.render(this.s, "animals/chute");
+      }));
+      return;
+    }
+    if (!run.shared) return this.chuteShared(run);
+    if (run.job === "sell") return this.chuteSell(run, animal, label);
+    return this.chuteWeigh(run, animal, label);
+  }
+  chuteShared(run) {
+    const form = el("form", undefined, "card");
+    const date = field(form, "date", "What day is this?", this.today, { type: "date", required: true });
+    let unit, destination, amount, currency;
+    if (run.job === "sell") {
+      destination = field(form, "destination", "Who is the buyer?", "");
+      amount = field(form, "amount", "Sale amount", "", { inputMode: "decimal" });
+      currency = field(form, "currency", "Currency", "");
+    } else {
+      unit = field(form, "unit", "Pounds or kilograms?", this.unit, { options: ["lb", "kg"] });
+    }
+    const start = el("button", "Start");
+    start.type = "submit";
+    form.append(start);
+    form.onsubmit = (e) => {
+      e.preventDefault();
+      if (!date.value) {
+        this.message("Pick the day.", true);
+        return;
+      }
+      if (run.job === "sell" && !destination.value.trim()) {
+        this.message("Type the buyer, or type Unknown.", true);
+        return;
+      }
+      if (run.job === "sell" && amount.value.trim() && !/^[A-Za-z]{3}$/.test(currency.value.trim())) {
+        this.message("Add the 3 letter currency.", true);
+        return;
+      }
+      run.shared = {
+        date: date.value,
+        type: run.job === "wean" ? "weaning" : "other",
+        unit: unit?.value || this.unit,
+        destination: destination?.value.trim() || "",
+        amount: amount?.value.trim() || null,
+        currency: currency?.value.trim().toUpperCase() || null,
+      };
+      this.render(this.s, "animals/chute");
+    };
+    this.root.append(form);
+  }
+  async finishChuteStep(notice) {
+    const run = this.chute;
+    run.saved += 1;
+    run.index += 1;
+    this.message(notice);
+    try {
+      await this.refresh();
+    } catch (error) {
+      this.message(`Saved on this phone, but the view could not refresh: ${error.message}. Reload before entering it again.`, true);
+    }
+    const expected = run.index >= run.ids.length ? "Group work done" : `${run.index + 1} of ${run.ids.length}`;
+    if (!this.root.textContent.includes(expected)) this.render(await this.repository().snapshot(), "animals/chute");
+  }
+  chuteWeigh(run, animal, label) {
+    const form = el("form", undefined, "card");
+    form.append(el("p", label));
+    const value = field(form, "value", "Weight", "", { type: "number", min: "0.000001", step: "any", inputMode: "decimal" });
+    const save = el("button", "Save weight");
+    save.type = "submit";
+    const next = button("Next animal", () => {
+      if (this.saving) return;
+      run.index += 1;
+      this.render(this.s, "animals/chute");
+    });
+    const bar = el("div", undefined, "sticky");
+    const actions = el("div", undefined, "actions");
+    actions.append(save, next);
+    bar.append(actions);
+    form.append(bar);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (this.saving) return;
+      if (!String(value.value).trim()) {
+        this.message("Type a weight, or tap Next animal to skip.", true);
+        return;
+      }
+      this.saving = true;
+      try {
+        await commitWorkflow(this.repository(), this.s, "weight", chuteWeightInput(animal.id, run.shared, value.value));
+        await this.finishChuteStep(`Saved on this phone: weight ${value.value} ${run.shared.unit} for ${animal.visualTag || animal.farmId}.`);
+      } catch (error) {
+        this.message(`Not saved: ${error.message}`, true);
+      } finally {
+        this.saving = false;
+      }
+    };
+    this.root.append(form);
+  }
+  chuteSell(run, animal) {
+    const form = el("form", undefined, "card");
+    const date = field(form, "date", "What day is this?", run.shared.date, { type: "date", required: true });
+    this.health.departure(form, form, animal);
+    field(
+      form,
+      "acknowledgeDeparture",
+      "I reviewed this notice and original records. This acknowledgment does not authorize slaughter or milk sale. Required for departures.",
+      false,
+      { type: "checkbox" },
+    );
+    const save = el("button", "Save sale");
+    save.type = "submit";
+    const next = button("Next animal", () => {
+      if (this.saving) return;
+      run.index += 1;
+      this.render(this.s, "animals/chute");
+    });
+    const bar = el("div", undefined, "sticky");
+    const actions = el("div", undefined, "actions");
+    actions.append(save, next);
+    bar.append(actions);
+    form.append(bar);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (this.saving) return;
+      if (!form.elements.namedItem("acknowledgeDeparture").checked) {
+        this.message("Check the notice for this animal before the sale is saved.", true);
+        return;
+      }
+      this.saving = true;
+      try {
+        const shared = { ...run.shared, date: date.value };
+        await commitWorkflow(this.repository(), this.s, "movement", chuteSaleInput(animal.id, shared, true));
+        await this.finishChuteStep(`Saved on this phone: sale for ${animal.visualTag || animal.farmId}.`);
+      } catch (error) {
+        this.message(`Not saved: ${error.message}`, true);
+      } finally {
+        this.saving = false;
+      }
+    };
+    this.root.append(form);
+  }
   card(a) {
     this.recentAnimals = [a.id, ...(this.recentAnimals || []).filter(id => id !== a.id)].slice(0, 4);
     this.title(`${a.visualTag || "No visual tag"} · ${a.farmId}`);
@@ -430,6 +725,33 @@ export class HerdUI {
     }
     identity.append(dl);
     this.root.append(identity);
+    const family = pedigreeView(this.s, a.id);
+    if (family) {
+      const box = el("section", undefined, "card pedigree");
+      box.append(el("h2", "Family"));
+      for (const row of family.rows) {
+        const line = el("div", undefined, "pedigree-row");
+        for (const cell of row) {
+          const item = el("div");
+          item.append(el("strong", cell.role), familyLink(cell));
+          line.append(item);
+        }
+        box.append(line);
+      }
+      box.append(el("p", family.summary));
+      if (!family.offspring.length) {
+        const quiet = el("p", undefined, "empty-state");
+        quiet.append(icon("calf"), el("span", "No calves saved yet."));
+        box.append(quiet);
+      }
+      for (const calf of family.offspring) {
+        const line = el("article", undefined, "list-row");
+        line.append(icon("calf"), el("p", calf.text));
+        if (calf.href) line.append(link("See this calf", calf.href));
+        box.append(line);
+      }
+      this.root.append(box);
+    }
     this.health.mount(a.id);
     for (const c of this.s.treatmentCourses.filter(
       (c) => c.animalId === a.id && !c.voidedAt,
@@ -484,6 +806,9 @@ export class HerdUI {
     for (const control of [first, second, unit]) control.onchange = calc;
     calc();
     this.root.append(controls, output);
+    const chart = el("section", undefined, "card weight-chart");
+    chart.append(el("h2", "Weight line"), drawWeightChart(document, weightPoints(weights, this.unit), this.unit));
+    this.root.append(chart);
     this.root.append(el("h2", "Full dated history"));
     this.history(events(this.s, { animalId: a.id }));
   }
@@ -803,12 +1128,15 @@ export class HerdUI {
     );
     for (const g of this.s.groups) {
       const card = el("section", undefined, "card");
+      const members = this.s.animals.filter((a) => a.currentGroupId === g.id && a.status === "active");
+      const gain = groupGain(this.s, members.map((a) => a.id), this.unit);
       card.append(
         el("h2", g.name),
         el(
           "p",
-          `${g.type} · ${g.archivedAt ? "Archived" : "Active"} · ${this.s.animals.filter((a) => a.currentGroupId === g.id && a.status === "active").length} active animals`,
+          `${g.type} · ${g.archivedAt ? "Archived" : "Active"} · ${members.length} active animals`,
         ),
+        el("p", `Group gain: ${gain.text}.`),
         el("p", g.description || ""),
         link("Rename / archive", `#groups/${g.id}`),
       );
@@ -876,7 +1204,7 @@ export class HerdUI {
           selections,
           `animal:${animal.id}`,
           `${animal.farmId} · ${animal.visualTag || "no tag"} · ${animal.status}`,
-          false,
+          !!this.chuteIds?.includes(animal.id),
           { type: "checkbox" },
         );
       body.append(selections);
@@ -891,6 +1219,10 @@ export class HerdUI {
             .join(", ") || "none");
       };
       body.append(preview);
+      if (this.chuteIds?.length) {
+        this.chuteIds = null;
+        selections.onchange();
+      }
     }
     this.reviews(body);
   }
@@ -906,7 +1238,19 @@ export class HerdUI {
       action,
       { animalId: a.id },
       `#animals/${a.id}`,
-      { next: `#animals/${a.id}/${action}` },
+      {
+        next: `#animals/${a.id}/${action}`,
+        // A typed due date wins. Days until become a date only when she is pregnant.
+        // Days already in calf are not a due date, and no gestation length is assumed.
+        collect: action === "pregnancy" ? (data) => {
+          if (data.result === "pregnant") {
+            const nextDate = expectedFromDays(data.date, data.daysUntilCalving, data.expectedCalvingDate || null);
+            if (nextDate) data.expectedCalvingDate = nextDate;
+          }
+          delete data.daysUntilCalving;
+          return data;
+        } : undefined,
+      },
     );
     if (action !== "breeding")
       field(body, "date", "Event date", this.today, {
@@ -958,6 +1302,13 @@ export class HerdUI {
       field(body, "result", "Result", "uncertain", {
         options: ["uncertain", "pregnant", "open"],
       });
+      field(
+        body,
+        "daysUntilCalving",
+        "About how many days until she calves?",
+        "",
+        { type: "number", min: 0, inputMode: "numeric" },
+      );
       field(
         body,
         "estimatedGestationDays",

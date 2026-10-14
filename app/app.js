@@ -155,12 +155,12 @@ async function refresh() {
 function route() {
   if (!repo) return;
   let path = location.hash.slice(1) || "dashboard";
-  if (DEPLOY.moved && (path.includes("/quick/") || /\/(new|add|edit|void|correct|batch|calving|weaning|pregnancy|sale|purchase)(\/|$)/.test(path))) {
+  if (DEPLOY.moved && (path.includes("/quick/") || /\/(new|add|edit|void|correct|batch|chute|calving|weaning|pregnancy|sale|purchase)(\/|$)/.test(path))) {
     path = "dashboard"; message("This old address is read-only. Save a copy, then add new records at the new address.");
   }
   const tab = path.split("/")[0];
   document.body.dataset.work = String(accepted);
-  let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch)(\/|$)/.test(path);
+  let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch|chute)(\/|$)/.test(path);
   document.body.dataset.recordEntry = String(entering);
   $('news-signup').hidden = DEPLOY.moved || entering;
   $('news-signup-link').hidden = DEPLOY.moved || entering;
