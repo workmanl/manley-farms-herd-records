@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.1-beta.1 (2026-10-13)
+
+- Fix: the "Update when ready" button and update messages sit outside the collapsed offline help again, so a staged update is visible. 1.5.0 hid them inside a closed section; records were never affected because the update still applied when all tabs closed.
+- Test: the update prompt can never be placed inside the collapsed offline details.
+
 ## 1.5.0-beta.1 (2026-10-13)
 
 - Add one original icon set on Home, the bottom bar, lists, Today and empty states.

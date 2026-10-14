@@ -131,7 +131,9 @@ test('offline status stays below work with update failures inside closed details
  assert.ok(main.compareDocumentPosition(panel)&dom.window.Node.DOCUMENT_POSITION_FOLLOWING);
  assert.equal(panel.querySelector('details').open,false);
  assert.equal(doc.querySelector('#offline-status').tagName,'SUMMARY');
- for(const id of ['update-status','pwa-update','update-backup','install-guidance'])assert.equal(doc.getElementById(id).closest('details'),panel.querySelector('details'));
+ assert.equal(doc.getElementById('install-guidance').closest('details'),panel.querySelector('details'));
+ // A staged update must be visible: the prompt and its status stay outside the collapsed details (fixed in 1.5.1).
+ for(const id of ['update-status','pwa-update','update-backup']){const el=doc.getElementById(id);assert.equal(el.closest('#pwa-panel'),panel);assert.equal(el.closest('details'),null);}
  dom.window.close();
 });
 test('larger text offers four launch actions plus More',async()=>{

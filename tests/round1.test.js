@@ -83,3 +83,15 @@ test('guides show a progress bar and the dose series question is plain', async (
     assert.match(read('app/styles.css'), /@media \(prefers-reduced-motion: reduce\)/);
   } finally { h.close(); }
 });
+
+test('update prompt is never hidden inside the closed offline details', async () => {
+  const { readFile } = await import('node:fs/promises');
+  const html = await readFile(new URL('../app/index.html', import.meta.url), 'utf8');
+  const start = html.indexOf('<aside id="pwa-panel"');
+  const details = html.slice(start, html.indexOf('</aside>', start));
+  const inside = details.slice(details.indexOf('<details>'), details.indexOf('</details>'));
+  for (const id of ['update-status', 'pwa-update', 'update-backup']) {
+    assert.ok(details.includes(`id="${id}"`), `${id} missing from the panel`);
+    assert.ok(!inside.includes(`id="${id}"`), `${id} must stay outside the collapsed details`);
+  }
+});

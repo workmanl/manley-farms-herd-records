@@ -21,7 +21,7 @@ try {
   const expected = mode === 'check' ? JSON.parse(await readFile(receiptPath, 'utf8')) : null;
   if (expected) assert.equal(expected.url, url, 'Use the same origin and path as the seed');
   ctx = await chromium.launchPersistentContext(resolve(profile), {viewport:{width:390,height:844}, serviceWorkers:'allow'});
-  const page = ctx.pages()[0] || await ctx.newPage(), errors = [];
+  let page = ctx.pages()[0] || await ctx.newPage(); const errors = [];
   ctx.on('page', p => p.on('pageerror', e => errors.push(e.message)));
   page.on('pageerror', e => errors.push(e.message));
   await page.goto(url, {waitUntil:'networkidle'});
@@ -75,19 +75,33 @@ try {
   } else {
     assert.notEqual(expected.appVersion, expectedApp, 'Seed before the upgrade, on the old release');
     await page.evaluate(async()=>{const registration=await navigator.serviceWorker.getRegistration();if(!registration)throw Error('Service worker missing');await registration.update();});
+    let updatePath = 'already-current';
     const current = await page.locator('.badge').textContent();
     if (!current.includes(expectedApp)) {
-      await page.locator('#pwa-update').waitFor({state:'visible',timeout:30000});
-      await page.locator('#pwa-update').click();
-      await page.waitForFunction(version=>document.querySelector('.badge')?.textContent.includes(version),expectedApp,{timeout:30000});
+      const prompt = await page.locator('#pwa-update').waitFor({state:'visible',timeout:30000}).then(()=>true,()=>false);
+      if (prompt) {
+        updatePath = 'prompt';
+        await page.locator('#pwa-update').click();
+        await page.waitForFunction(version=>document.querySelector('.badge')?.textContent.includes(version),expectedApp,{timeout:30000});
+      } else {
+        // The running release did not show its update prompt. Real users then get the update after closing every tab.
+        console.log('UPDATE PROMPT NOT VISIBLE ON THE OLD RELEASE: verifying the close-and-reopen path instead');
+        updatePath = 'reopen';
+        await ctx.close();
+        ctx = await chromium.launchPersistentContext(resolve(profile), {viewport:{width:390,height:844}, serviceWorkers:'allow'});
+        page = ctx.pages()[0] || await ctx.newPage();
+        page.on('pageerror', e => errors.push(e.message));
+        await page.goto(url, {waitUntil:'networkidle'});
+        await page.waitForFunction(version=>document.querySelector('.badge')?.textContent.includes(version),expectedApp,{timeout:30000});
+      }
     }
     await page.reload({waitUntil:'networkidle'});
     assert.ok((await page.locator('.badge').textContent()).includes(expectedApp), 'Wrong app version after update');
     assert.equal(await page.evaluate(()=>!!navigator.serviceWorker.controller),true,'No active service worker');
     assertUpgrade(expected,await read(),errors,dbVersion);
     await page.screenshot({path:join(output,'live-upgrade-after.png')});
-    await writeFile(join(output,'upgrade-pass.json'),JSON.stringify({url,appVersion:expectedApp,dbVersion,errors,checkedAt:new Date().toISOString()},null,2)+'\n');
-    console.log('UPGRADE GATE PASSED');
+    await writeFile(join(output,'upgrade-pass.json'),JSON.stringify({url,appVersion:expectedApp,dbVersion,updatePath,errors,checkedAt:new Date().toISOString()},null,2)+'\n');
+    console.log('UPGRADE GATE PASSED via', updatePath);
   }
 } catch(e) {console.error('UPGRADE GATE FAILED:',e.stack || e.message);process.exitCode=1;}
 finally {await ctx?.close();}
