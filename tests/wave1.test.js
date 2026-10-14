@@ -176,7 +176,7 @@ test('guide scrolls its question on each step, both themes keep the same control
     dom.window.HTMLElement.prototype.scrollIntoView=function(){scrolled++;};
     guideForm(form);assert.equal(scrolled,1);
     form.elements.farmId.value='001';[...form.querySelectorAll('button')].find(b=>b.textContent==='Next').click();
-    assert.ok(scrolled>1);assert.equal(dom.window.document.activeElement.name,'sex');
+    assert.ok(scrolled>1);assert.equal(dom.window.document.activeElement.className,'guide-question');assert.match(dom.window.document.activeElement.textContent,/Male, female or steer/);
     assert.equal(form.querySelectorAll('label:not([hidden])').length,1);
     dom.window.close();
   }

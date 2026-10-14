@@ -100,6 +100,7 @@ function healthFields(h) {
     "milk:instructionText": "No marketed milk",
   }))
     h.field(key, value);
+  h.root.querySelector("form").refreshTime?.();
 }
 test('empty dashboard has three steps, seven quick actions and bounded animal search',async()=>{
  const h=await setup();h.ui.demo=()=>{};await h.render('dashboard');
@@ -123,7 +124,7 @@ test('demo records have separate dataset IDs, writes cannot reach real herd, del
 });
 for(const action of ['animal','calving','treatment','weight','move','breeding','pregnancy','movement'])test(`guided ${action} saves through the existing transaction path`,async()=>{
  const h=await setup();const a=await h.save('animal',{farmId:'Mother',sex:'female'});const g=await h.save('group',{name:'South',type:'pasture'});await h.render(`dashboard/quick/${action}/${a.id}`);
- const form=h.root.querySelector('form');assert.ok(form.classList.contains('guided-form'));assert.equal(form.querySelectorAll('label:not([hidden])').length,1);
+ const form=h.root.querySelector('form');assert.ok(form.classList.contains('guided-form'));assert.ok(form.querySelectorAll('label:not([hidden])').length>=1);
  if(action==='animal')h.field('farmId','New animal');
  if(action==='calving')h.field('dateConfirmed',true);
  if(action==='treatment')healthFields(h);
@@ -195,6 +196,6 @@ test('demo hold dates stay relative to seeding time and elapsed intervals do not
 });
 test('quick action copy uses plain words and retains the hold safety notice',async()=>{
  const h=await setup();const a=await h.save('animal',{farmId:'Daisy',sex:'female'});await h.render(`dashboard/quick/treatment/${a.id}`);
- assert.match(h.root.textContent,/What day was the treatment\?/);assert.match(h.root.textContent,/Who gave the treatment\?/);assert.match(h.root.textContent,/How was the treatment given\?/);assert.match(h.root.textContent,/How long is the wait\?/);
+ assert.match(h.root.textContent,/What day was it\?/);assert.match(h.root.textContent,/Who gave it\?/);assert.match(h.root.textContent,/How did you give it\?/);assert.match(h.root.textContent,/How long is the wait\?/);
  await h.render('dashboard');assert.match(h.root.textContent,/An elapsed interval never means safe/);assert.match(h.root.textContent,/Ask your veterinarian and check the label/);assert.doesNotMatch(h.root.textContent,/Breeding \/ preg check/);h.cleanup();
 });

@@ -396,7 +396,7 @@ test("PWA integration: offline startup uses cached status without fetching; dirt
   assert.equal(network, 0);
   assert.equal(
     document.getElementById("offline-status").textContent,
-    "Ready offline",
+    "Works offline",
   );
   const input = document.getElementById("operation-name");
   input.dispatchEvent(new dom.window.Event("input", { bubbles: true }));

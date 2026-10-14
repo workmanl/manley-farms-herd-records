@@ -105,7 +105,7 @@ test('moved views keep search, history and report/export controls while entry ro
     const ui=new HerdUI(root,{repository:()=>repo,refresh:async()=>{},message:()=>{}});
     ui.render(s,'animals');
     assert.equal(root.querySelector('button[type="submit"]').disabled,false);
-    ui.render(s,'events');assert.ok(root.textContent.includes('Complete record'));
+    ui.render(s,'events');assert.ok(root.textContent.includes('For helpers: full saved record'));
     for(const route of ['animals/new','dashboard/quick/calving','animals/'+s.animals[0].id+'/weight','groups/new','health/clock']) {
       ui.render(s,route);assert.equal(root.querySelector('form'),null);assert.match(root.textContent,/read-only/);
     }

@@ -1,3 +1,6 @@
+import {plainReason} from './copy.js';
+import {setupTime} from './when.js';
+import {humanWhen} from './when.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import {
   evaluateWithdrawal,
@@ -16,12 +19,10 @@ export class HealthUI {
     return this.host.s;
   }
   format(instant) {
-    return instant
-      ? `${localParts(instant, this.s.operation[0].timeZone).replace("T", " ")} ${this.s.operation[0].timeZone} (${instant})`
-      : "No controlling release";
+    return instant ? humanWhen(instant,this.s.operation[0].timeZone) : "No set end time";
   }
   summary(c) {
-    return `${c.label}${c.reasons.length ? `: ${c.reasons.join("; ")}` : ""} · ${this.format(c.releaseAt)}${c.remaining ? ` · ${c.remaining} remaining` : ""}`;
+    return `${c.label}${c.reasons.length ? `: ${c.reasons.map(plainReason).join("; ")}` : ""} · ${this.format(c.releaseAt)}${c.remaining ? ` · ${c.remaining} remaining` : ""}`;
   }
   mount(animalId) {
     const section = this.el("section", undefined, "withdrawal-panel");
@@ -85,15 +86,15 @@ export class HealthUI {
         counts,
         el(
           "p",
-          "Counts overlap. Each animal appears once per category, including departed and archived animals.",
+          "An animal can be in more than one count. Sold and archived animals are counted too.",
         ),
       );
     }
     section.append(
-      el("p", DASHBOARD_NOTICE, "notice"),
+      this.safetyNote(),
       el(
         "p",
-        `Calculated ${this.format(evaluation.calculatedAt)}. Device clock only. No notifications while closed.`,
+        `Checked ${this.format(evaluation.calculatedAt)}. Uses this phone’s clock. No alerts while the app is closed.`,
       ),
       link("Terms and disclaimer", "#terms"),
     );
@@ -128,7 +129,7 @@ export class HealthUI {
           link(`${a.visualTag || "No tag"} · ${a.farmId}`, `#animals/${a.id}`),
           el(
             "p",
-            `${this.s.groups.find((g) => g.id === a.currentGroupId)?.name || "No group"} · ${a.pasture || "No pasture text"} · ${a.status}`,
+            `${this.s.groups.find((g) => g.id === a.currentGroupId)?.name || "No group"} · ${a.pasture || "No pasture text"} · ${a.status[0].toUpperCase()+a.status.slice(1)}`,
           ),
         );
         const commodities =
@@ -150,7 +151,7 @@ export class HealthUI {
             el("h3", `${commodity}: ${this.summary(c)}`),
             el(
               "p",
-              `Product: ${[...new Set(treatments.map((t) => t.product))].join(", ") || "No completed treatment"}. Last administration: ${last || "Unknown"}`,
+              `Product: ${[...new Set(treatments.map((t) => t.product))].join(", ") || "No dose marked done"}. Last dose: ${last ? humanWhen(last,this.s.operation[0].timeZone) : "Not known"}`,
             ),
           );
           const expanded = el("details");
@@ -162,14 +163,14 @@ export class HealthUI {
             expanded.append(
               el(
                 "p",
-                `${t?.product || item.course?.product} · ${t?.administrationAt || t?.administrationDate || "No dose"} · ${this.summary(item)}`,
+                `${t?.product || item.course?.product} · ${t ? humanWhen(t.administrationAt || t.administrationDate,this.s.operation[0].timeZone) : "No dose"} · ${this.summary(item)}`,
               ),
             );
             if (t)
               expanded.append(
                 link("Correct / void treatment", `#health/treatment/${t.id}`),
                 details(
-                  "Recorded instructions and original timing",
+                  "For helpers: saved instructions and time",
                   JSON.stringify(t, null, 2),
                 ),
               );
@@ -212,6 +213,10 @@ export class HealthUI {
       section.append(d);
     }
   }
+  safetyNote(){
+    const box=this.el('div',undefined,'notice');box.append(this.el('p','A finished wait is not a safe-to-sell check. Follow the label and your vet.'));
+    const why=this.el('details');why.append(this.el('summary','Why?'),this.el('p',DASHBOARD_NOTICE));box.append(why);return box;
+  }
   reviewFields(body) {
     this.field(body, "revisionReason", "Correction / review reason", "", {
       required: true,
@@ -227,7 +232,7 @@ export class HealthUI {
     this.field(
       body,
       "reviewConfirmed",
-      "I reviewed the original values, instructions and effect on holds",
+      "I checked the old answers, instructions and how holds will change",
       false,
       { type: "checkbox", required: true },
     );
@@ -258,6 +263,7 @@ export class HealthUI {
         }),
       },
     );
+    form.dataset.animalName=animal?.farmId || "your selected animals";
     const t = prior || {};
     if (batch) {
       const choices = el("fieldset");
@@ -266,7 +272,7 @@ export class HealthUI {
         field(
           choices,
           `animal:${a.id}`,
-          `${a.farmId} · ${a.visualTag || "No tag"} · ${a.status}`,
+          `${a.farmId} · ${a.visualTag || "No tag"} · ${a.status[0].toUpperCase()+a.status.slice(1)}`,
           false,
           { type: "checkbox" },
         );
@@ -325,9 +331,9 @@ export class HealthUI {
       { type: "number", min: -840, max: 840, step: 1 },
     );
     body.append(
-      el(
-        "p",
-        "Date-only history remains unresolved. For repeated DST hours choose the actual offset; nonexistent local times are rejected. Future doses cannot be recorded as completed.",
+      this.details(
+        "Why does the time matter?",
+        "A day without a time needs a check. Some clock times happen twice. Choose the first or second time. You cannot record a future dose as done.",
       ),
     );
     for (const [name, label] of [
@@ -401,7 +407,7 @@ export class HealthUI {
       fs.append(
         el(
           "p",
-          "Use manual-review for conflicting instructions, milkings or other unresolved conditions. Document the instructions; do not guess an hours conversion.",
+          "Pick Needs a vet check if the instructions conflict or use milkings. Write the full instructions. Do not guess hours.",
         ),
       );
       const r = t[commodity] || {};
@@ -458,7 +464,7 @@ export class HealthUI {
       directed.append(
         el(
           "summary",
-          "Document veterinarian-directed release for unknown / manual review",
+          "Record the end time your vet has checked",
         ),
       );
       for (const [key, label] of [
@@ -480,7 +486,7 @@ export class HealthUI {
     if (prior) {
       body.append(
         this.details(
-          "Earlier answers are kept when changed",
+          "For helpers: earlier answers stay in history",
           JSON.stringify(prior, null, 2),
         ),
       );
@@ -490,6 +496,7 @@ export class HealthUI {
       );
     }
     h.reviews(body);
+    setupTime(form,{preserve:!!prior});
   }
   route(kind, id) {
     const h = this.host;
@@ -504,7 +511,7 @@ export class HealthUI {
       body.append(
         this.el(
           "p",
-          "Verify the device date, time and zone before resetting the recorded clock high-water mark.",
+          "Check this phone’s date, time and clock setting. Only then confirm the clock check.",
         ),
       );
       this.field(body, "revisionReason", "Clock review reason", "", {
@@ -578,7 +585,7 @@ export class HealthUI {
           "p",
           "The original record stays in history. Voiding a final administration reopens its course.",
         ),
-        this.details("Original treatment", JSON.stringify(t, null, 2)),
+        this.details("For helpers: original treatment", JSON.stringify(t, null, 2)),
       );
       this.reviewFields(body);
       return;
@@ -615,7 +622,7 @@ export class HealthUI {
         previous = signature;
         panel.append(
           this.el("h2", "Departure withdrawal preview"),
-          this.el("p", departureText(preview)),
+          this.el("p", "Check meat and milk for the move day and for now. Check the records behind each result. Recording a move does not permit slaughter or milk sale."),
         );
         for (const [label, row] of [
           ["Event-time", preview.event],

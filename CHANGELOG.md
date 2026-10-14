@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0-beta.1 (2026-10-13)
+
+- Put search and common work first, add phone bottom navigation, and keep More for the other tools.
+- Reduce treatment from 26 to eight screens and weight, move and single calving to four. Keep the same validators, audited writes and withdrawal rules.
+- Add explicit last-treatment reuse, separate visible meat/milk suggestions, farm-clock time choices and repeated-hour checks.
+- Add plain option labels, human dates, sentence reviews, inline errors, six-second saved feedback and device text sizes.
+- Expand unit coverage and the staged phone checker. Rebuild both origin and read-only moved outputs. See docs/wave2-report.md for acceptance limits and remaining browser, copy, clinical and device review gates.
+
 ## 1.3.2-beta.1 (2026-10-13)
 
 - Replace email capture with a plain outbound updates link on the private origin after the public FAQ and in the footer. Hide both on record-entry routes and the moved build.

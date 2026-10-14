@@ -150,7 +150,7 @@ export async function startPWA({
     try {
       const status = await workerStatus(active);
       $("offline-status").textContent = readyOffline(active, status)
-        ? "Ready offline"
+        ? "Works offline"
         : "Getting ready to work offline...";
       if ($("release-version")) $("release-version").textContent = status.version || "Not ready offline yet";
       const waiting = registration.waiting;

@@ -386,6 +386,7 @@ function healthFields(h) {
     "milk:instructionText": "No marketed milk",
   }))
     h.field(key, value);
+  h.root.querySelector("form").refreshTime?.();
 }
 test("Treatment action opens complete form, saves instructions and renders holds/history safely", async () => {
   const h = await setup();

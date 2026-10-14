@@ -42,9 +42,9 @@ test("bundled full terms are exact and hash input contains all required displaye
   assert.doesNotMatch(html, /<input[^>]*id="accept-check"[^>]*\bchecked\b/);
   assert.match(html, /<button[^>]*id="accept"[^>]*disabled/);
 });
-test("deployable app has local assets, all five tabs, exact footer and full matching license", () => {
+test("deployable app has local assets, all four tabs, exact footer and full matching license", () => {
   const html = read("app/index.html");
-  for (const tab of ["dashboard", "animals", "events", "reports", "backup"])
+  for (const tab of ["dashboard", "animals", "add", "backup"])
     assert.ok(html.includes(`data-tab="${tab}"`));
   // Navigation and canonical URLs are inert. Runtime assets must be bundled.
   for (const match of html.matchAll(/(?:src|href)="([^"]+)"/g)) {

@@ -1,3 +1,5 @@
+import {plainOption, plainLabel, entryError} from './copy.js';
+import {rememberTreatment, treatmentTools} from './last-used.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { drawDashboard } from "./dashboard.js";
 import { guideForm, pickerProgress } from "./guided-form.js";
@@ -31,6 +33,7 @@ const button = (text, action) => {
   b.onclick = action;
   return b;
 };
+const safeDeviceStorage = () => {try{return document.defaultView.localStorage;}catch{return undefined;}};
 const opts = (values) => values.map((v) => (Array.isArray(v) ? v : [v, v]));
 const sexes = ["unknown", "female", "male", "steer"];
 const statuses = ["active", "sold", "culled", "dead", "archived"];
@@ -50,7 +53,8 @@ const names = {
 };
 let sequence = 0;
 function field(parent, name, labelText, value = "", config = {}) {
-  const label = el("label", labelText);
+  if(name === 'timeZone')config={...config,options:[...new Set([value,'Etc/UTC',...(Intl.supportedValuesOf?.('timeZone') || [])])].filter(Boolean).map(z=>[z,z==='Etc/UTC'?'World clock':z.split('/').slice(1).join(', ').replaceAll('_',' ')])};
+  const label = el("label", plainLabel(labelText));
   const control = el(
     config.options
       ? "select"
@@ -64,7 +68,7 @@ function field(parent, name, labelText, value = "", config = {}) {
   label.htmlFor = control.id;
   if (config.options)
     for (const [value, text] of opts(config.options)) {
-      const o = el("option", text);
+      const o = el("option", text !== value && Array.isArray(config.options?.find(v=>Array.isArray(v)&&v[0]===value)) ? text : plainOption(text));
       o.value = value;
       control.append(o);
     }
@@ -90,7 +94,7 @@ const values = (form) =>
   Object.fromEntries(
     [...form.elements]
       .filter((e) => e.name && !e.disabled)
-      .map((e) => [e.name, e.type === "checkbox" ? e.checked : e.value]),
+      .map((e) => [e.name, e.type === "checkbox" ? e.checked : e.type === "datetime-local" ? e.value.replace(/\.\d+$/, "") : e.value]),
   );
 const details = (title, text) => {
   const d = el("details");
@@ -130,9 +134,11 @@ export class HerdUI {
       this.root.append(el('p','This old address is read-only. Save a copy, then restore it at herd.manleyfarms.com.'), link('View your herd','#dashboard'));
       return;
     }
-    if (tab === "dashboard") {
+    if (tab === "add") { this.title("Add a record"); for(const [kind,label] of [["animal","Add an animal"],["calving","Add a calf"],["weight","Weigh"],["treatment","Record a treatment"],["move","Move to a pasture or group"],["breeding","Breeding"],["pregnancy","Pregnancy check"],["movement","Sold or died"]])this.root.append(link(label,`#dashboard/quick/${kind}`));this.root.append(link("Work a group", "#health/batch")); }
+    else if (tab === "dashboard") {
       if (id === "quick") this.quick(action, route.split("/")[3]);
       else this.dashboard();
+      if (this.repository().moved) this.root.prepend(el('p','This old address is read-only. Save a copy, then add new records at herd.manleyfarms.com.','notice'));
     }
     else if (tab === "health") this.health.route(id, action);
     else if (tab === "groups") id ? this.groupForm(id) : this.groups();
@@ -223,6 +229,7 @@ export class HerdUI {
       const group=form.elements.namedItem(action === "animal" ? "currentGroupId" : "groupId");
       if(group && last && [...group.options].some(o=>o.value===last.groupId))group.value=last.groupId;
       if(action === "breeding")form.elements.namedItem("serviceDate").value=this.today;
+      if(action === "treatment" && !this.demoMode) treatmentTools(form, this.s.operation[0].id, safeDeviceStorage());
       guideForm(form, {selection:action!=="animal"});
     }
   }
@@ -393,7 +400,7 @@ export class HerdUI {
       ["Farm ID", a.farmId],
       ["Visual tag", a.visualTag],
       ["RFID", a.rfid],
-      ["DOB", `${a.birthDate || "Unknown"} (${a.birthDatePrecision})`],
+      ["DOB", `${a.birthDate || "Unknown"} · ${plainOption(a.birthDatePrecision)}`],
       [
         "Dam",
         this.s.animals.find((x) => x.id === a.damId)?.farmId || a.damReference,
@@ -406,7 +413,7 @@ export class HerdUI {
       ["Group", this.s.groups.find((g) => g.id === a.currentGroupId)?.name],
       ["Pasture", a.pasture],
       ["Notes", a.notes],
-      ["Internal ID", a.id],
+      
     ]) {
       dl.append(el("dt", label), el("dd", value || "Unknown"));
     }
@@ -523,7 +530,7 @@ export class HerdUI {
       li.append(links);
       li.append(
         details(
-          "Complete record and original values",
+          "For helpers: full saved record",
           JSON.stringify(r, null, 2),
         ),
       );
@@ -572,6 +579,7 @@ export class HerdUI {
   form(title, action, initial, back, { collect, draft, next } = {}) {
     this.title(title);
     const form = el("form", undefined, "card");
+    form.noValidate = true;
     const body = el("div", undefined, "fields");
     form.append(body);
     const status = el("p", "Not saved.");
@@ -584,7 +592,8 @@ export class HerdUI {
       (e) => {
         e.target.setAttribute("aria-invalid", "true");
         e.target.setAttribute("aria-describedby", status.id);
-        status.textContent = `Check ${e.target.labels?.[0]?.textContent || "the highlighted field"}: ${e.target.validationMessage}`;
+        status.textContent = entryError(e.target);
+        let hint=e.target.parentNode.querySelector(".inline-error");if(!hint){hint=el("span",undefined,"inline-error");hint.setAttribute("role","alert");e.target.parentNode.append(hint);}hint.textContent=status.textContent;
       },
       true,
     );
@@ -613,6 +622,7 @@ export class HerdUI {
     form.onsubmit = async (e) => {
       e.preventDefault();
       if (this.saving) return;
+      if (!form.checkValidity()) { status.focus(); return; }
       this.saving = true;
       status.textContent = "Saving…";
       const controls = [
@@ -626,7 +636,9 @@ export class HerdUI {
         // Persist the delivery token and exact entry before beginning its atomic commit.
         if (draft) draft.save(data);
         controls.forEach((c) => (c.disabled = true));
-        await commitWorkflow(this.repository(), baseSnapshot, action, data);
+        const result = await commitWorkflow(this.repository(), baseSnapshot, action, data);
+        if(!this.demoMode && (action === "treatment" || action === "batch-treatment")) rememberTreatment(safeDeviceStorage(), baseSnapshot.operation[0].id, data);
+        form.savedResult = result;
         committed = true;
         document.dispatchEvent(
           new document.defaultView.CustomEvent("herd-saved", {
@@ -641,7 +653,10 @@ export class HerdUI {
             cleanup =
               " The saved answers are still on this phone. Reopening will show that they were saved.";
           }
-        this.message(`Saved on this device.${cleanup}`);
+        const animal = baseSnapshot.animals.find(a=>a.id === (data.animalId || resultAnimal(form.savedResult)));
+        this.message(`Saved on this phone: ${action} ${data.value || ""} ${data.unit || ""} for ${animal?.visualTag || animal?.farmId || data.farmId || "your herd"}.${cleanup}`);
+        const notice=document.getElementById("status");
+        if(notice){ const change=link("Change it", action === "treatment" ? `#health/treatment/${form.savedResult?.id || form.savedResult?.[0]?.id}` : ["animal","group"].includes(action) && form.savedResult?.id ? `#${action === "animal" ? "animals" : "groups"}/${form.savedResult.id}/edit` : "#reports"); notice.append(change); }
         await this.refresh();
         const destination = e.submitter?.value === "next" && next ? next : back;
         if (location.hash === entryRoute) {
@@ -1214,3 +1229,5 @@ export class HerdUI {
     body.append(discard);
   }
 }
+
+function resultAnimal(result) { return result?.animalId || result?.[0]?.animalId; }

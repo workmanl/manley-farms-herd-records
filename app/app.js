@@ -1,3 +1,5 @@
+import {readDevice as readPreferences,writeDevice as writePreferences} from './lib/device-safety.js';
+import {plainOption} from './lib/copy.js';
 import {DEPLOY, NEW_ADDRESS} from './lib/deploy-config.js';
 import {hasHerdRecords, shouldRedirect, verifyMoveCopy, removeMovedRecords} from './lib/origin-move.js';
 import {hasDrafts} from './lib/pwa.js';
@@ -60,10 +62,14 @@ let repo,
   safetyBackup,
   decisions = {},
   busy = false;
+let savedNoticeTimer;
 const message = (text, error = false) => {
   $("status").hidden = !text;
   $("status").textContent = text;
   $("status").classList.toggle("error", error);
+  clearTimeout(savedNoticeTimer);
+  $("status").dataset.saved=String(/^Saved on this phone/.test(text));
+  if(/^Saved on this phone/.test(text))savedNoticeTimer=setTimeout(()=>{$("status").hidden=true;$("status").dataset.saved='false';},6000);
 };
 function download(value, name) {
   const blob = new Blob([JSON.stringify(value, null, 2) + "\n"], {
@@ -153,12 +159,14 @@ function route() {
     path = "dashboard"; message("This old address is read-only. Save a copy, then add new records at the new address.");
   }
   const tab = path.split("/")[0];
+  document.body.dataset.work = String(accepted);
   let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch)(\/|$)/.test(path);
   document.body.dataset.recordEntry = String(entering);
   $('news-signup').hidden = DEPLOY.moved || entering;
   $('news-signup-link').hidden = DEPLOY.moved || entering;
   const herdTab = [
     "dashboard",
+    "add",
     "animals",
     "groups",
     "events",
@@ -186,7 +194,7 @@ function route() {
   if (tab === "terms" && !repo.recovery) $("gate").hidden = false;
   $("gate-notice").hidden = accepted;
   for (const link of document.querySelectorAll("[data-tab]")) {
-    if (link.dataset.tab === (tab === "groups" ? "animals" : tab))
+    if (link.dataset.tab === (path.includes("/quick/") ? "add" : tab === "groups" ? "animals" : tab))
       link.setAttribute("aria-current", "page");
     else link.removeAttribute("aria-current");
   }
@@ -366,10 +374,12 @@ async function preview() {
   $("replace-safety").hidden = plan.mode !== "replace";
   updateCommit();
 }
+for(const text of ['Your records stay on this phone. Save copies.','This app does not tell you when meat or milk is safe. Follow the label and your vet.','Free. No account.']){const p=document.createElement('p');p.textContent=text;$('intro').append(p);}
+const termsIntro=document.createElement('details');const termsSummary=document.createElement('summary');termsSummary.textContent='Read the full start notes';termsIntro.append(termsSummary);$('intro').append(termsIntro);
 for (const paragraph of INTRO.split("\n\n")) {
   const p = document.createElement("p");
   p.textContent = paragraph;
-  $("intro").append(p);
+  termsIntro.append(p);
 }
 $("accept-label").textContent = CHECKBOX;
 $("full-terms").textContent =
@@ -824,3 +834,12 @@ $('move-remove').onclick = () => void run(async () => {
   await removeMovedRecords(repo, {confirmed:true, drafts:hasDrafts(deviceStorage)});
   repo.close(); location.replace(NEW_ADDRESS);
 });
+
+// Device preferences never change herd records or require a schema upgrade.
+let preferenceStorage;try{preferenceStorage=localStorage;}catch{}
+const applyText=size=>{document.documentElement.style.fontSize=([17,19,22].includes(Number(size))?size:17)+'px';};
+applyText(readPreferences(preferenceStorage).textSize);
+$('text-size').value=String(readPreferences(preferenceStorage).textSize || 17);
+$('text-size').onchange=e=>{applyText(e.target.value);writePreferences(preferenceStorage,{textSize:Number(e.target.value)});void refresh();};
+const zones=Intl.supportedValuesOf?.('timeZone') || [Intl.DateTimeFormat().resolvedOptions().timeZone];
+for(const zone of new Set(['Etc/UTC',...zones])){const o=document.createElement('option');o.value=zone;o.textContent=zone==='Etc/UTC'?'World clock':zone.split('/').slice(1).join(', ').replaceAll('_',' ');$('time-zone').append(o);}

@@ -1174,3 +1174,59 @@ body[data-empty-move="true"] #move-panel > :not(#move-title):not(#move-copy),
 body[data-empty-move="true"] .app-tabs { display:none; }
 
 .backup-light .quiet-link { text-decoration: underline; font-size: 15px; padding: 8px; }
+
+/* Wave 2: work first and thumb reach. */
+html {font-size:17px;}
+body {font-size:1rem;line-height:1.5;padding-bottom:80px;}
+#herd input,#herd select,#herd textarea {font-size:1rem;}
+.site-header {position:static;height:56px;min-height:56px;overflow:hidden;padding:0;}
+.site-header .nav-wrap {height:56px;padding:4px 12px;}
+.site-header .nav-links {display:none;}
+.site-header .brand {font-size:1rem;}
+.app-tabs {position:fixed;inset:auto 0 0;z-index:10;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));height:56px;padding:0;background:var(--card);gap:0;overflow:visible;}
+.app-tabs a,.app-tabs a:last-child {display:flex;flex-direction:column;justify-content:center;align-items:center;min-width:48px;min-height:48px;padding:0;font-size:15px;white-space:normal;line-height:1.2;}
+.app-tabs a span {font-size:18px;}
+body[data-work="true"] .app-identity,body[data-work="true"] #public-intro {display:none;}
+body[data-work="true"] #pwa-panel {margin:0;padding:0 12px;border:0;}
+body[data-work="true"] #pwa-panel summary {min-height:48px;display:flex;align-items:center;}
+body[data-work="true"] #offline-status {margin:0;font-size:15px;}
+body[data-work="true"] #herd>h1 {font-size:1.2rem;margin:4px 0;}
+.home-work .card {margin:4px 0;padding:8px;}
+.home-work h2 {font-size:1rem;margin:4px 0;}
+.home-find form {display:flex;gap:8px;align-items:end;}
+.home-find label {flex:1;min-width:0;font-size:15px;}
+.home-find input {width:100%;}
+.home-find button {min-width:48px;}
+.home-work .quick-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.home-work .quick-action {min-width:0;min-height:56px;padding:4px;font-size:1rem;line-height:1.15;}
+.home-work .quick-action svg {display:none;}
+.home-work .quick-action:last-child {grid-column:auto;min-height:56px;}
+.home-work details {margin:0;}
+.home-work summary {min-height:48px;}
+#herd .guided-form {height:calc(100dvh - 80px);min-height:240px;}
+#herd .guided-form label:not([hidden]) {font-size:1rem;padding:8px 0;}
+#herd .guided-form .sticky {padding-bottom:8px;}
+#herd .fields {overflow-wrap:anywhere;}
+#herd .guide-extra {margin:8px 0;}
+.inline-error {display:block;color:var(--error);}
+.time-tools {display:flex;flex-wrap:wrap;gap:8px;}
+.time-tools button {font-size:1rem;}
+#status:empty {display:none;}
+#status a {margin-left:8px;}
+@media print {.app-tabs{display:none;}}
+
+#status[data-saved="true"] {position:fixed;inset:8px 8px auto;z-index:30;background:var(--card);font-size:1rem;border:3px solid var(--brand);}
+body[data-work="true"] main {padding:4px 12px 16px;}
+#herd .home-find input {min-height:48px;}
+#herd .guide-extra:not([hidden]) {display:block;}
+
+/* Keep each question and its control in the same scrolling pane. */
+#herd .guided-form .guide-question { margin: 4px 0 8px; font-size: 1.2rem; }
+#herd .guided-form .guide-label-hidden { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+@media (max-height: 650px) {
+  #herd .guided-form .sticky { padding:4px 0; }
+  #herd .guided-form .sticky > p { margin:0; font-size:12px; line-height:1.2; }
+  #herd .guided-form .sticky > p:empty { display:none; }
+  #herd .guided-form .sticky > p.guide-unsaved { display:none; }
+  #herd .guided-form .sticky .actions > :is(button,a) { min-height:48px; height:48px; padding:4px; }
+}

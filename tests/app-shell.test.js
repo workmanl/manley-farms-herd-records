@@ -77,6 +77,10 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   location.hash = "#backup";
   await until(() => !$("backup").hidden);
   assert.equal(document.querySelector("#backup-light [data-backup-snooze]").className,"secondary quiet-link");
+  $('text-size').value='22';$('text-size').dispatchEvent(new dom.window.Event('change'));
+  assert.equal(document.documentElement.style.fontSize,'22px');
+  assert.equal(JSON.parse(localStorage.getItem('manley-herd-device-v1')).textSize,22);
+  $('text-size').value='17';$('text-size').dispatchEvent(new dom.window.Event('change'));
   $("theme").value = "sunlight";
   $("settings").dispatchEvent(
     new dom.window.Event("submit", { cancelable: true, bubbles: true }),
@@ -113,11 +117,11 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   dom.window.close();
 });
 
-test("site landmarks remain separate from the five app tabs", () => {
+test("site landmarks remain separate from the four app tabs", () => {
   const document = new JSDOM(fs.readFileSync(new URL('../app/index.html', import.meta.url), 'utf8')).window.document;
   assert.equal(document.querySelector('header.site-header nav').getAttribute('aria-label'), 'Primary');
   assert.equal(document.querySelector('.nav-links [aria-current="page"]').textContent, 'Tools');
-  assert.equal(document.querySelectorAll('.app-tabs [data-tab]').length, 5);
+  assert.equal(document.querySelectorAll('.app-tabs [data-tab]').length, 4);
   assert.equal(document.querySelector('.site-header').nextElementSibling.className, 'app-tabs print-hide');
   assert.equal(document.querySelector('.skip').getAttribute('href'), '#main');
   assert.ok(document.querySelector('footer.footer.print-hide .footer-contact'));

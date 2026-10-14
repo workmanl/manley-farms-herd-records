@@ -13,7 +13,7 @@ test('checkbox and secondary controls keep at least 48px targets in both themes'
 });
 test('offline status replaces preparation text with readiness rather than adding another notice',()=>{
   const source=read('app/lib/pwa.js');
-  assert.match(source,/readyOffline\(active, status\)\s*\? "Ready offline"\s*: "Getting ready to work offline\.\.\."/);
+  assert.match(source,/readyOffline\(active, status\)\s*\? "Works offline"\s*: "Getting ready to work offline\.\.\."/);
   assert.doesNotMatch(source,/Offline preparation|schema migration/);
   const dom=new JSDOM(read('app/index.html'));
   assert.equal(dom.window.document.querySelectorAll('#offline-status').length,1);

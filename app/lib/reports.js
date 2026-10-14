@@ -1,3 +1,5 @@
+import {plainOption,plainLabel,plainReason} from './copy.js';
+import {humanWhen} from './when.js';
 import {APP_ADDRESS} from './deploy-config.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { evaluateWithdrawal, LABELS } from "./withdrawal.js";
@@ -6,11 +8,11 @@ import { isDate, requireThat as check } from "./validation.js";
 export const PRINT_FOOTER =
   `Manley Farms Herd Records organizes user-entered records. This report is not veterinary, legal or regulatory advice, a compliance certificate, or authorization for slaughter or milk sale. Verify entries, withdrawal instructions and applicable requirements. This app is not certified by BQA or any authority. Provided as is, without warranty to the extent allowed by law. The user is responsible for decisions and backups. Full terms: ${APP_ADDRESS.replace(/^https:\/\//, "")}terms.txt.`;
 export const SWITCHING_STEPS = [
-  "Export and verify a full JSON backup. Export all CSV tables plus the field dictionary, retaining parent and event IDs.",
-  "Print the current treatment log and calving book. Compare counts and sample records, including tags with leading zeros, sold animals, and unresolved holds.",
-  "Copy files to a second user-controlled location outside this browser. Back up after each major work session, keep quarterly CSV archives, and practice a restore on a spare browser or profile at least yearly.",
-  "Map fields into the destination system. Import animals before dependent events, and reconcile totals, parentage, weights, and withdrawal instructions. Vendor compatibility is not guaranteed.",
-  "Keep the original exports and a runnable release archive with its manual. To self-host after the website disappears, serve that archive over HTTPS or localhost and restore JSON. Double-clicking a file:// page is not the supported PWA recovery method.",
+ 'Save a copy and check it. Save all the tables and the field guide. Keep record links in the files.',
+ 'Print the treatment log and calf book. Check totals and some records. Check leading zeros, sold animals and holds that need review.',
+ 'Keep the files in two places outside this browser. Save a copy after herd work. Save tables every three months. Try a restore in a spare browser each year.',
+ 'Match fields in the new app. Add animals before their events. Check totals, parents, weights and wait instructions. Other apps may use different fields.',
+ 'Keep the original files, the app source and the guide. A helper can run that copy if this site closes. The guide explains how to host it and restore your herd. Opening the page as a file will not work.',
 ];
 const display = (v) =>
   v === null || v === undefined
@@ -22,10 +24,10 @@ const identity = (a) =>
   a
     ? `${a.farmId} | tag ${a.visualTag ?? "Unknown"} | RFID ${a.rfid ?? "Unknown"}`
     : "Unknown";
-const instruction = (r) =>
-  `${r.state}; ${r.value ?? "unknown"} ${r.unit ?? ""}; source ${r.source ?? "unknown"}; ${r.instructionText ?? ""}; reference ${r.instructionReference ?? "unknown"}; directed release ${r.directedReleaseAt ?? "none"}; resolution ${r.resolutionReason ?? "none"}`;
-const hold = (h) =>
-  `${LABELS[h.status]}${h.releaseAt ? "; release UTC " + h.releaseAt : ""}${h.reasons.length ? "; " + h.reasons.join("; ") : ""}`;
+const instruction = (r,zone) =>
+  `${plainOption(r.state)}; ${r.value ?? "not known"} ${r.unit ? plainOption(r.unit) : ""}; from ${plainOption(r.source || "not known")}; ${r.instructionText ?? ""}; label or vet note: ${r.instructionReference ?? "not known"}; vet set end time: ${r.directedReleaseAt ? humanWhen(r.directedReleaseAt,zone) : "none"}; check notes: ${r.resolutionReason ?? "none"}`;
+const hold = (h,zone) =>
+  `${LABELS[h.status]}${h.releaseAt ? "; recorded wait ends " + humanWhen(h.releaseAt,zone) : ""}${h.reasons.length ? "; " + h.reasons.map(plainReason).join("; ") : ""}`;
 export function assembleReport(
   s,
   {
@@ -67,7 +69,7 @@ export function assembleReport(
     zone: s.operation[0].timeZone,
     unit,
     legend:
-      "Unknown means not recorded. Archived and voided records are kept and labeled. Voided treatments do not contribute to current holds. Recorded interval elapsed is not permission for slaughter or milk sale. Releases are UTC instants; current holds use the entire saved history, regardless of report range.",
+      "Unknown means not entered. Old and voided records stay here and are marked. A voided treatment does not count toward current holds. Recorded interval elapsed is not permission for slaughter or milk sale. Times show the clock used. Current holds use all saved records, even those outside these dates.",
     footer: PRINT_FOOTER,
     rows: [],
     holds: [],
@@ -94,17 +96,17 @@ export function assembleReport(
       const calculation = ["meat", "milk"]
         .map((k) => {
           const c = h[k].contributions.find((c) => c.treatment?.id === t.id);
-          return `${k}: ${c ? hold(c) : "Voided, excluded from calculation"}`;
+          return `${k}: ${c ? hold(c,s.operation[0].timeZone) : "Voided, excluded from calculation"}`;
         })
         .join("\n");
       return {
         id: t.id,
         cells: [
-          `${t.administrationDate}\n${t.administrationAt ?? "Date only, unresolved timing"}\n${t.enteredLocalTime ?? ""} ${t.timeZone ?? ""} offset ${t.offsetMinutes ?? "unknown"}\n${identity(t.snapshots.find((a) => a.animalId === t.animalId) || find(t.animalId))}`,
+          `${humanWhen(t.administrationAt || t.administrationDate,t.timeZone)}\n${t.administrationAt ? "Day and time known" : "Day only, needs a check"}\n${identity(t.snapshots.find((a) => a.animalId === t.animalId) || find(t.animalId))}`,
           `${t.product}\nLot: ${t.lot ?? "Unknown"}\nExpiry: ${t.expiryDate ?? "Unknown"}`,
-          `Dose: ${t.doseValue ?? "Unknown"} ${t.doseUnit ?? ""}\nRoute: ${t.route} ${t.routeOther ?? ""}\nSite: ${t.injectionSite ?? "Unknown"}\nReason: ${t.reason}\nAdministrator: ${t.administrator ?? "Unknown"}\nVeterinarian: ${t.veterinarian ?? "Unknown"}`,
-          `Meat: ${instruction(t.meat)}\nMilk: ${instruction(t.milk)}\nReference: ${t.instructionReference ?? "Unknown"}`,
-          `${calculation}\nCourse: ${t.courseId ?? "Single dose"}\nBatch: ${t.batchId ?? "None"}\nArchived: ${t.archivedAt ?? "No"}; voided: ${t.voidedAt ?? "No"}\nNotes: ${t.notes ?? ""}\nID: ${t.id}`,
+          `Dose: ${t.doseValue ?? "Unknown"} ${t.doseUnit ?? ""}\nHow given: ${plainOption(t.route)} ${t.routeOther ?? ""}\nSite: ${t.injectionSite ?? "Unknown"}\nReason: ${t.reason}\nAdministrator: ${t.administrator ?? "Unknown"}\nVeterinarian: ${t.veterinarian ?? "Unknown"}`,
+          `Meat: ${instruction(t.meat,s.operation[0].timeZone)}\nMilk: ${instruction(t.milk,s.operation[0].timeZone)}\nReference: ${t.instructionReference ?? "Unknown"}`,
+          `${calculation}\nCourse: ${t.courseId ? "Linked doses" : "Single dose"}\nGroup treatment: ${t.batchId ? "Yes" : "No"}\nArchived: ${t.archivedAt ?? "No"}; voided: ${t.voidedAt ?? "No"}\nNotes: ${t.notes ?? ""}`,
         ],
       };
     });
@@ -131,9 +133,9 @@ export function assembleReport(
           id: `${c.id}:${outcome.calfId}`,
           cells: [
             `${c.birthDate}\nDam: ${identity(find(c.damId))}\nSire: ${c.sireId ? identity(find(c.sireId)) : (c.sireReference ?? "Unknown")}`,
-            `${identity(calf)}\nSex: ${calf.sex}\nOutcome: ${outcome.outcome}\nID: ${calf.id}`,
+            `${identity(calf)}\nSex: ${calf.sex}\nOutcome: ${outcome.outcome}`,
             weight(s.weights.find((w) => w.id === outcome.birthWeightId)),
-            `Ease: ${c.easeScore ?? "Unknown"} (${c.easeScaleVersion})\n${c.notes ?? ""}\nArchived: ${c.archivedAt ?? "No"}; voided: ${c.voidedAt ?? "No"}\nDelivery ID: ${c.id}`,
+            `Ease: ${c.easeScore ?? "Unknown"}\n${c.notes ?? ""}\nArchived: ${c.archivedAt ?? "No"}; voided: ${c.voidedAt ?? "No"}`,
           ],
         };
       }),
@@ -152,7 +154,7 @@ export function assembleReport(
         id: a.id,
         cells: [
           "Current animal identity and parentage",
-          JSON.stringify(a, null, 2),
+          recordWords(a),
         ],
       },
       ...events(s, { animalId, from, to })
@@ -161,7 +163,7 @@ export function assembleReport(
           id: `${e.store}:${e.record.id}`,
           cells: [
             `${e.date}\n${e.store}`,
-            JSON.stringify(e.record, null, 2) +
+            recordWords(e.record) +
               (e.store === "weights"
                 ? "\nDisplay weight: " + weight(e.record)
                 : ""),
@@ -173,8 +175,8 @@ export function assembleReport(
     .filter((h) => ids.has(h.animal.id))
     .map((h) => ({
       identity: identity(h.animal),
-      meat: hold(h.meat),
-      milk: hold(h.milk),
+      meat: hold(h.meat,s.operation[0].timeZone),
+      milk: hold(h.milk,s.operation[0].timeZone),
       departureAlert: h.departureAlert,
     }));
   report.departures = s.movements
@@ -200,7 +202,7 @@ export function renderReport(root, report) {
     el("h2", report.title),
     el(
       "p",
-      `${report.operation} | ${report.range} | Generated ${report.generatedAt} UTC | Farm zone ${report.zone} | Weights ${report.unit}; dose and withdrawal units as recorded | ${report.rows.length} report rows`,
+      `${report.operation} | ${report.range} | Made ${humanWhen(report.generatedAt,report.zone)} | Weights in ${plainOption(report.unit)}. Dose and wait units are as entered. ${report.rows.length} rows.`,
     ),
     el("p", report.legend),
   );
@@ -226,7 +228,7 @@ export function renderReport(root, report) {
   root.append(
     el(
       "h3",
-      "Current holds from all saved history, independent of selected range",
+      "Current holds use all saved records, not just these dates",
     ),
   );
   for (const h of report.holds)
@@ -241,7 +243,7 @@ export function renderReport(root, report) {
     root.append(
       el(
         "p",
-        `${d.identity} | ${d.date} | Voided: ${d.voidedAt ?? "No"}\n${JSON.stringify(d.acknowledgment)}`,
+        `${d.identity} | ${d.date} | Voided: ${d.voidedAt ?? "No"}\n${recordWords(d.acknowledgment)}`,
       ),
     );
   const footer = el("div");
@@ -249,9 +251,21 @@ export function renderReport(root, report) {
   footer.append(
     el(
       "p",
-      `${report.operation} | ${report.title} | ${report.range} | ${report.generatedAt} UTC | ${report.zone}`,
+      `${report.operation} | ${report.title} | ${report.range} | ${humanWhen(report.generatedAt,report.zone)}`,
     ),
     el("p", report.footer),
   );
   root.append(footer);
+}
+
+function recordWords(value, prefix='') {
+ if(value===null || value===undefined)return 'Not known';
+ if(typeof value!=='object')return typeof value==='boolean'?(value?'Yes':'No'):String(value);
+ return Object.entries(value).filter(([key])=>!['id','animalId','damId','sireId','createdAt','updatedAt','revision','datasetId'].includes(key)).map(([key,v])=>{
+  const name=plainLabel(key.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,c=>c.toUpperCase()));
+  if(typeof v==='string' && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(v))return `${name}: linked record`;
+  if(typeof v==='string' && /^\d{4}-\d\d-\d\dT.*Z$/.test(v))return `${name}: ${humanWhen(v)}`;
+  if(key==='timeZone')return `${name}: ${v?.split('/').slice(1).join(', ').replaceAll('_',' ') || 'Not known'}`;
+  return `${name}: ${typeof v==='object'?recordWords(v,name):typeof v==='string'&&/^[a-z]+(?:-[a-z]+)*$/.test(v)?plainOption(v):recordWords(v)}`;
+ }).join('\n');
 }

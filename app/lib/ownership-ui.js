@@ -1,3 +1,4 @@
+import {plainLabel,plainOption} from './copy.js';
 import {readSafeFile} from './file-safety.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { STORES } from "./contract.js";
@@ -47,7 +48,7 @@ export class OwnershipUI {
     return b;
   }
   input(label, value = "", type = "text", parent = this.root) {
-    const l = this.el("label", label, parent),
+    const l = this.el("label", plainLabel(label), parent),
       n = this.el("input", null, l);
     n.type = type;
     if (type === "text") n.maxLength = 10000;
@@ -55,12 +56,12 @@ export class OwnershipUI {
     return n;
   }
   select(label, values, parent = this.root) {
-    const l = this.el("label", label, parent),
+    const l = this.el("label", plainLabel(label), parent),
       n = this.el("select", null, l);
     for (const [value, text] of values.map((v) =>
       Array.isArray(v) ? v : [v, v],
     )) {
-      const o = this.el("option", text, n);
+      const o = this.el("option", plainOption(text), n);
       o.value = value;
     }
     return n;
@@ -190,10 +191,10 @@ export class OwnershipUI {
     this.el("h2", "CSV exports and templates", section);
     this.el(
       "p",
-      "Full exports include archived, voided and revision records. Download every listed file into one folder. CSV has no integrity checksum; verified JSON remains the authoritative backup.",
+      "This set keeps all old records and changes. Save every file in one folder. A table set is not a checked backup. Save a copy too.",
       section,
     );
-    const store = this.select("Export entity or template", STORES, section);
+    const store = this.select("Which table do you want?", STORES, section);
     const from = this.input("Optional export date from", "", "date", section),
       to = this.input("Optional export date through", "", "date", section);
     const files = this.el("div", null, section);
@@ -202,13 +203,13 @@ export class OwnershipUI {
       async () => {
         this.fileLinks(exportSet(await this.repository().snapshot()), files);
         this.message(
-          "Full set prepared. Download all 14 tables, manifest and dictionary. This does not confirm a backup.",
+          "Save all 14 tables, the file list and the field guide. This does not confirm a saved backup.",
         );
       },
       section,
     );
     this.button(
-      "Prepare entity CSV and scope manifest",
+      "Prepare one table and its file list",
       async () => {
         if (from.value && to.value && from.value > to.value)
           throw new Error("Export date range is reversed");
@@ -244,7 +245,7 @@ export class OwnershipUI {
           files,
         );
         this.message(
-          "Filtered entity export prepared. Scope is in the companion manifest. This is not a complete backup.",
+          "The table and its file list are ready. This is not a full backup.",
         );
       },
       section,
@@ -264,7 +265,7 @@ export class OwnershipUI {
     this.el("h2", "CSV import", section);
     this.el(
       "p",
-      "Select one or more related tables. Map every nonempty source column. Match immutable IDs only. Tags never merge animals. Unknown parent IDs must be fixed or mapped as explicit external damReference/sireReference text with no local ID. Spreadsheet resaving can change leading zeros or dates; review each value.",
+      "Pick your tables. Match each filled column to a field. Records match by their saved number, never by tag. Fix missing parents or name them as outside the herd. Check each date and tag. A spreadsheet can drop leading zeros.",
       section,
     );
     const files = this.input(
@@ -320,7 +321,7 @@ export class OwnershipUI {
       section,
     );
     const snapshots = this.check(
-      "Use current identities for missing event snapshots. I reviewed that these are not historical identities.",
+      "Use today’s animal details where old details are missing. I checked that these details may differ from the past.",
       section,
     );
     const mapped = this.el("div", null, section),
@@ -439,11 +440,7 @@ export class OwnershipUI {
       for (const c of plan.conflicts) {
         const box = this.el("fieldset", null, output);
         this.el("legend", `${c.store} row ${c.row}: ${c.id || c.key}`, box);
-        this.el(
-          "pre",
-          JSON.stringify({ current: c.local, incoming: c.incoming }, null, 2),
-          box,
-        );
+        const helper=this.el("details",null,box);this.el("summary","For helpers: compare full records",helper);this.el("pre",JSON.stringify({current:c.local,incoming:c.incoming},null,2),helper);
         const choice = this.select(
           "Conflict decision",
           [
@@ -496,7 +493,7 @@ export class OwnershipUI {
         const details = this.el("details", null, output);
         this.el(
           "summary",
-          `${row.store} row ${row.row}: ${row.action}`,
+          `For helpers: ${plainOption(row.store)} row ${row.row}: ${row.action}`,
           details,
         );
         this.el("pre", JSON.stringify(row.record, null, 2), details);
@@ -547,7 +544,7 @@ export class OwnershipUI {
       section,
     );
     const confirmation = this.check(
-      "I reviewed every staged row, conversion, duplicate, parentage and hold warning. Commit the complete import once.",
+      "I checked each row, changed value, repeated tag, parent and hold warning. Save this whole set once.",
       section,
     );
     const commit = this.button(
@@ -586,7 +583,7 @@ export class OwnershipUI {
     );
     this.el(
       "p",
-      "Choose csv-manifest.json plus all 14 canonical tables together. This uses the same merge/replace preview, correction decisions and verified safety-backup gate as JSON restore. CSV has no source checksum.",
+      "Pick the file list named csv-manifest.json and all 14 tables. Check the preview and choose which records to keep. Save and check a copy of this herd before you replace it. This table set has no file check.",
       advanced,
     );
     const full = this.input("Full CSV set and manifest", "", "file", advanced);

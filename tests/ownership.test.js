@@ -549,8 +549,8 @@ test("Report preview is accessible text, footer exact, print isolated with repea
   assert.match(css, /report-print-footer\s*\{\s*position: fixed/);
   assert.match(css, /main > :not\(#ownership\)/);
   assert.equal(SWITCHING_STEPS.length, 5);
-  assert.match(SWITCHING_STEPS.join(), /yearly/);
-  assert.match(SWITCHING_STEPS.join(), /file:\/\//);
+  assert.match(SWITCHING_STEPS.join(), /each year/);
+  assert.match(SWITCHING_STEPS.join(), /as a file/);
   dom.window.close();
 });
 test("Reports UI renders working controls, safe previews, imports and offline switching guide", async () => {
@@ -772,7 +772,7 @@ test("Rendered CSV import maps columns, previews errors and commits only after e
     [...root.querySelectorAll("label")]
       .find((l) => l.firstChild?.textContent === label)
       ?.querySelector("select");
-  const sourceMode = select("Formula protection (explicit choice required)");
+  const sourceMode = select("Formula protection");
   sourceMode.value = "none";
   sourceMode.onchange();
   for (const [source, target] of [
@@ -794,7 +794,7 @@ test("Rendered CSV import maps columns, previews errors and commits only after e
   assert.match(messages.at(-1).text, /Confirm/);
   assert.equal((await r.snapshot()).animals.length, 0);
   const confirm = [...root.querySelectorAll("label")]
-    .find((l) => l.textContent.startsWith("I reviewed every staged row"))
+    .find((l) => l.textContent.startsWith("I checked each row"))
     .querySelector("input");
   confirm.checked = true;
   await button("Save imported records").onclick();
