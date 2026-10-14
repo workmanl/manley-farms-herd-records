@@ -49,7 +49,7 @@ test("deployable app has local assets, all five tabs, exact footer and full matc
   // Navigation and canonical URLs are inert. Runtime assets must be bundled.
   for (const match of html.matchAll(/(?:src|href)="([^"]+)"/g)) {
     const path = match[1];
-    if (path.startsWith("#") || path.startsWith("../") || path === "REPO_URL" || /^https?:/.test(path)) continue;
+    if (path === "/privacy/" || path.startsWith("#") || path.startsWith("../") || path === "REPO_URL" || /^(https?:|mailto:)/.test(path)) continue;
     assert.ok(fs.existsSync(new URL("../app/" + path, import.meta.url)), path);
   }
   assert.ok(
@@ -66,7 +66,7 @@ test("deployable app has local assets, all five tabs, exact footer and full matc
   );
   assert.ok(read("LICENSE").length > 34000);
 });
-test("no runtime dependency, build step, remote connection or HTML injection sink", () => {
+test("no runtime dependency, build step, record connection or HTML injection sink", () => {
   const pkg = JSON.parse(read("package.json"));
   assert.equal(pkg.dependencies, undefined);
   assert.deepEqual(Object.keys(pkg.devDependencies), [
@@ -77,7 +77,7 @@ test("no runtime dependency, build step, remote connection or HTML injection sin
     "app/app.js",
     ...fs
       .readdirSync(new URL("../app/lib/", import.meta.url))
-      .filter((p) => p.endsWith(".js"))
+      .filter((p) => p.endsWith(".js") && p !== "signup.js")
       .map((p) => "app/lib/" + p),
   ]
     .map(read)
@@ -86,5 +86,29 @@ test("no runtime dependency, build step, remote connection or HTML injection sin
     source,
     /innerHTML|eval\(|fetch\(|XMLHttpRequest|WebSocket/,
   );
-  assert.match(read("app/index.html"), /connect-src 'self'; worker-src 'self'; manifest-src 'self'/);
+  assert.match(read("app/index.html"), /connect-src 'self' https:\/\/northwestmediasystems\.com; worker-src 'self'; manifest-src 'self'/);
+});
+
+test("site header and navigation equal the home and Tools link contract", async () => {
+  const { JSDOM } = await import('jsdom');
+  const base = 'https://manleyfarms.com/tools/herd-records/';
+  const document = new JSDOM(read('app/index.html'), {url: base}).window.document;
+  // Snapshot verified against site-current home and tools/index.html, 2026-10-13.
+  const expected = [['Home','/'],['Tools','/tools/'],['Dashboard','/dashboard/'],['Products','/products/'],['Blog','/blog/'],['About','/about/']];
+  const links = (selector) => [...document.querySelectorAll(selector)].map(a => [a.textContent.trim(),new URL(a.href).pathname]);
+  assert.deepEqual(links('.nav-links a'), expected);
+  assert.deepEqual(links('.footer-links a'), [...expected,['Privacy','/privacy/'],['Disclaimer','/disclaimer/'],['Archive','/archive/']]);
+  const brand = document.querySelector('.site-header .brand');
+  assert.equal(new URL(brand.href).pathname, '/');
+  assert.equal(brand.querySelector('img').alt, 'Manley Farms');
+  assert.equal(brand.querySelector('span').textContent, 'Manley Farms');
+  assert.equal(document.querySelector('.footer-contact a').getAttribute('href'),'mailto:hello@manleyfarms.com');
+  for (const asset of document.querySelectorAll('[src],link[rel="stylesheet"]')) {
+    const path = asset.getAttribute('src') || asset.getAttribute('href');
+    assert.ok(!/^(https?:|\/|\.\.\/)/.test(path), path);
+  }
+  const css = read('app/styles.css');
+  assert.match(css, /\.app-tabs\s*\{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;/);
+  assert.match(css, /\.print-hide\s*\{ display: none !important;/);
+  assert.doesNotMatch(css, /@import|https?:\/\//);
 });

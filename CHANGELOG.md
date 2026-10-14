@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.1-beta.1 / 2026-10-13 / schema 1 / local only
+
+- Bundled Manley Farms logo, site header, primary navigation and shared footer layout. Tools stays active; app tabs are a separate horizontally scrollable strip.
+- Preserved sunlight and dark themes, keyboard focus, skip link, print hiding, beta introduction and terms.
+- Bundled licensed DM Sans and Inter variable fonts with local swap loading, site typography and offline inventory.
+- Added optional news signup after the public FAQ and a footer link. Only explicit submission sends email and signup tags; offline attempts are not queued. Updated privacy disclosures and terms section 6.
+- Added signup, payload, offline, CSP, service worker and typography verification; see docs/signup-report.md.
+- Updated shell, navigation contract and release tests; regenerated the offline inventory. No schema change or deployment.
+
 ## 1.0.0-beta.1 / 2026-10-13 / schema 1 / public beta prepared locally
 
 - Static public introduction, honest beta notices, FAQ, canonical/Open Graph metadata and software/source structured data. Returning datasets collapse the introduction.

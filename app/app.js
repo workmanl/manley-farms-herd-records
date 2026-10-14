@@ -1,4 +1,6 @@
 import { openDemo, deleteDemo } from "./lib/demo.js";
+import { setupNewsSignup } from "./lib/signup.js";
+setupNewsSignup(document);
 import { updateIntroduction } from "./lib/landing.js";
 import {
   startPWA,

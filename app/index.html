@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://northwestmediasystems.com; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta name="theme-color" content="#1a1f16" />
     <title>Free Cattle Management Software | Manley Farms</title>
@@ -33,7 +33,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "softwareVersion": "1.1.0-beta.1",
+      "softwareVersion": "1.1.1-beta.1",
       "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
       "featureList": [
         "Offline entry after verified shell download",
@@ -56,7 +56,7 @@
       "codeRepository": "https://github.com/workmanl/manley-farms-herd-records",
       "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
       "programmingLanguage": "JavaScript",
-      "version": "1.1.0-beta.1"
+      "version": "1.1.1-beta.1"
     },
     {
       "@type": "FAQPage",
@@ -137,20 +137,37 @@
   </head>
   <body>
     <a class="skip" href="#main">Skip to content</a>
-    <header>
-      <div>
-        <a class="site-brand" href="../../">Manley Farms</a><strong>Herd Records</strong>
+    <header class="site-header print-hide">
+      <div class="nav-wrap">
+        <a href="../../" class="brand">
+          <img src="images/logo.png" alt="Manley Farms" width="732" height="275" />
+          <span>Manley Farms</span>
+        </a>
+        <nav class="nav-links" aria-label="Primary">
+          <a href="../../">Home</a>
+          <a href="../" class="nav-active" aria-current="page">Tools</a>
+          <a href="../../dashboard/">Dashboard</a>
+          <a href="../../products/">Products</a>
+          <a href="../../blog/">Blog</a>
+          <a href="../../about/">About</a>
+        </nav>
       </div>
-      <span class="badge">Local records · 1.1.0-beta.1</span>
-      <div class="site-links" aria-label="Manley Farms links"><a href="../../">Home</a> <a href="../../dashboard/">Dashboard</a> <a href="../../blog/">Blog</a> <a href="../">Tools</a> <a href="../../products/">Products</a> <a href="../../about/">About</a></div>
     </header>
+    <nav class="app-tabs print-hide" aria-label="Herd Records navigation">
+      <a href="#dashboard" data-tab="dashboard">Dashboard</a
+      ><a href="#animals" data-tab="animals">Animals</a
+      ><a href="#events" data-tab="events">Events</a
+      ><a href="#reports" data-tab="reports">Reports</a
+      ><a href="#backup" data-tab="backup">Backup &amp; Settings</a>
+    </nav>
+    <p class="app-identity print-hide"><strong>Herd Records</strong> <span class="badge">Local records · 1.1.1-beta.1</span></p>
     <details id="public-intro" class="public-intro no-print" open>
       <summary>About Herd Records</summary>
       <div class="landing-copy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">&gt;</span><a href="../">Tools</a><span aria-hidden="true">&gt;</span><span aria-current="page">Herd Records</span></nav>
         <h1>Free cattle records that work offline</h1>
         <p>Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription. Keep cattle history on your phone, tablet or computer, and move your records whenever you choose.</p>
-        <p class="notice">Public beta 1.1.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.</p>
+        <p class="notice">Public beta 1.1.1-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.</p>
         <a class="button" id="open-herd-records" href="#dashboard">Open herd records</a>
         <h2>See recorded meat and milk withdrawal holds</h2>
         <p>Record each treatment and the separate meat and milk instructions from the product label or your veterinarian. The dashboard shows holds, controlling recorded dates and Needs review for unknown or unresolved instructions. There is no drug database or dose advice. Recorded interval elapsed never means safe for slaughter or milk. You remain responsible for withdrawal compliance and checking the actual treatment history.</p>
@@ -163,7 +180,7 @@
         <h2>Install in three steps</h2>
         <ol><li>Open herd records while connected. Read and acknowledge the terms, then wait for Ready offline.</li><li>On iPhone or iPad Safari choose Share, then Add to Home Screen. On Android Chrome choose Install app or Add to Home screen. On desktop use the browser’s install control where available. Installation is optional.</li><li>Open the installed app, verify your herd and a saved backup, then try reopening without signal. Browser and installed contexts may have separate records. Read the <a href="help.html">offline field guide</a>.</li></ol>
         <h2>Your records, your backups</h2>
-        <p>One operation lives in this browser profile’s IndexedDB database on this device. There is no account, cloud copy or automatic phone sync. The app does not upload herd fields; the host receives ordinary page and asset requests. Records are not encrypted by the app. Device access, same-origin scripts, private browsing, storage eviction, cleared site data or a lost phone can expose or erase them.</p>
+        <p>One operation lives in this browser profile’s IndexedDB database on this device. There is no account, cloud copy or automatic phone sync. The app does not upload herd fields. Ordinary page and asset requests go to the web host. Only if you choose to sign up is your email sent to the Manley Farms mailing list, along with the signup source, page path and app version. Herd records are never sent. Records are not encrypted by the app. Device access, same-origin scripts, private browsing, storage eviction, cleared site data or a lost phone can expose or erase them.</p>
         <p>Download a full JSON backup, save it outside the browser and select it to verify. Keep a second copy and rehearse restoration. A requested download is not proof of a saved file. Export documented CSV files and printable reports to move elsewhere without a fee. Never clear storage to fix an update.</p>
         <h2>Herd records questions, answered</h2>
         <div id="public-faq">
@@ -176,17 +193,20 @@
           <article><h3>What if Manley Farms closes?</h3><p>Keep exports and a downloadable source release. The app can be hosted elsewhere without an account. Future hosting, support and maintenance are not guaranteed.</p></article>
           <article><h3>Can I leave?</h3><p>Yes. Export all records as JSON and documented CSV files, plus printable reports, without a fee. Verify your JSON backup and keep the IDs and relationships when moving records.</p></article>
         </div>
+        <section id="news-signup" class="card" aria-label="Get Herd Records news">
+          <h2>Get Herd Records updates.</h2>
+          <p>Short emails when there's a new feature or important fix, plus new free farm tools. No spam, unsubscribe anytime. Your herd records are never sent.</p>
+          <form id="news-signup-form" novalidate>
+            <label for="news-email">Email address <input id="news-email" name="email" type="email" autocomplete="email" required aria-describedby="news-status" /></label>
+            <button type="submit">Sign me up.</button>
+          </form>
+          <p id="news-status" role="status" aria-live="polite" aria-atomic="true"></p>
+          <p>Optional. No email is required to use the app. <a href="/privacy/">Privacy</a>.</p>
+        </section>
         <p><a href="https://github.com/workmanl/manley-farms-herd-records">Source repository</a> · <a href="source.html">Source and license guide</a> · <a href="LICENSE">AGPL-3.0-only license</a> · <a href="terms.txt">Terms of Use and Disclaimer</a></p>
         <p>This official tool is free forever. If it helps you, <a href="https://buy.stripe.com/bJefZg26S8Ry99qePt8Ra03" rel="noopener">an optional donation supports Manley Farms</a>.</p>
       </div>
     </details>
-    <nav aria-label="Main navigation">
-      <a href="#dashboard" data-tab="dashboard">Dashboard</a
-      ><a href="#animals" data-tab="animals">Animals</a
-      ><a href="#events" data-tab="events">Events</a
-      ><a href="#reports" data-tab="reports">Reports</a
-      ><a href="#backup" data-tab="backup">Backup &amp; Settings</a>
-    </nav>
     <aside id="backup-reminder" hidden aria-label="Backup reminder">
       <p id="backup-reminder-text"></p>
       <button id="backup-now" type="button">Backup now</button>
@@ -245,7 +265,7 @@
         <div class="notice">
           <strong>Public beta</strong>
           <p>
-            Public beta 1.1.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.
+            Public beta 1.1.1-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.
           </p>
         </div>
         <div class="card" id="intro"></div>
@@ -461,13 +481,21 @@
         </p>
       </section>
     </main>
-    <footer>
-      <div class="footer-links"><a href="../../">Home</a> · <a href="../">Tools</a> · <a href="../../blog/">Blog</a> · <a href="../../about/">About</a> · <a href="../../privacy/">Privacy</a> · <a href="../../disclaimer/">Disclaimer</a> · <a href="../../archive/">Archive</a></div>
-      <p>Manley Farms. Practical tools for modern growers. Built in the Pacific Northwest.</p>
-      Recordkeeping only. Not veterinary or legal advice. Verify withdrawal
-      instructions and keep backups. Provided as is.
-      <a href="terms.txt">Terms and disclaimer</a> ·
-      <a href="source.html">Source and license</a>.
+    <footer class="footer print-hide">
+      <div class="footer-links">
+        <a href="../../">Home</a>
+        <a href="../">Tools</a>
+        <a href="../../dashboard/">Dashboard</a>
+        <a href="../../products/">Products</a>
+        <a href="../../blog/">Blog</a>
+        <a href="../../about/">About</a>
+        <a href="../../privacy/">Privacy</a>
+        <a href="../../disclaimer/">Disclaimer</a>
+        <a href="../../archive/">Archive</a>
+      </div>
+      <p class="footer-contact"><a href="mailto:hello@manleyfarms.com">hello@manleyfarms.com</a></p>
+      <div>Manley Farms - Practical tools for modern growers.</div>
+      <p class="footer-app-note"><a id="news-signup-link" href="#news-signup">Get updates by email</a> · <a href="terms.txt">Terms and disclaimer</a> · <a href="source.html">Source and license</a> · Recordkeeping only. Not veterinary or legal advice. Verify withdrawal instructions and keep backups. Provided as is.</p>
     </footer>
     <noscript
       ><p>

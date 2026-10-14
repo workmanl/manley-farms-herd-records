@@ -32,7 +32,7 @@ The app is not certified, approved or endorsed by BQA, FDA, USDA or any regulato
 
 #### 6. Local storage, access and backups
 
-Herd record processing and storage occur in your browser on your device. The app does not upload herd fields to Manley Farms or provide cloud backup or automatic synchronization. Exported files go where you choose to save or share them. You are responsible for their security and any disclosure. Ordinary website and asset requests can reach the web host. An optional external link opens only when you choose it and does not include herd record context.
+Herd record processing and storage occur in your browser on your device. The app does not upload herd fields to Manley Farms or provide cloud backup or automatic synchronization. Exported files go where you choose to save or share them. You are responsible for their security and any disclosure. Ordinary page and asset requests go to the web host. Only if you choose to sign up is your email sent to the Manley Farms mailing list, along with the signup source, page path and app version. Herd records are never sent. An optional external link opens only when you choose it and does not include herd record context.
 
 Local records are not encrypted by the app. Anyone or any software with sufficient access to your device, browser profile or website origin may be able to access them. Different browsers, profiles or installed app contexts may hold separate copies. Clearing site data, private browsing, browser eviction, storage limits, device damage or loss, software errors and unauthorized access can cause permanent loss or exposure. IndexedDB, an installed app and offline caching do not guarantee durable storage.
 

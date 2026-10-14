@@ -2,7 +2,7 @@
 
 Free cattle records that work offline after the first verified download. Keep animal identity, parentage, calving, weights, breeding, treatments and departures, with separate recorded meat and milk withdrawal holds.
 
-**Public beta 1.1.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
+**Public beta 1.1.1-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
 
 [Open Herd Records](https://manleyfarms.com/tools/herd-records/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
 
@@ -32,7 +32,7 @@ Core browser use targets current Safari on iPhone/iPad and Mac, Chrome on Androi
 
 ## Privacy and storage limits
 
-Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. The web host receives ordinary page and asset requests. Optional source and donation links navigate only when chosen and include no herd context.
+Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. Ordinary page and asset requests go to the web host. Only if you choose to sign up is your email sent to the Manley Farms mailing list, along with the signup source, page path and app version. Herd records are never sent. Optional source and donation links navigate only when chosen and include no herd context.
 
 Records are not encrypted by the app. Device/profile access and other scripts on the same website origin can expose them. Different browsers, profiles and installed contexts may hold separate copies. Clearing site data, private browsing, eviction, device loss, storage limits or software errors can destroy records. Persistent storage can reduce eviction risk, but does not guarantee retention. Manley Farms has no recovery copy.
 
@@ -104,7 +104,7 @@ Clinical review, the multi-device field pilot, lawyer review of terms, staged br
 
 ## License and source
 
-Copyright (C) 2026 Scott Manley. Original code and covered project documentation are **AGPL-3.0-only**. The complete unmodified license is in [LICENSE](LICENSE) and `app/LICENSE`. Modified network-interactive versions must offer corresponding source as the license requires. Your own herd records remain yours. Contributor Covenant text carries its own attribution below. System font fallbacks are used, with no remote fonts or runtime dependencies.
+Copyright (C) 2026 Scott Manley. Original code and covered project documentation are **AGPL-3.0-only**. The complete unmodified license is in [LICENSE](LICENSE) and `app/LICENSE`. Modified network-interactive versions must offer corresponding source as the license requires. Your own herd records remain yours. Contributor Covenant text carries its own attribution below. Locally bundled DM Sans and Inter variable Latin fonts are licensed under SIL OFL 1.1. See [third-party licenses](THIRD_PARTY.md) and the original licenses in app/fonts/. No remote fonts or runtime dependencies are used.
 
 ### Dashboard screenshots and review
 

@@ -89,3 +89,13 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   assert.equal($("herd").querySelector("[name=farmId]").value, "Unsaved draft");
   dom.window.close();
 });
+
+test("site landmarks remain separate from the five app tabs", () => {
+  const document = new JSDOM(fs.readFileSync(new URL('../app/index.html', import.meta.url), 'utf8')).window.document;
+  assert.equal(document.querySelector('header.site-header nav').getAttribute('aria-label'), 'Primary');
+  assert.equal(document.querySelector('.nav-links [aria-current="page"]').textContent, 'Tools');
+  assert.equal(document.querySelectorAll('.app-tabs [data-tab]').length, 5);
+  assert.equal(document.querySelector('.site-header').nextElementSibling.className, 'app-tabs print-hide');
+  assert.equal(document.querySelector('.skip').getAttribute('href'), '#main');
+  assert.ok(document.querySelector('footer.footer.print-hide .footer-contact'));
+});
