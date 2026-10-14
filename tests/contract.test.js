@@ -78,7 +78,7 @@ test("no runtime dependency, build step, record connection or HTML injection sin
     "app/app.js",
     ...fs
       .readdirSync(new URL("../app/lib/", import.meta.url))
-      .filter((p) => p.endsWith(".js") && p !== "signup.js")
+      .filter((p) => p.endsWith(".js"))
       .map((p) => "app/lib/" + p),
   ]
     .map(read)

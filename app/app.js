@@ -155,8 +155,8 @@ function route() {
   const tab = path.split("/")[0];
   let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch)(\/|$)/.test(path);
   document.body.dataset.recordEntry = String(entering);
-  $('news-signup').hidden = true;
-  $('news-signup-link').hidden = true;
+  $('news-signup').hidden = DEPLOY.moved || entering;
+  $('news-signup-link').hidden = DEPLOY.moved || entering;
   const herdTab = [
     "dashboard",
     "animals",
@@ -168,8 +168,8 @@ function route() {
   if (!$("herd").hidden) herd.render(snapshot, path);
   entering = entering || (!$("herd").hidden && !!$("herd").querySelector('form .sticky'));
   document.body.dataset.recordEntry = String(entering);
-  $('news-signup').hidden = true;
-  $('news-signup-link').hidden = true;
+  $('news-signup').hidden = DEPLOY.moved || entering;
+  $('news-signup-link').hidden = DEPLOY.moved || entering;
   const backup = tab === "backup";
   $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery || !!herd?.demoMode;
   if (!$("ownership").hidden) ownership.render(snapshot);

@@ -168,7 +168,7 @@ test('home activity uses plain herd sentences while Events retains technical rec
  for(const pattern of [/Daisy 214 had a calf/,/Weighed Rosie 215: 1,140 lb/,/Treated Steer 330 \(meat hold until/,/Moved 6 cattle to North pasture/,/Sold Heifer 412/])assert.ok(activity.some(e=>pattern.test(e.text)),String(pattern));
  assert.ok(activity.every(e=>e.relative&&e.icon));assert.ok(activity.every(e=>!['animals','identifiers','revisions','groups'].includes(e.store)));
  assert.ok(events(s).some(e=>e.store==='identifiers'));assert.equal(recentActivity(s).length,5);
- const h=await setup();h.ui.demoMode=true;h.ui.demo=()=>{};h.ui.render(s,'dashboard');assert.equal(h.root.querySelectorAll('aside').length,0);assert.match(h.root.textContent,/Undo this treatment/);assert.doesNotMatch(h.root.textContent,/First-run terms|Animal identity|Identifier farm-id/);h.cleanup();repo.close();
+ const h=await setup();h.ui.demoMode=true;h.ui.demo=()=>{};h.ui.render(s,'dashboard');assert.equal(h.root.querySelectorAll('aside').length,0);assert.match(h.root.textContent,/Correct \/ void treatment/);assert.doesNotMatch(h.root.textContent,/First-run terms|Animal identity|Identifier farm-id/);h.cleanup();repo.close();
 });
 test('every animal picker and selected quick action has matching numbered progress',async()=>{
  const h=await setup();const a=await h.save('animal',{farmId:'Daisy 214',sex:'female'});

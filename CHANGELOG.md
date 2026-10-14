@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.2-beta.1 (2026-10-13)
+
+- Replace email capture with a plain outbound updates link on the private origin after the public FAQ and in the footer. Hide both on record-entry routes and the moved build.
+- Remove the capture module and update privacy copy. Keep all runtime connections local and CSP connect-src self only.
+- Update signup, shell and asset tests; regenerate inventories and both local release outputs.
+
 ## 1.3.1-beta.1 (2026-10-13)
 
 - Merge Home backup prompts into one saved-copy card with one primary Save a copy button and a quiet reminder link. Remove the repeated backup alert.

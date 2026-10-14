@@ -134,7 +134,7 @@ test('new herds use Sunlight, all copy pickers accept text, signup recipient and
   assert.equal(emptyDataset().operation[0].theme,'sunlight');
   const dom=new JSDOM(read('app/index.html')), d=dom.window.document;
   for(const id of ['verify-file','restore-file','safety-file','update-backup-file']) assert.match(d.getElementById(id).accept,/\.txt.*text\/plain/);
-  assert.match(d.getElementById('news-signup').textContent,/northwestmediasystems\.com/);
+  assert.match(d.getElementById('news-signup').textContent,/Signing up happens on manleyfarms\.com/);
   assert.equal(d.querySelector('[http-equiv="Content-Security-Policy"]').content.match(/connect-src ([^;]+)/)[1],"'self'");
   assert.equal(d.getElementById('backup-light').parentElement.id,'backup');
   dom.window.close();

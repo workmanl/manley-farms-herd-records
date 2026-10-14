@@ -35,6 +35,9 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   await until(() => $("status").hidden);
   assert.equal($("status").textContent, "");
   assert.equal($("public-intro").open, true);
+  assert.equal($("news-signup").hidden, false);
+  assert.equal($("news-signup-link").hidden, false);
+  assert.equal($("news-signup-link").href, "https://manleyfarms.com/herd-records-updates/?from=app");
   assert.equal($("herd").hidden, true);
   assert.equal($("gate").hidden, false);
   $("accept-check").checked = true;

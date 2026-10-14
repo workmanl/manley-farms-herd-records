@@ -32,7 +32,7 @@ Core browser use targets current Safari on iPhone/iPad and Mac, Chrome on Androi
 
 ## Privacy and storage limits
 
-Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. Ordinary page and asset requests go to the web host. There is no email signup on this app origin. Herd records are never sent. Optional source and donation links navigate only when chosen and include no herd context.
+Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. Ordinary page and asset requests go to the web host. Signing up happens on manleyfarms.com. This app never sends your email or herd records anywhere. Optional source and donation links navigate only when chosen and include no herd context.
 
 Records are not encrypted by the app. Device/profile access and other scripts on the same website origin can expose them. Different browsers, profiles and installed contexts may hold separate copies. Clearing site data, private browsing, eviction, device loss, storage limits or software errors can destroy records. Persistent storage can reduce eviction risk, but does not guarantee retention. Manley Farms has no recovery copy.
 

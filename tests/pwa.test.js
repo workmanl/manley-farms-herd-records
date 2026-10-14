@@ -306,7 +306,7 @@ test("install instructions cover iOS, Android, Firefox, desktop Safari and insta
   assert.match(installGuidance("Safari"), /Add to Dock/);
   assert.match(installGuidance("Chrome", true), /Installed app/);
 });
-test("app has local resources, no remote imports or record-request sinks, and one explicit signup endpoint", () => {
+test("app has local resources, no remote imports or record-request sinks, and no outside connections", () => {
   // License/dictionary prose URLs and the SVG namespace are inert identifiers, not requests.
   for (const a of release().assets.filter((a) =>
     /\.(js|html|css|svg|webmanifest)$/.test(a.path),
@@ -314,10 +314,6 @@ test("app has local resources, no remote imports or record-request sinks, and on
     let source = read(a.path).replaceAll("http://www.w3.org/2000/svg", "");
     if (a.path === "lib/csv-dictionary.js") continue;
     if (a.path === 'lib/deploy-config.js') source = source.replaceAll('https://herd.manleyfarms.com','');
-    if (a.path === "lib/signup.js") {
-      assert.equal((source.match(/https:\/\/[^"\s]+/g) || []).join(), "https://northwestmediasystems.com/api/capture.php");
-      source = source.replace("https://northwestmediasystems.com/api/capture.php", "");
-    }
     if (a.path.endsWith(".html")) {
       const document = new JSDOM(source).window.document;
       // Static metadata, JSON-LD and explicit navigation links are not resource loads.

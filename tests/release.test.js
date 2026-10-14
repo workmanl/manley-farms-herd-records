@@ -10,7 +10,7 @@ import { updateIntroduction } from "../app/lib/landing.js";
 const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const dom = () => new JSDOM(read("app/index.html"));
 const graph = () => JSON.parse(dom().window.document.querySelector('script[type="application/ld+json"]').textContent)['@graph'];
-const version = "1.3.1-beta.1";
+const version = "1.3.2-beta.1";
 test("public beta version agrees across package, app, structured data and hash-derived worker release", () => {
   assert.equal(JSON.parse(read("package.json")).version, version);
   const lock = JSON.parse(read("package-lock.json"));
@@ -118,6 +118,10 @@ test("release packager verifies shell, includes dotfiles, omits local/scale arti
       const name=`manley-farms-herd-records-${version}-${folder}.zip`;
       assert.equal(sums,`${createHash('sha256').update(await readFile(join(temp,'dist',name))).digest('hex')}  ${name}\n`);
       const html=await readFile(join(directory,'index.html'),'utf8');
+      const document = new JSDOM(html).window.document;
+      assert.equal(document.querySelector('#news-signup-link').getAttribute('href'),'https://manleyfarms.com/herd-records-updates/?from=app');
+      assert.equal(document.querySelector('[http-equiv="Content-Security-Policy"]').content.match(/connect-src ([^;]+)/)[1],"'self'");
+      assert.ok(!generated.self.HERD_RELEASE.assets.some(a=>a.path==='lib/signup.js'));
       assert.match(html,/id="move-open" class="button" href="https:\/\/herd.manleyfarms.com\/"/);
     }
     assert.ok(fs.existsSync(join(temp,'dist','herd-origin','.htaccess')));
