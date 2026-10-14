@@ -32,10 +32,12 @@ export function guideForm(form, { selection=false }={}) {
  const cancel=actions.querySelector('a');if(cancel){cancel.textContent='Cancel';cancel.href='#dashboard';}
  const progress=document.createElement('p');progress.className='guide-progress';progress.setAttribute('role','status');
  const dots=document.createElement('div');dots.className='progress-dots';dots.setAttribute('aria-hidden','true');
- // One dot per question, in a horizontally scrollable strip for full clinical forms.
+ const bar=document.createElement('div');bar.className='progress-bar';bar.setAttribute('role','progressbar');bar.setAttribute('aria-valuemin','1');
+ const fill=document.createElement('span');bar.append(fill);
+ // Dots stay for step counts. The bar is what the farmer sees.
  const offset=selection?1:0;
  Array.from({length:questions.length+offset+1}).forEach(()=>{const dot=document.createElement('span');dots.append(dot);});
- form.prepend(progress,dots);
+ form.prepend(progress,bar,dots);
  const heading=document.createElement('h2');heading.className='guide-question';heading.tabIndex=-1;body.prepend(heading);
  const reviewPanel=document.createElement('section');reviewPanel.className='guide-review';body.append(reviewPanel);
  let step=0,review=false;
@@ -56,8 +58,12 @@ export function guideForm(form, { selection=false }={}) {
  extra.hidden=!review;
  for(const l of optional)l.hidden=!review;
  if(action === "treatment") {const c=form.elements.namedItem("offsetMinutes");if(c?.options?.length===1)c.closest("label").hidden=true;form.elements.namedItem("timeZone").closest("label").hidden=true;}
- progress.textContent=`Step ${review?questions.length+offset+1:step+offset+1} of ${questions.length+offset+1}${review?': Check your answers, then save.':''}`;
+ const total=questions.length+offset+1, current=review?total:step+offset+1;
+ progress.textContent=`Step ${current} of ${total}${review?': Check your answers, then save.':''}`;
  [...dots.children].forEach((dot,i)=>dot.classList.toggle('current',i===(review?questions.length+offset:step+offset)));
+ bar.setAttribute('aria-valuenow',String(current));bar.setAttribute('aria-valuemax',String(total));bar.setAttribute('aria-label',progress.textContent);
+ fill.style.width=`${Math.round(current/total*100)}%`;
+ body.dataset.step=String(current);
  back.disabled=!review&&step===0;next.hidden=review;submit.hidden=!review;
  if(focus){body.scrollTop=0;const target=review?progress:heading;target?.focus({preventScroll:true});if(!review)revealControl(groups[step].flatMap(l=>[...l.querySelectorAll('input,select,textarea')]).find(c=>!c.disabled));}
  };
@@ -68,7 +74,7 @@ export function guideForm(form, { selection=false }={}) {
  const save=form.onsubmit;form.onsubmit=e=>{if(!review){e.preventDefault();next.click();return;}if(!form.checkValidity()){e.preventDefault();return;}return save(e);};
  form.addEventListener('invalid',e=>{const index=groups.findIndex(g=>g.some(l=>l.contains(e.target)));if(index>=0){step=index;review=false;show(false);}},true);
  // Twins add controls after the guide was built. Restart presentation over the same form.
- const observer=new form.ownerDocument.defaultView.MutationObserver(records=>{if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches('label,fieldset')||n.querySelector?.('label'))))){observer.disconnect();labels.forEach(l=>l.hidden=false);progress.remove();dots.remove();back.remove();next.remove();reviewPanel.remove();heading.remove();for(const l of optional)body.append(l);extra.remove();form.onsubmit=save;guideForm(form, {selection});}});
+ const observer=new form.ownerDocument.defaultView.MutationObserver(records=>{if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches('label,fieldset')||n.querySelector?.('label'))))){observer.disconnect();labels.forEach(l=>l.hidden=false);progress.remove();bar.remove();dots.remove();back.remove();next.remove();reviewPanel.remove();heading.remove();for(const l of optional)body.append(l);extra.remove();form.onsubmit=save;guideForm(form, {selection});}});
  observer.observe(body,{childList:true,subtree:true});
  show(false);
  if(form.isConnected) form.scrollIntoView?.({block:'start'});
@@ -79,5 +85,7 @@ export function pickerProgress(form, count){
  const document=form.ownerDocument;
  const progress=document.createElement('p');progress.className='guide-progress';progress.setAttribute('role','status');progress.textContent=`Step 1 of ${count}`;
  const dots=document.createElement('div');dots.className='progress-dots';dots.setAttribute('aria-hidden','true');
- for(let i=0;i<count;i++){const dot=document.createElement('span');if(!i)dot.className='current';dots.append(dot);}form.prepend(progress,dots);
+ const bar=document.createElement('div');bar.className='progress-bar';bar.setAttribute('role','progressbar');bar.setAttribute('aria-valuemin','1');bar.setAttribute('aria-valuenow','1');bar.setAttribute('aria-valuemax',String(count));bar.setAttribute('aria-label',progress.textContent);
+ const fill=document.createElement('span');fill.style.width=`${Math.round(100/count)}%`;bar.append(fill);
+ for(let i=0;i<count;i++){const dot=document.createElement('span');if(!i)dot.className='current';dots.append(dot);}form.prepend(progress,bar,dots);
 }

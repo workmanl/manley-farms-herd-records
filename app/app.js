@@ -773,7 +773,9 @@ async function doSaveCopy() {
 }
 function mountBackupPanel(root) {
   if (!root) return;
-  root.replaceChildren(); root.className = 'card backup-light';
+  const place = root.dataset.place;
+  root.replaceChildren(); root.className = place === 'home' ? 'card backup-light home-backup' : 'card backup-light';
+  if (place) root.dataset.place = place;
   if (herd?.demoMode) {root.hidden = true; return;}
   root.hidden = false;
   const device = readDevice(deviceStorage);

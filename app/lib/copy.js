@@ -17,6 +17,7 @@ export function plainLabel(text) {
  Administrator:'Who gave it?', Reason:'Why did you give it?', 'Label or veterinarian instruction reference':'Which label or vet note did you use?',
  'Rule state (required; blank is not zero)':'What do the instructions say?', 'Entered interval':'How long is the wait?',
  'Interval unit':'Hours or days?', 'Instruction source':'Where are the instructions from?', 'Instruction reference':'Which label or vet note?',
+ 'Start an open course for each selected animal':'Keep this dose open for more doses later?',
  'Farm ID':'What do you call this animal?', 'Visual tag (text)':'What is on the ear tag?',
  'Notes (explain unknown source or destination)':'What else should you note?', 'Revision reason':'Why are you changing this?', 'Internal ID':'Record number'};
  return labels[text] || text.replace(/\s*\([^)]*\)/g,'').replace(/\brevision\b/gi,'change').replace(/\bdataset\b/gi,'herd').replace(/\bUTC\b/g,'world clock').replace(/\bISO\b/g,'full date and time').replace(/\bAdministrator\b/g,'Who gave it').replace(/\bVeterinarian\b/g,'Vet').replace(/\bDOB\b/g,'Birth date').replace(/\bADG\b/g,'Daily gain').replace(/\bDam\b/g,'Mother').replace(/\bSire\b/g,'Father');

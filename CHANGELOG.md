@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0-beta.1 (2026-10-13)
+
+- Add one original icon set on Home, the bottom bar, lists, Today and empty states.
+- Tighten spacing, type, buttons and cards so Home reads like a phone app. Keep the site header and footer.
+- Show a progress bar on guided questions. Keep the same steps, validators and saved fields.
+- Say "Keep this dose open for more doses later?" instead of the old course sentence.
+- See docs/round-1-report.md. Not field tested. No schema change.
+
 ## 1.4.0-beta.1 (2026-10-13)
 
 - Put search and common work first, add phone bottom navigation, and keep More for the other tools.

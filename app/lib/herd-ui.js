@@ -4,7 +4,8 @@ import {rememberTreatment, treatmentTools} from './last-used.js';
 import { drawDashboard } from "./dashboard.js";
 import { guideForm, pickerProgress } from "./guided-form.js";
 import { HealthUI } from "./health-ui.js";
-import { isHold } from "./withdrawal.js";
+import { isHold, evaluateWithdrawal } from "./withdrawal.js";
+import { icon } from "./icons.js";
 import { isUUID } from "./validation.js";
 import {
   commitWorkflow,
@@ -134,7 +135,7 @@ export class HerdUI {
       this.root.append(el('p','This old address is read-only. Save a copy, then restore it at herd.manleyfarms.com.'), link('View your herd','#dashboard'));
       return;
     }
-    if (tab === "add") { this.title("Add a record"); for(const [kind,label] of [["animal","Add an animal"],["calving","Add a calf"],["weight","Weigh"],["treatment","Record a treatment"],["move","Move to a pasture or group"],["breeding","Breeding"],["pregnancy","Pregnancy check"],["movement","Sold or died"]])this.root.append(link(label,`#dashboard/quick/${kind}`));this.root.append(link("Work a group", "#health/batch")); }
+    if (tab === "add") { this.title("Add a record"); const grid=el("div",undefined,"quick-actions"); for(const [kind,label,glyph] of [["animal","Add an animal","plus"],["calving","Add a calf","calf"],["weight","Weigh","weight"],["treatment","Record a treatment","health"],["move","Move to a pasture or group","move"],["breeding","Breeding","breed"],["pregnancy","Pregnancy check","calendar"],["movement","Sold or died","sale"]]){const a=link("",`#dashboard/quick/${kind}`);a.className="button secondary quick-action";a.setAttribute("aria-label",label);a.append(icon(glyph),el("span",label));grid.append(a);} this.root.append(grid); const group=link("Work a group","#health/batch");group.className="button secondary";group.prepend(icon("group"));this.root.append(group); }
     else if (tab === "dashboard") {
       if (id === "quick") this.quick(action, route.split("/")[3]);
       else this.dashboard();
@@ -343,20 +344,30 @@ export class HerdUI {
         `${result.total} matching of ${result.herdTotal} animals. Page ${result.page} of ${result.pages}. Age uses ${this.today}; unknown dates are excluded from date and age filters.`,
       ),
     );
-    const list = el("ul", undefined, "rows");
+    const list = el("ul", undefined, "rows animal-list");
+    const health = evaluateWithdrawal(this.s, { now: new Date().toISOString() });
+    const healthById = new Map(health.animals.map((row) => [row.animal.id, row]));
     for (const a of result.rows) {
-      const li = el("li", undefined, "row");
-      li.append(
-        link(
-          `${a.visualTag || "No visual tag"} · ${a.farmId}`,
-          `#animals/${a.id}`,
-        ),
-        el("p", `${a.sex} · ${a.breed || "Unknown breed"} · ${a.status}`),
-        el(
-          "p",
-          `${this.s.groups.find((g) => g.id === a.currentGroupId)?.name || "No group"} · ${a.pasture || "No pasture text"}`,
-        ),
+      const li = el("li", undefined, "list-row");
+      const open = link("", `#animals/${a.id}`);
+      open.className = "row-link";
+      const text = el("span", undefined, "row-copy");
+      text.append(
+        el("strong", `${a.visualTag || "No visual tag"} · ${a.farmId}`),
+        el("small", `${plainOption(a.sex)} · ${a.breed || "Unknown breed"} · ${plainOption(a.status)}`),
+        el("small", `${this.s.groups.find((g) => g.id === a.currentGroupId)?.name || "No group"} · ${a.pasture || "No pasture"}`),
       );
+      const badges = el("span", undefined, "row-badges");
+      const row = healthById.get(a.id);
+      if (row && (isHold(row.meat.status) || isHold(row.milk.status))) badges.append(el("span", "On a hold", "badge badge-hold"));
+      if (row?.needsReview) badges.append(el("span", "Needs a check", "badge badge-check"));
+      open.append(icon(a.sex === "female" ? "cow" : "calf"), text, badges);
+      li.append(open);
+      list.append(li);
+    }
+    if (!result.rows.length) {
+      const li = el("li", undefined, "list-row empty-state");
+      li.append(icon("animals"), el("p", "No animals match."));
       list.append(li);
     }
     this.root.append(list);
@@ -480,7 +491,9 @@ export class HerdUI {
     const list = el("ul", undefined, "rows");
     for (const e of rows) {
       const r = e.record,
-        li = el("li", undefined, "card");
+        li = el("li", undefined, "list-row event-row");
+      const eventIcons = {weights:"weight",calvings:"calf",breedings:"breed",pregnancyChecks:"calendar",movements:"sale",treatments:"health",memberships:"move",animals:"cow",identifiers:"tag",groups:"group",revisions:"check",treatmentCourses:"health"};
+      li.append(icon(eventIcons[e.store] || "tag"));
       const summary =
         e.store === "weights"
           ? `${r.type}: ${r.value} ${r.unit}`
