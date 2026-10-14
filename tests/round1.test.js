@@ -49,7 +49,7 @@ test('home tiles, today rows and empty activity show icons with names', async ()
     }
     assert.ok(h.root.querySelector('.home-backup, [data-place="home"]'));
     assert.ok(h.root.querySelector('.empty-state svg'));
-    assert.equal(h.root.querySelectorAll('.snapshot-tile svg').length, 6);
+    assert.equal(h.root.querySelectorAll('.snapshot-tile svg').length, 7);
   } finally { h.close(); }
 });
 test('animal rows lead with an icon and a hold badge', async () => {

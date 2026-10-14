@@ -105,7 +105,7 @@ function healthFields(h) {
 test('empty dashboard has three steps, seven quick actions and bounded animal search',async()=>{
  const h=await setup();h.ui.demo=()=>{};await h.render('dashboard');
  assert.match(h.root.textContent,/Your first three steps/);assert.match(h.root.textContent,/Try it with sample cattle/);
- assert.equal(h.root.querySelectorAll('.quick-action').length,7);assert.equal(h.root.querySelectorAll('.snapshot-tile').length,6);
+ assert.equal(h.root.querySelectorAll('.quick-action').length,7);assert.equal(h.root.querySelectorAll('.snapshot-tile').length,7);
  assert.equal(h.root.querySelector('[name=query]').placeholder,'Type a tag or name');h.cleanup();
 });
 test('dashboard counts and Today use evaluator including departed and unknown holds',async()=>{

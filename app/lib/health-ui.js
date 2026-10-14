@@ -273,7 +273,7 @@ export class HealthUI {
           choices,
           `animal:${a.id}`,
           `${a.farmId} · ${a.visualTag || "No tag"} · ${a.status[0].toUpperCase()+a.status.slice(1)}`,
-          false,
+          !!h.chuteIds?.includes(a.id),
           { type: "checkbox" },
         );
       const preview = el("p", "Selected: none");
@@ -294,6 +294,10 @@ export class HealthUI {
             .join(", ") || "none");
       };
       body.append(choices, preview);
+      if (h.chuteIds?.length) {
+        h.chuteIds = null;
+        choices.onchange();
+      }
     }
     field(
       body,
