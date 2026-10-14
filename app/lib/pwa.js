@@ -1,3 +1,4 @@
+import {DEPLOY} from './deploy-config.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 export const SCHEMA_VERSION = 1;
 export const MIGRATION_RECEIPT = `manley-herd-migration-backup:${new URL("../", import.meta.url).pathname}`;
@@ -195,7 +196,7 @@ export async function startPWA({
       registration ||= await navigator.serviceWorker.register(
         new URL("../sw.js", import.meta.url),
         {
-          scope: new URL("../", import.meta.url).pathname,
+          scope: DEPLOY.basePath,
           updateViaCache: "none",
         },
       );

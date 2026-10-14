@@ -121,13 +121,13 @@ test('large files rejected without a read; import-only text cap leaves long old 
   assert.match(backupError(Error('Checksum mismatch')),/changed or damaged/);
 });
 test('report footer URL points to a bundled file, including all URL-shaped text',()=>{
-  const urls=PRINT_FOOTER.match(/(?:https?:\/\/)?manleyfarms\.com\/[^\s]+/g)||[];
+  const urls=PRINT_FOOTER.match(/(?:https?:\/\/)?herd\.manleyfarms\.com\/[^\s]+/g)||[];
   assert.ok(urls.length);
   for(const text of urls) {
     const url=new URL('https://'+text.replace(/^https?:\/\//,'').replace(/\.$/,''));
-    assert.equal(url.hostname,'manleyfarms.com');
-    assert.ok(url.pathname.startsWith('/tools/herd-records/'));
-    assert.ok(fs.statSync(new URL('../app/'+url.pathname.slice('/tools/herd-records/'.length),import.meta.url)).isFile(),text);
+    assert.equal(url.hostname,'herd.manleyfarms.com');
+    assert.ok(url.pathname.startsWith('/'));
+    assert.ok(fs.statSync(new URL('../app/'+url.pathname.slice(1),import.meta.url)).isFile(),text);
   }
 });
 test('new herds use Sunlight, all copy pickers accept text, signup recipient and CSP are explicit',()=>{
@@ -135,7 +135,7 @@ test('new herds use Sunlight, all copy pickers accept text, signup recipient and
   const dom=new JSDOM(read('app/index.html')), d=dom.window.document;
   for(const id of ['verify-file','restore-file','safety-file','update-backup-file']) assert.match(d.getElementById(id).accept,/\.txt.*text\/plain/);
   assert.match(d.getElementById('news-signup').textContent,/northwestmediasystems\.com/);
-  assert.equal(d.querySelector('[http-equiv="Content-Security-Policy"]').content.match(/connect-src ([^;]+)/)[1],"'self' https://northwestmediasystems.com/api/capture.php");
+  assert.equal(d.querySelector('[http-equiv="Content-Security-Policy"]').content.match(/connect-src ([^;]+)/)[1],"'self'");
   assert.equal(d.getElementById('backup-light').parentElement.id,'backup');
   dom.window.close();
 });
@@ -158,7 +158,7 @@ test('every URL in all printed report types resolves to app files',()=>{
   const dom=new JSDOM('<main></main>'), root=dom.window.document.querySelector('main');
   for(const type of ['treatments','calvings','animal']) {
     renderReport(root,assembleReport(fixture.stores,{type,animalId:fixture.stores.animals[0].id,now:'2026-10-13T12:00:00.000Z'}));
-    const urls=root.textContent.match(/(?:https?:\/\/[^\s]+|manleyfarms\.com\/[^\s]+)/g)||[];
+    const urls=root.textContent.match(/(?:https?:\/\/[^\s]+|herd\.manleyfarms\.com\/[^\s]+)/g)||[];
     assert.ok(urls.length,type);
     for(const value of urls) {
       const url=new URL(value.startsWith('http')?value:'https://'+value.replace(/\.$/,''));

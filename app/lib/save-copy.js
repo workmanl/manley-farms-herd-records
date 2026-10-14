@@ -1,3 +1,4 @@
+import {verifyMoveCopy} from './origin-move.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import {exportBackup, verifyBackup, previewRestore} from './backup.js';
 import {backupContent, confirmRequestedBackup} from './reminders.js';
@@ -33,13 +34,14 @@ export async function saveCopy(repo, copy, {navigator: nav = navigator, download
       download(copy.json);
       return {kind:'download', content:receipt.content};
     }
-    await confirmRequestedBackup(repo, receipt.content, {now});
+    if (!repo.moved) await confirmRequestedBackup(repo, receipt.content, {now});
     return {kind:'shared', counts:copy.counts};
   }
   download(copy.json);
   return {kind:'download', content:receipt.content};
 }
 export async function checkCopy(repo, input, now = new Date().toISOString()) {
+  if (repo.moved) return verifyMoveCopy(repo, input);
   if (repo.recovery || repo.demoMode) throw Error("These records are read-only. Nothing was changed here.");
   const {backup} = await verifyBackup(input);
   // Check and timestamp in the same transaction. A concurrent write cannot make an old copy green.

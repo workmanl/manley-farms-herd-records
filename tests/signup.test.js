@@ -30,7 +30,7 @@ test('signup is only after public FAQ, before source, outside dashboard; footer 
   assert.equal(d.activeElement.id, 'news-email');
   assert.equal(h.calls.length, 0);
   assert.equal(d.querySelector('#news-status').getAttribute('aria-live'), 'polite');
-  assert.equal(d.querySelector('#news-signup a').getAttribute('href'), '/privacy/');
+  assert.equal(d.querySelector('#news-signup a').getAttribute('href'), 'https://manleyfarms.com/privacy/');
   h.dom.window.close();
 });
 test('no request on initialization, input or focus; submit sends only allowed payload', async () => {
@@ -72,7 +72,7 @@ test('offline attempts have no request and no queue; invalid input and HTTP erro
 test('CSP allows only host and capture origin, font files and licenses are inventoried, typography is local', () => {
   const d = new JSDOM(read('app/index.html')).window.document;
   const csp = d.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
-  assert.equal(csp.match(/connect-src ([^;]+)/)[1], "'self' https://northwestmediasystems.com/api/capture.php");
+  assert.equal(csp.match(/connect-src ([^;]+)/)[1], "'self'");
   assert.match(csp, /font-src 'self';/);
   const ctx = { self: {} }; vm.runInNewContext(read('app/precache.js'), ctx);
   for (const p of ['dm-sans-latin-var.woff2', 'inter-latin-var.woff2', 'DM-Sans-OFL.txt', 'Inter-OFL.txt']) assert.ok(ctx.self.HERD_RELEASE.assets.some(a => a.path === 'fonts/'+p));
@@ -85,7 +85,7 @@ test('CSP allows only host and capture origin, font files and licenses are inven
 });
 test('terms and privacy disclosures describe host requests, elective email and no herd uploads', () => {
   for (const text of [FULL_TERMS, read('app/terms.txt'), read('app/index.html'), read('app/help.html'), read('README.md')]) {
-    assert.match(text, /Only if you choose to sign up is your email sent to the Manley Farms mailing list/);
+    assert.match(text, /Only if you choose to sign up is your email sent to the Manley Farms mailing list|There is no email signup on this app origin/);
     assert.match(text, /Herd records are never sent/);
     assert.match(text, /Ordinary page and asset requests go to the web host/);
   }

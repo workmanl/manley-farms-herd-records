@@ -1,8 +1,22 @@
 // Local release inventory generator. Run after changing any app asset.
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
-const root = new URL("../app/", import.meta.url);
-const scope = process.env.HERD_BASE_PATH || "/tools/herd-records/";
+import {DEPLOY, deployConfig} from '../app/lib/deploy-config.js';
+import {pathToFileURL} from 'node:url';
+const root = process.env.HERD_BUILD_DIR ? pathToFileURL(process.env.HERD_BUILD_DIR.replace(/\/$/, '') + '/') : new URL('../app/', import.meta.url);
+const config = deployConfig({...DEPLOY, basePath:process.env.HERD_BASE_PATH || DEPLOY.basePath, origin:process.env.HERD_ORIGIN || DEPLOY.origin, moved:process.env.HERD_MOVED === '1'});
+const scope = config.basePath;
+const configFile = new URL('lib/deploy-config.js', root);
+const previous = await readFile(configFile, 'utf8');
+const prior = JSON.parse(previous.match(/Object\.freeze\((\{.*?\})\)/)?.[1]?.replace(/'/g, '"').replace(/([{,]\s*)(\w+):/g, '$1"$2":') || '{}');
+for (const name of ['index.html','help.html','source.html','lib/reports.js']) {
+  const path = new URL(name, root);
+  const bytes = await readFile(path, 'utf8');
+  const from = (prior.origin || DEPLOY.origin) + (prior.basePath || DEPLOY.basePath);
+  await writeFile(path, bytes.replace('id="move-open" class="button" href="https://herd.manleyfarms.com/"', 'id="move-open" class="button" href="MOVE_DESTINATION"').split(from).join(config.url).replace('MOVE_DESTINATION','https://herd.manleyfarms.com/'));
+
+}
+await writeFile(configFile, previous.replace(/export const DEPLOY = Object\.freeze\(.*?\);/, 'export const DEPLOY = Object.freeze(' + JSON.stringify({basePath:scope, origin:config.origin, moved:config.moved}) + ');'));
 if (!/^\/(?:[a-zA-Z0-9_-]+\/)*$/.test(scope))
   throw Error("Use an absolute directory path ending in /.");
 await writeFile(
@@ -54,7 +68,7 @@ const files = (await readdir(root, { recursive: true, withFileTypes: true }))
     (e) => (e.parentPath || e.path).slice(root.pathname.length) + "/" + e.name,
   )
   .map((p) => p.replace(/^\//, ""))
-  .filter((p) => p !== "precache.js")
+  .filter((p) => p !== "precache.js" && !p.startsWith("."))
   .sort();
 const assets = [];
 for (const path of files)

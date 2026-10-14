@@ -2,9 +2,9 @@
 
 Free cattle records that work offline after the first verified download. Keep animal identity, parentage, calving, weights, breeding, treatments and departures, with separate recorded meat and milk withdrawal holds.
 
-**Public beta 1.2.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
+**Public beta 1.3.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
 
-[Open Herd Records](https://manleyfarms.com/tools/herd-records/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
+[Open Herd Records](https://herd.manleyfarms.com/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
 
 This checkout prepares the release locally. Publication and deployment are separate handoff steps; the live link above is the intended public destination.
 
@@ -32,7 +32,7 @@ Core browser use targets current Safari on iPhone/iPad and Mac, Chrome on Androi
 
 ## Privacy and storage limits
 
-Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. Ordinary page and asset requests go to the web host. Only if you choose to sign up is your email sent to the Manley Farms mailing list, along with the signup source, page path and app version. Herd records are never sent. Optional source and donation links navigate only when chosen and include no herd context.
+Herd fields stay in IndexedDB on your device. No account, telemetry, record uploads, cloud backup or automatic sync is provided. Ordinary page and asset requests go to the web host. There is no email signup on this app origin. Herd records are never sent. Optional source and donation links navigate only when chosen and include no herd context.
 
 Records are not encrypted by the app. Device/profile access and other scripts on the same website origin can expose them. Different browsers, profiles and installed contexts may hold separate copies. Clearing site data, private browsing, eviction, device loss, storage limits or software errors can destroy records. Persistent storage can reduce eviction risk, but does not guarantee retention. Manley Farms has no recovery copy.
 
@@ -70,7 +70,7 @@ No runtime package installation or build step is required. Serve the complete `a
 node scripts/serve.mjs
 ```
 
-Open <http://127.0.0.1:8765/tools/herd-records/>. Keep the same origin, port and browser profile to access the same records. Opening with `file://` is unsupported. For a fork’s different directory path, run `HERD_BASE_PATH=/your/path/ node scripts/build-pwa.mjs` and align the host directory with the manifest scope. Regenerate the inventory after any app asset edit.
+Open <http://127.0.0.1:8765/>. Keep the same origin, port and browser profile to access the same records. Opening with `file://` is unsupported. For a fork’s different directory path, run `HERD_BASE_PATH=/your/path/ node scripts/build-pwa.mjs` and align the host directory with the manifest scope. Regenerate the inventory after any app asset edit.
 
 [Data dictionary](docs/data-dictionary.md) · [Architecture](docs/architecture.md) · [Synthetic fixture](tests/fixtures/sample-herd.json)
 
@@ -109,3 +109,13 @@ Copyright (C) 2026 Scott Manley. Original code and covered project documentation
 ### Dashboard screenshots and review
 
 The 1.1 dashboard starts at Your herd with counts, seven guided quick actions, Today, animal search and recent activity. New users get three welcome steps and optional isolated sample cattle. Screenshot capture is pending Claude’s local browser review: capture populated and empty dashboards at 390px and 1280px, plus the sunlight theme and a guided treatment. Existing phase screenshots document previous versions.
+
+## Move to the new address
+
+Open [herd.manleyfarms.com](https://herd.manleyfarms.com/). If you used the old address, save a copy there, then choose **Restore your saved copy** here. Records do not move by themselves. The old address stays read-only so new records go in one place. It never removes records on its own.
+
+`npm run release` builds `dist/herd-origin/` and `dist/moved/`, their ZIP files, the source ZIP and `dist/SHA256SUMS`. Upload the contents of each folder at its target path. The new-origin folder includes the files from `hosting/herd-origin/`.
+
+The deploy settings live in `app/lib/deploy-config.js`. For a custom host, set `HERD_BASE_PATH` and `HERD_ORIGIN` when running `npm run pwa:inventory`; this writes the one config and generates matching metadata, manifest and precache. The moved artifact keeps the old worker path and scope.
+
+See [the origin move report](docs/origin-move-report.md) for the deploy order and the live gate. Do not redirect the old app path at the host.

@@ -1,10 +1,10 @@
 {
-  "id": "/tools/herd-records/",
+  "id": "/",
   "name": "Manley Farms Herd Records",
   "short_name": "Herd Records",
   "display": "standalone",
-  "start_url": "/tools/herd-records/",
-  "scope": "/tools/herd-records/",
+  "start_url": "/",
+  "scope": "/",
   "theme_color": "#1a1f16",
   "background_color": "#1a1f16",
   "icons": [

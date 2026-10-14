@@ -10,7 +10,7 @@ import { updateIntroduction } from "../app/lib/landing.js";
 const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const dom = () => new JSDOM(read("app/index.html"));
 const graph = () => JSON.parse(dom().window.document.querySelector('script[type="application/ld+json"]').textContent)['@graph'];
-const version = "1.2.0-beta.1";
+const version = "1.3.0-beta.1";
 test("public beta version agrees across package, app, structured data and hash-derived worker release", () => {
   assert.equal(JSON.parse(read("package.json")).version, version);
   const lock = JSON.parse(read("package-lock.json"));
@@ -37,7 +37,7 @@ test("JSON-LD FAQ matches every visible question and answer exactly", () => {
 test("SEO identifies free beta software and source without ratings or nonexistent image", () => {
   const document = dom().window.document, nodes = graph();
   const app = nodes.find((n) => n['@type'] === 'SoftwareApplication');
-  const url = 'https://manleyfarms.com/tools/herd-records/';
+  const url = 'https://herd.manleyfarms.com/';
   assert.equal(app.url, url);
   assert.equal(document.querySelector('[rel=canonical]').href, url);
   assert.equal(document.querySelector('[property="og:url"]').content, url);
@@ -86,7 +86,8 @@ test("release packager verifies shell, includes dotfiles, omits local/scale arti
   const temp = await mkdtemp(join(tmpdir(),'herd-release-test-'));
   try {
     await mkdir(join(temp,'scripts'));
-    await cp(new URL('../scripts/release.mjs',import.meta.url), join(temp,'scripts/release.mjs'));
+    await cp(new URL('../scripts/',import.meta.url), join(temp,'scripts'), {recursive:true});
+    await cp(new URL('../hosting/',import.meta.url), join(temp,'hosting'), {recursive:true});
     await cp(new URL('../app/',import.meta.url), join(temp,'app'), {recursive:true});
     await cp(new URL('../package.json',import.meta.url), join(temp,'package.json'));
     await mkdir(join(temp,'.github'));
@@ -103,6 +104,23 @@ test("release packager verifies shell, includes dotfiles, omits local/scale arti
     const run = () => spawnSync(process.execPath,[join(temp,'scripts/release.mjs')],{encoding:'utf8'});
     const result = run();
     assert.equal(result.status,0,result.stderr);
+    for (const [folder,scope,moved] of [['herd-origin','/',false],['moved','/tools/herd-records/',true]]) {
+      const directory=join(temp,'dist',folder);
+      const manifest=JSON.parse(await readFile(join(directory,'manifest.webmanifest'),'utf8'));
+      assert.equal(manifest.id,scope);assert.equal(manifest.scope,scope);assert.equal(manifest.start_url,scope);
+      const config=await readFile(join(directory,'lib/deploy-config.js'),'utf8');
+      assert.ok(config.includes('"moved":'+moved));
+      assert.match(config,/NEW_ADDRESS = 'https:\/\/herd.manleyfarms.com\/'/);
+      const generated={self:{}};vm.runInNewContext(await readFile(join(directory,'precache.js'),'utf8'),generated);
+      for(const asset of generated.self.HERD_RELEASE.assets) assert.equal(createHash('sha256').update(await readFile(join(directory,asset.path))).digest('hex'),asset.sha256);
+      assert.ok(!generated.self.HERD_RELEASE.assets.some(a=>a.path==='.htaccess'));
+      const sums=await readFile(join(temp,'dist',`manley-farms-herd-records-${version}-${folder}-SHA256SUMS`),'utf8');
+      const name=`manley-farms-herd-records-${version}-${folder}.zip`;
+      assert.equal(sums,`${createHash('sha256').update(await readFile(join(temp,'dist',name))).digest('hex')}  ${name}\n`);
+      const html=await readFile(join(directory,'index.html'),'utf8');
+      assert.match(html,/id="move-open" class="button" href="https:\/\/herd.manleyfarms.com\/"/);
+    }
+    assert.ok(fs.existsSync(join(temp,'dist','herd-origin','.htaccess')));
     const staticName = `manley-farms-herd-records-${version}-static.zip`;
     const sourceName = `manley-farms-herd-records-${version}-source.zip`;
     const list = (name) => {

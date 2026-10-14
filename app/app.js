@@ -1,3 +1,6 @@
+import {DEPLOY, NEW_ADDRESS} from './lib/deploy-config.js';
+import {hasHerdRecords, shouldRedirect, verifyMoveCopy, removeMovedRecords} from './lib/origin-move.js';
+import {hasDrafts} from './lib/pwa.js';
 import {STORE_WORDS, recordLines} from './lib/backup-copy.js';
 import {prepareCopy, saveCopy, checkCopy, practiceCopy, copySummary} from './lib/save-copy.js';
 import {healthFromSnapshot} from './lib/backup-health.js';
@@ -7,8 +10,7 @@ const friendlyDate = value => value ? new Intl.DateTimeFormat("en-US", {dateStyl
 let practiceRestore = false;
 let readyCopy, pendingAnimalSave = false, phoneKeepsRecords = false;
 import { openDemo, deleteDemo } from "./lib/demo.js";
-import { setupNewsSignup } from "./lib/signup.js";
-setupNewsSignup(document);
+// Mailing list signup stays on the main site.
 import { updateIntroduction } from "./lib/landing.js";
 import {
   startPWA,
@@ -103,7 +105,8 @@ function theme(value) {
 async function refresh() {
   snapshot = await refreshHealth(repo);
   updateIntroduction($("public-intro"), snapshot);
-  accepted = await hasAccepted(snapshot);
+  accepted = DEPLOY.moved || await hasAccepted(snapshot);
+  updateMovePanel();
   const op = snapshot.operation[0],
     meta = snapshot.metadata[0];
   operationRevision = op.revision;
@@ -130,6 +133,7 @@ async function refresh() {
   }
   readyCopy = null;
   if (!repo.recovery && !herd?.demoMode) readyCopy = await prepareCopy(repo);
+  if (DEPLOY.moved) $("move-save").disabled = !readyCopy;
   try { phoneKeepsRecords = !!(await navigator.storage?.persisted?.()); } catch { phoneKeepsRecords = false; }
   if (pendingAnimalSave) {
     pendingAnimalSave = false;
@@ -143,12 +147,15 @@ async function refresh() {
 }
 function route() {
   if (!repo) return;
-  const path = location.hash.slice(1) || "dashboard";
+  let path = location.hash.slice(1) || "dashboard";
+  if (DEPLOY.moved && (path.includes("/quick/") || /\/(new|add|edit|void|correct|batch|calving|weaning|pregnancy|sale|purchase)(\/|$)/.test(path))) {
+    path = "dashboard"; message("This old address is read-only. Save a copy, then add new records at the new address.");
+  }
   const tab = path.split("/")[0];
   let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch)(\/|$)/.test(path);
   document.body.dataset.recordEntry = String(entering);
-  $('news-signup').hidden = entering;
-  $('news-signup-link').hidden = entering;
+  $('news-signup').hidden = true;
+  $('news-signup-link').hidden = true;
   const herdTab = [
     "dashboard",
     "animals",
@@ -160,11 +167,12 @@ function route() {
   if (!$("herd").hidden) herd.render(snapshot, path);
   entering = entering || (!$("herd").hidden && !!$("herd").querySelector('form .sticky'));
   document.body.dataset.recordEntry = String(entering);
-  $('news-signup').hidden = entering;
-  $('news-signup-link').hidden = entering;
+  $('news-signup').hidden = true;
+  $('news-signup-link').hidden = true;
   const backup = tab === "backup";
   $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery || !!herd?.demoMode;
   if (!$("ownership").hidden) ownership.render(snapshot);
+  if (DEPLOY.moved) enforceMovedView();
   $("gate").hidden = accepted || backup || !!repo.recovery;
   $("backup").hidden = !backup || !!repo.recovery || !!herd?.demoMode;
   $("placeholder").hidden =
@@ -192,6 +200,7 @@ function route() {
     "Choose a tab above to return to your records.";
 }
 async function bookkeeping(field, { preserveView = false } = {}) {
+  if (DEPLOY.moved) return;
   const s = await repo.snapshot();
   const m = s.metadata[0],
     now = new Date().toISOString();
@@ -391,7 +400,7 @@ $("saved-check").onchange = () => {
 };
 on("confirm-saved", "click", async () => {
   if (!$("saved-check").checked) return;
-  await confirmRequestedBackup(repo, requestedBackup);
+  if (!DEPLOY.moved) await confirmRequestedBackup(repo, requestedBackup);
   await refresh();
   requestedBackup = null;
   $("saved-check").checked = false;
@@ -575,6 +584,7 @@ document.addEventListener('herd-saved', e => {
 herd = new HerdUI($("herd"), { repository: () => repo, refresh, message,
   backupPanel: mountBackupPanel,
   demo: (mode) => run(async () => {
+    if (DEPLOY.moved) throw Error("Practice at the new address.");
     if (herd.saving || edits.dirty()) throw new Error("Finish or cancel your form before switching herds.");
     requestedBackup = null; resetPlan(); restoreInput = null;
     if (mode === true) {
@@ -622,6 +632,13 @@ await run(async () => {
         .forEach((el) => (el.disabled = true));
     },
   });
+  if (DEPLOY.moved && !repo.recovery && shouldRedirect(await repo.snapshot(), {moved:true, drafts:hasDrafts(deviceStorage)})) {
+    document.body.dataset.emptyMove = "true";
+    $("move-panel").hidden = false; $("move-title").textContent = "Herd Records moved";
+    $("move-copy").textContent = "No herd records are saved here. Opening the new address.";
+    $("move-save").hidden = true; $("move-check-label").hidden = true;
+    location.replace(NEW_ADDRESS); return;
+  }
   if (repo.recovery) {
     $("recovery").hidden = false;
     $("recovery-message").textContent = repo.recovery;
@@ -653,6 +670,7 @@ async function refreshVisibleHealth() {
     herd.s = snapshot;
     showReminder();
     if ((location.hash === "#dashboard" || !location.hash) && !$("herd").contains(document.activeElement)) herd.render(snapshot, "dashboard");
+    if (DEPLOY.moved) enforceMovedView();
     for (const panel of document.querySelectorAll(".withdrawal-panel"))
       if (!panel.contains(document.activeElement)) herd.health.update(panel);
     for (const panel of document.querySelectorAll(".departure-preview"))
@@ -770,7 +788,7 @@ function mountBackupPanel(root) {
   for(const text of ['Your records stay on this phone.', 'A share or checked file is a saved copy.', state.storageNote]) {const p=document.createElement('p');p.textContent=text;why.append(p);}
   if(safari) {add('p',SAFARI_WARNING).className='safari-warning';add('p',SAFARI_SEPARATE);const list=add('ol','');for(const text of SAFARI_STEPS){const li=document.createElement('li');li.textContent=text;list.append(li);}}
   if (!device.lastPracticeAt || Date.now() - device.lastPracticeAt >= 30*86400000) add('p','Try a practice restore this month. Open Backup and pick your copy.');
-  if(root.id !== 'backup-light') {
+  if(root.id !== 'backup-light' && !DEPLOY.moved) {
     const switcher=add('button',snapshot.operation[0].theme === 'sunlight' ? '☾ Use dark theme' : '☀ Use Sunlight');
     switcher.type='button'; switcher.onclick=()=>void run(async()=>{
       const op=(await repo.snapshot()).operation[0];
@@ -779,3 +797,36 @@ function mountBackupPanel(root) {
     });
   }
 }
+
+function enforceMovedView() {
+  // Keep view, print and export controls. Mutation paths are also blocked in storage.
+  for (const root of [$('herd')]) {
+    for (const link of root.querySelectorAll('a[href]')) {
+      if (/\/(new|add|edit|void|correct|batch|quick|calving|weaning|pregnancy|sale|purchase|move|weight|breeding|movement|treatment|course|clock)(\/|$)/.test(link.getAttribute('href'))) {
+        link.setAttribute('aria-disabled','true'); link.removeAttribute('href');
+      }
+    }
+  }
+  for (const id of ['save-settings','accept','commit','preview','restore-file','backup-snooze','confirm-saved','practice-restore']) $(id).disabled = true;
+}
+function updateMovePanel() {
+  $('restore-welcome').hidden = DEPLOY.moved || hasHerdRecords(snapshot);
+  $('move-panel').hidden = !DEPLOY.moved;
+  if (DEPLOY.moved) {
+    document.body.dataset.moved = 'true';
+    $('move-save').disabled = !readyCopy;
+    $('move-open').href = NEW_ADDRESS;
+  }
+}
+$('move-save').onclick = () => void run(doSaveCopy);
+$('move-check').onchange = () => void run(async () => {
+  const file = $('move-check').files[0]; if (!file) return;
+  const counts = await verifyMoveCopy(repo, await readSafeFile(file));
+  $('move-result').textContent = 'Copy checked. ' + copySummary(counts);
+  $('move-remove').hidden = false;
+});
+$('move-remove').onclick = () => void run(async () => {
+  if (!window.confirm('Have you restored and checked your herd at the new address? Remove the records from this old address? Your saved file will stay safe.')) return;
+  await removeMovedRecords(repo, {confirmed:true, drafts:hasDrafts(deviceStorage)});
+  repo.close(); location.replace(NEW_ADDRESS);
+});

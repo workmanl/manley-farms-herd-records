@@ -1,3 +1,4 @@
+import {DEPLOY} from './deploy-config.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { clockState } from "./withdrawal.js";
 import { indexes, STORES } from "./contract.js";
@@ -9,7 +10,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "1.2.0-beta.1";
+export const APP_VERSION = "1.3.0-beta.1";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -69,7 +70,9 @@ function installV1(db, tx) {
     for (const row of initial[name]) tx.objectStore(name).add(row);
 }
 export const migrations = { 1: { upgrade: installV1 } };
-export function transaction(db, mode, work) {
+const movedDatabases = new WeakSet();
+export function transaction(db, mode, work, {manualMoveRemoval = false} = {}) {
+  if (mode !== "readonly" && movedDatabases.has(db) && !manualMoveRemoval) throw Error("This old address is read-only. Use the new address for new records.");
   return new Promise((resolve, reject) => {
     let tx;
     try {
@@ -216,9 +219,11 @@ export function validateTransitions(before, after) {
   }
 }
 export class Repository {
-  constructor(db, { recovery = null, onVersionChange = () => {} } = {}) {
+  constructor(db, { recovery = null, moved = DEPLOY.moved, onVersionChange = () => {} } = {}) {
     this.db = db;
     this.recovery = recovery;
+    this.moved = moved;
+    if (this.moved) movedDatabases.add(db);
     this.closed = false;
     db.onversionchange = () => {
       this.closed = true;
@@ -236,6 +241,7 @@ export class Repository {
   }
   observeClock(now) {
     this.openingSnapshot = null;
+    check(!this.moved, "This old address is read-only. Use the new address for new records.");
     check(!this.recovery, "Recovery mode is read-only.");
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction("metadata", "readwrite");
@@ -272,6 +278,7 @@ export class Repository {
   // Read all of its foreign keys in the same serialized transaction as the add.
   async appendWeight(record) {
     this.openingSnapshot = null;
+    check(!this.moved, "This old address is read-only. Use the new address for new records.");
     check(!this.recovery, "Recovery mode is read-only.");
     validateRecord("weights", record);
     check(
@@ -330,8 +337,8 @@ export class Repository {
   ) {
     this.openingSnapshot = null;
     check(
-      !this.recovery,
-      "Recovery mode is read-only. Export existing records before recovery.",
+      !this.recovery && !this.moved,
+      this.moved ? "This old address is read-only. Use the new address for new records." : "Recovery mode is read-only. Export existing records before recovery.",
     );
     return transaction(this.db, "readwrite", (before, tx) => {
       if (expectedHealth) {
@@ -538,7 +545,7 @@ export async function openRepository({
             acknowledgeDuplicateTags: true,
             acknowledgeParentSex: true,
           }));
-      if (initialClock) {
+      if (initialClock && !repo.moved) {
         // One consistent launch read, validation and clock observation. The UI consumes
         // this transaction's snapshot once, rather than reading all history twice.
         repo.openingSnapshot = await transaction(db, "readwrite", (s, tx) => {

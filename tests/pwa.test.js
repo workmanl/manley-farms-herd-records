@@ -98,7 +98,7 @@ function harness({ fail = false, clients = [] } = {}) {
 }
 test("manifest stable identity, deploy scope, standalone and regular/maskable local icons", () => {
   const m = JSON.parse(read("manifest.webmanifest"));
-  assert.equal(m.id, "/tools/herd-records/");
+  assert.equal(m.id, "/");
   assert.equal(m.scope, m.id);
   assert.equal(m.start_url, m.id);
   assert.equal(m.display, "standalone");
@@ -313,6 +313,7 @@ test("app has local resources, no remote imports or record-request sinks, and on
   )) {
     let source = read(a.path).replaceAll("http://www.w3.org/2000/svg", "");
     if (a.path === "lib/csv-dictionary.js") continue;
+    if (a.path === 'lib/deploy-config.js') source = source.replaceAll('https://herd.manleyfarms.com','');
     if (a.path === "lib/signup.js") {
       assert.equal((source.match(/https:\/\/[^"\s]+/g) || []).join(), "https://northwestmediasystems.com/api/capture.php");
       source = source.replace("https://northwestmediasystems.com/api/capture.php", "");

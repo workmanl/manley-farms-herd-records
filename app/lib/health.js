@@ -285,6 +285,7 @@ export function placeholderCorrections(s, now) {
     });
 }
 export async function refreshHealth(repo, now = new Date().toISOString()) {
+  if (repo.moved) return repo.snapshot();
   // A concurrent clock observation can conflict. Re-read rather than overwriting it.
   let s = repo.openingSnapshot;
   repo.openingSnapshot = null;

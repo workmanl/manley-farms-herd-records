@@ -1,9 +1,10 @@
+import {APP_ADDRESS} from './deploy-config.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { evaluateWithdrawal, LABELS } from "./withdrawal.js";
 import { events } from "./workflows.js";
 import { isDate, requireThat as check } from "./validation.js";
 export const PRINT_FOOTER =
-  "Manley Farms Herd Records organizes user-entered records. This report is not veterinary, legal or regulatory advice, a compliance certificate, or authorization for slaughter or milk sale. Verify entries, withdrawal instructions and applicable requirements. This app is not certified by BQA or any authority. Provided as is, without warranty to the extent allowed by law. The user is responsible for decisions and backups. Full terms: manleyfarms.com/tools/herd-records/terms.txt.";
+  `Manley Farms Herd Records organizes user-entered records. This report is not veterinary, legal or regulatory advice, a compliance certificate, or authorization for slaughter or milk sale. Verify entries, withdrawal instructions and applicable requirements. This app is not certified by BQA or any authority. Provided as is, without warranty to the extent allowed by law. The user is responsible for decisions and backups. Full terms: ${APP_ADDRESS.replace(/^https:\/\//, "")}terms.txt.`;
 export const SWITCHING_STEPS = [
   "Export and verify a full JSON backup. Export all CSV tables plus the field dictionary, retaining parent and event IDs.",
   "Print the current treatment log and calving book. Compare counts and sample records, including tags with leading zeros, sold animals, and unresolved holds.",

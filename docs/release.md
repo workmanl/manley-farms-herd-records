@@ -1,8 +1,8 @@
 # Release gate
 
-A packaged ZIP is not approval to deploy. No record or database schema changes are part of 1.2.0-beta.1. Schema stays at 1.
+A packaged ZIP is not approval to deploy. No record or database schema changes are part of 1.3.0-beta.1. Schema stays at 1.
 
-The owner decision on 2026-10-13 (TG 9414 and TG 9418) amended the spec's email-capture non-goal: optional news signup stays.
+For this origin move, use [the exact deploy order and cross-origin gate](origin-move-report.md). News signup is disabled on the dedicated app origin; its CSP permits only local connections.
 
 ## Dependency setup by the release maintainer
 
@@ -21,7 +21,7 @@ This creates animal UPG777 through the existing audited write path, with known v
 For every migration wave, also seed a second profile with the complete sample herd:
 
 ```sh
-node tests/live-upgrade-check.mjs seed https://manleyfarms.com/tools/herd-records/ /tmp/herd-fixture-profile /tmp/herd-fixture-evidence 1 1.2.0-beta.1 --fixture
+node tests/live-upgrade-check.mjs seed https://manleyfarms.com/tools/herd-records/ /tmp/herd-fixture-profile /tmp/herd-fixture-evidence 1 1.3.0-beta.1 --fixture
 ```
 
 The seed command records the actual old app version. The explicit app version is used by check mode. The fixture profile exercises restore through the existing checked replacement path, then adds the same UPG777 seed. For a future schema migration, adapt the expected store transforms and validation before changing this strict gate. Do not weaken assertions to hide legitimate or unexpected differences.
@@ -37,8 +37,8 @@ node scripts/serve.mjs
 In a second terminal, after installing Playwright:
 
 ```sh
-node tests/ui-rules.mjs http://127.0.0.1:8765/tools/herd-records/ /tmp/herd-wave1-ui
-node tests/live-smoke-check.mjs http://127.0.0.1:8765/tools/herd-records/ /tmp/herd-smoke
+node tests/ui-rules.mjs http://127.0.0.1:8765/ /tmp/herd-wave1-ui
+node tests/live-smoke-check.mjs http://127.0.0.1:8765/ /tmp/herd-smoke
 ```
 
 Create the smoke output folder first. Inspect every screenshot in both themes. Complete the device and fallback checklist in wave1-report.md. The UI script seeds synthetic data in isolated profiles, checks every guided flow, saves all steps, checks all three backup states, tests 48px controls and fails on overlap, horizontal scrolling or page errors. It does not save unfinished treatment forms.
@@ -50,7 +50,7 @@ About Herd Records in Backup shows the app version and installed offline build v
 Claude owns browser review, commits, the live upgrade gate and deployment. Using the exact profile and evidence folder from seed:
 
 ```sh
-node tests/live-upgrade-check.mjs check https://manleyfarms.com/tools/herd-records/ /tmp/herd-upgrade-profile /tmp/herd-upgrade-evidence 1 1.2.0-beta.1
+node tests/live-upgrade-check.mjs check https://manleyfarms.com/tools/herd-records/ /tmp/herd-upgrade-profile /tmp/herd-upgrade-evidence 1 1.3.0-beta.1
 ```
 
 Check asks the service worker for an update, uses Update when ready if needed, reloads, and prints the full surviving record, database version and page errors. It asserts every known field, the entire seeded record, every non-metadata store, expected app version, active service worker and zero page errors. Metadata is excluded from the store comparison because the normal clock check changes its device-local fields. Any mismatch exits 1. The seed must come from an older release. A successful check writes upgrade-pass.json and a screenshot.

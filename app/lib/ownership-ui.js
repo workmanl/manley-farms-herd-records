@@ -97,7 +97,7 @@ export class OwnershipUI {
     this.el("h1", "Reports and data ownership");
     this.reports();
     this.exports();
-    this.imports();
+    if (!this.repository().moved) this.imports();
     this.guide();
   }
   reports() {

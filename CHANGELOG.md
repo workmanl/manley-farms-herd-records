@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.3.0-beta.1 (2026-10-13)
+
+- Move the main app to herd.manleyfarms.com with a root deploy base and bundled site assets.
+- Add a separate old-address build with read-only records, verified Save a copy, guided restore and manual removal after checking a current copy.
+- Keep draft-safe service worker updates and old records intact. Empty old profiles open the new address.
+- Add dedicated-origin Apache headers, robots and sitemap, both release artifacts, checksums and an exact-field cross-origin move gate.
+- Turn off email signup on the app origin and narrow its CSP to local connections.
+
 ## 1.2.0-beta.1 / 2026-10-13 / schema 1 / local only
 
 - Added Save a copy on Home and Backup with a pre-verified file, share-sheet support, plain-text fallback and download fallback. Cancelled shares do not change backup timestamps.

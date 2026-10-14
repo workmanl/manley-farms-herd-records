@@ -318,7 +318,7 @@ export async function commitRestore(
   } = {},
 ) {
   check(
-    !repo.recovery,
+    !repo.recovery && !repo.moved,
     "Recovery mode is read-only. Export and reopen with a compatible app.",
   );
   onProgress({ phase: "Checking your current copy", percent: 0 });

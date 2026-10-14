@@ -121,6 +121,15 @@ export class HerdUI {
     this.unit = snapshot.operation[0].weightUnit;
     this.root.replaceChildren();
     const [tab, id, action] = route.split("/");
+    if (this.repository().moved && (
+      (tab === 'dashboard' && id) ||
+      (tab === 'animals' && (['new','batch'].includes(id) || action)) ||
+      (tab === 'groups' && id) || (tab === 'health' && id)
+    )) {
+      this.title('Add new records at the new address');
+      this.root.append(el('p','This old address is read-only. Save a copy, then restore it at herd.manleyfarms.com.'), link('View your herd','#dashboard'));
+      return;
+    }
     if (tab === "dashboard") {
       if (id === "quick") this.quick(action, route.split("/")[3]);
       else this.dashboard();
