@@ -60,7 +60,11 @@ try {
         await commitWorkflow(repo,await repo.snapshot(),'animal',fields);
       } finally {repo.close();}
     }, {url, fields:SEED_FIELDS, fixture});
-    await page.reload({waitUntil:'networkidle'});
+    // A first visit installs the worker but does not control this page until a reload after activation.
+    await page.evaluate(() => navigator.serviceWorker.ready);
+    for (let attempt = 0; attempt < 3 && !(await page.evaluate(() => !!navigator.serviceWorker.controller)); attempt++) {
+      await page.reload({waitUntil:'networkidle'});
+    }
     await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, {timeout:30000});
     const state=await read();
     assertUpgrade(state,state,errors,dbVersion);
