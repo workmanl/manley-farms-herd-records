@@ -40,6 +40,14 @@ for (const asset of release.assets)
   if (sha(await readFile(join(app, asset.path))) !== asset.sha256) throw Error(`Stale precache hash: ${asset.path}`);
 const expectedVersion = `${version}:${sha(JSON.stringify(release.assets)).slice(0, 20)}`;
 if (release.version !== expectedVersion) throw Error("Precache release version does not match package and asset bytes.");
+// Packaging stays local by default. Maintainers explicitly run the live gate after an update.
+const gateIndex = process.argv.indexOf('--upgrade-check');
+if (gateIndex !== -1) {
+  const args = process.argv.slice(gateIndex + 1);
+  if (args.length !== 3) throw Error('Use --upgrade-check BASE_URL PROFILE_DIR OUT_DIR');
+  const gate = spawnSync(process.execPath, [join(root, 'tests/live-upgrade-check.mjs'), 'check', ...args, '1', version], {stdio:'inherit'});
+  if (gate.error || gate.status !== 0) throw gate.error || Error('Upgrade gate failed. Release stopped.');
+}
 const output = resolve(root, "dist");
 await mkdir(output, { recursive: true });
 async function archive(kind, files) {

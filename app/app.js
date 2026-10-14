@@ -1,3 +1,11 @@
+import {STORE_WORDS, recordLines} from './lib/backup-copy.js';
+import {prepareCopy, saveCopy, checkCopy, practiceCopy, copySummary} from './lib/save-copy.js';
+import {healthFromSnapshot} from './lib/backup-health.js';
+import {keepRecords, safariTab, SAFARI_WARNING, SAFARI_STEPS, SAFARI_SEPARATE, readDevice, writeDevice} from './lib/device-safety.js';
+import {readSafeFile, backupError} from './lib/file-safety.js';
+const friendlyDate = value => value ? new Intl.DateTimeFormat("en-US", {dateStyle:"medium", timeStyle:"short"}).format(new Date(value)) : "Not yet";
+let practiceRestore = false;
+let readyCopy, pendingAnimalSave = false, phoneKeepsRecords = false;
 import { openDemo, deleteDemo } from "./lib/demo.js";
 import { setupNewsSignup } from "./lib/signup.js";
 setupNewsSignup(document);
@@ -29,6 +37,8 @@ import {
   TERMS_VERSION,
 } from "./lib/terms-copy.js";
 const $ = (id) => document.getElementById(id);
+const deviceStorage = (() => {try {return window.localStorage;} catch {return null;}})();
+const migrationReceipt = () => {try {return deviceStorage?.getItem(MIGRATION_RECEIPT) || null;} catch {return null;}};
 const edits = trackEdits(document);
 import { OwnershipUI } from "./lib/ownership-ui.js";
 import {
@@ -71,7 +81,7 @@ async function run(fn) {
   try {
     await fn();
   } catch (e) {
-    message(e.message, true);
+    message(location.hash.startsWith("#backup") && /JSON|schema|dataset|checksum|restore preview|backup.*invalid/i.test(e.message) ? backupError(e) : e.message, true);
   } finally {
     busy = false;
   }
@@ -103,8 +113,8 @@ async function refresh() {
   $("theme").value = op.theme;
   $("reminder-days").value = op.backupReminderDays;
   theme(op.theme);
-  $("last-export").textContent = meta.lastExportAttemptAt || "Never";
-  $("last-confirmed").textContent = meta.lastUserConfirmedBackupAt || "Never";
+  $("last-export").textContent = friendlyDate(meta.lastExportAttemptAt);
+  $("last-confirmed").textContent = friendlyDate(meta.lastUserConfirmedBackupAt);
   $("save-settings").disabled = !accepted || !!repo.recovery;
   let demoBanner = $("demo-banner");
   if (!demoBanner) { demoBanner = document.createElement("aside"); demoBanner.id = "demo-banner"; $("main").prepend(demoBanner); }
@@ -118,6 +128,16 @@ async function refresh() {
     const remove = document.createElement("button"); remove.type = "button"; remove.className = "secondary danger"; remove.textContent = "Delete demo herd"; remove.onclick = () => herd.demo("delete");
     actions.append(leave, remove); demoBanner.append(actions);
   }
+  readyCopy = null;
+  if (!repo.recovery && !herd?.demoMode) readyCopy = await prepareCopy(repo);
+  try { phoneKeepsRecords = !!(await navigator.storage?.persisted?.()); } catch { phoneKeepsRecords = false; }
+  if (pendingAnimalSave) {
+    pendingAnimalSave = false;
+    if (!herd?.demoMode && snapshot.animals.length === 1) {
+      // The record is already committed. Storage failures cannot undo or block the save.
+      void keepRecords(navigator.storage, deviceStorage).then(kept => {phoneKeepsRecords = kept;});
+    }
+  }
   route();
   showReminder();
 }
@@ -125,6 +145,10 @@ function route() {
   if (!repo) return;
   const path = location.hash.slice(1) || "dashboard";
   const tab = path.split("/")[0];
+  let entering = path.includes('/quick/') || /\/(new|add|edit|void|correct|batch)(\/|$)/.test(path);
+  document.body.dataset.recordEntry = String(entering);
+  $('news-signup').hidden = entering;
+  $('news-signup-link').hidden = entering;
   const herdTab = [
     "dashboard",
     "animals",
@@ -134,6 +158,10 @@ function route() {
   ].includes(tab);
   $("herd").hidden = !accepted || !herdTab || !!repo.recovery;
   if (!$("herd").hidden) herd.render(snapshot, path);
+  entering = entering || (!$("herd").hidden && !!$("herd").querySelector('form .sticky'));
+  document.body.dataset.recordEntry = String(entering);
+  $('news-signup').hidden = entering;
+  $('news-signup-link').hidden = entering;
   const backup = tab === "backup";
   $("ownership").hidden = tab !== "reports" || !accepted || !!repo.recovery || !!herd?.demoMode;
   if (!$("ownership").hidden) ownership.render(snapshot);
@@ -190,8 +218,8 @@ async function showStorage() {
   const mb = (n) =>
     n === null ? "unavailable" : (n / 1048576).toFixed(2) + " MB";
   $("storage").textContent =
-    `Persistent storage: ${s.persisted ? "granted" : s.supported ? "not granted" : "not supported"}. Usage: ${mb(s.usage)}. Estimated quota: ${mb(s.quota)}.`;
-  $("persist").disabled = !s.supported;
+    `${s.persisted ? "This phone was asked to keep records." : "This phone may clear records."} You use ${mb(s.usage)}. Keep a saved copy.`;
+  $("persist").disabled = !readyCopy || !!herd?.demoMode;
 }
 function resetPlan() {
   plan = null;
@@ -201,7 +229,7 @@ function resetPlan() {
   $("safety-file").value = "";
   $("warnings-check").checked = false;
   $("safety-result").textContent =
-    "Current-records backup has not been verified.";
+    "Current copy not checked yet.";
 }
 function updateCommit() {
   $("commit").disabled =
@@ -224,40 +252,40 @@ async function preview() {
     const div = document.createElement("div"),
       strong = document.createElement("strong");
     strong.textContent = count;
-    div.append(strong, document.createTextNode(name));
+    div.append(strong, document.createTextNode(STORE_WORDS[name] || name));
     $("counts").append(div);
   }
   $("preview-summary").textContent = plan.validationError
-    ? `Cannot commit: ${plan.validationError}`
-    : `${plan.conflicts.length} conflicting records. ${plan.skipped} identical records skipped. No live records have changed.`;
+    ? "This copy has records that need a check. Nothing was changed here."
+    : `${plan.conflicts.length} records need a choice. ${plan.skipped} records already match. No herd records changed.`;
   $("conflicts").replaceChildren();
   for (const c of plan.conflicts) {
     const section = document.createElement("section");
     section.className = "conflict";
     const title = document.createElement("h3");
-    title.textContent = `${c.store}: ${c.id}`;
+    title.textContent = `${STORE_WORDS[c.store]}: ${c.local?.visualTag || c.local?.farmId || c.local?.name || "Choose which record to keep"}`;
     section.append(title);
     for (const [label, value] of [
       ["Current record", c.local],
-      ["Incoming record", c.incoming],
+      ["Record from the copy", c.incoming],
     ]) {
       const details = document.createElement("details"),
         summary = document.createElement("summary"),
         pre = document.createElement("pre");
       summary.textContent = label;
-      pre.textContent = JSON.stringify(value, null, 2);
+      pre.textContent = recordLines(value, [snapshot]);
       details.append(summary, pre);
       section.append(details);
     }
     const label = document.createElement("label");
-    label.textContent = "Choose explicitly";
+    label.textContent = "Which record should we keep?";
     const select = document.createElement("select");
     for (const [value, text] of [
-      ["", "Unresolved"],
-      ["local", "Keep current"],
+      ["", "Pick one"],
+      ["local", "Keep this phone’s record"],
       ...(c.store === "revisions"
         ? []
-        : [["incoming", "Use incoming with correction history"]]),
+        : [["incoming", "Use the copy and keep the history"]]),
     ]) {
       const option = document.createElement("option");
       option.value = value;
@@ -318,7 +346,7 @@ async function preview() {
   }
   if (plan.conflicts.length) {
     const button = document.createElement("button");
-    button.textContent = "Apply decisions and validate again";
+    button.textContent = "Check these choices";
     button.onclick = () => run(preview);
     $("conflicts").append(button);
   }
@@ -350,11 +378,12 @@ on("accept", "click", async () => {
 });
 on("download", "click", async () => {
   const b = await exportBackup(repo, undefined, showProgress);
+  await verifyBackup(b);
   requestedBackup = backupContent(b.stores);
   download(b, filename());
   await bookkeeping("lastExportAttemptAt");
   message(
-    "Export requested. Confirm only after you have saved the file outside this browser.",
+    "Download started. Save the file in Files. Then check your copy.",
   );
 });
 $("saved-check").onchange = () => {
@@ -367,16 +396,25 @@ on("confirm-saved", "click", async () => {
   requestedBackup = null;
   $("saved-check").checked = false;
   $("confirm-saved").disabled = true;
-  message("Your backup confirmation was saved.");
+  message("You marked the copy saved. Pick Check my copy to check it.");
 });
 on("verify-file", "change", async () => {
   const file = $("verify-file").files[0];
-  $("verify-result").textContent = "Not verified.";
+  $("verify-result").textContent = "Copy not checked.";
   if (!file) return;
-  const { backup, warnings } = await verifyBackup(await file.text());
-  $("verify-result").textContent =
-    `Verified: ${Object.values(backup.counts).reduce((a, b) => a + b, 0)} records across 14 stores. ${warnings.join(" ")}`;
-  message("Backup verified. No live records changed.");
+  try {
+    const bytes = await readSafeFile(file);
+    const counts = await (practiceRestore ? practiceCopy(repo, bytes) : checkCopy(repo, bytes));
+    if (practiceRestore) writeDevice(deviceStorage, {lastPracticeAt:Date.now()});
+    $('verify-result').textContent = 'Copy checked. ' + copySummary(counts);
+    phoneKeepsRecords = await keepRecords(navigator.storage, deviceStorage);
+    await refresh();
+    message('Copy checked. ' + copySummary(counts) + (practiceRestore ? ' Practice done. No herd records changed.' : ''));
+    practiceRestore = false;
+  } catch (e) {
+    $('verify-result').textContent = /older than/.test(e.message) ? e.message : backupError(e);
+    message($('verify-result').textContent, true);
+  }
 });
 $("restore-file").onchange = () => {
   resetPlan();
@@ -393,7 +431,7 @@ on("preview", "click", async () => {
   if (!csvRestore) {
     const file = $("restore-file").files[0];
     if (!file) return;
-    restoreInput = await file.text();
+    restoreInput = await readSafeFile(file);
   }
   await preview();
 });
@@ -404,27 +442,28 @@ on("cancel", "click", async () => {
 });
 on("safety-download", "click", async () => {
   const b = await exportBackup(repo, undefined, showProgress);
+  await verifyBackup(b);
   download(b, filename("before-restore"));
   message(
-    "Current-records backup download requested. Select the saved file below to verify it.",
+    "Download started. Pick the saved copy below to check it.",
   );
 });
 on("safety-file", "change", async () => {
   safetyBackup = null;
   $("safety-result").textContent =
-    "Current-records backup has not been verified.";
+    "Current copy not checked yet.";
   updateCommit();
   const file = $("safety-file").files[0];
   if (!file) return;
-  const { backup } = await verifyBackup(await file.text());
+  const { backup } = await verifyBackup(await readSafeFile(file));
   const current = await exportBackup(repo);
   if (!same(backup.stores, current.stores))
     throw new Error(
-      "This backup does not match the current dataset. Download and select a new current-records backup.",
+      "This copy does not match your records. Save a new copy and pick it here.",
     );
   safetyBackup = backup;
   $("safety-result").textContent =
-    "Saved current-records backup verified. Replacement can proceed after review.";
+    "Current copy checked. Review the other copy, then use those records.";
   updateCommit();
 });
 $("warnings-check").onchange = updateCommit;
@@ -436,19 +475,17 @@ on("commit", "click", async () => {
     acknowledgeWarnings: $("warnings-check").checked,
   });
   resetPlan();
+  writeDevice(deviceStorage, {sharedAt:null, lastCopy:null});
   await refresh();
   message(
-    "Restore committed atomically. Review acknowledgment before ordinary use.",
+    "Records restored. Read and accept the terms to use them.",
   );
 });
-on("persist", "click", async () => {
-  const granted = await navigator.storage.persist();
-  await showStorage();
-  message(
-    granted
-      ? "Persistent storage granted. Keep external backups."
-      : "Persistent storage was not granted. Keep external backups.",
-  );
+on("persist", "click", doSaveCopy);
+on('practice-restore', 'click', () => {
+  practiceRestore = true;
+  $('verify-file').value = '';
+  $('verify-file').click();
 });
 on("settings", "submit", async () => {
   if (!accepted) throw new Error("Acknowledge terms first.");
@@ -496,22 +533,16 @@ on("migration-export", "click", async () => {
 async function refreshReminder() {
   snapshot = await repo.snapshot();
   herd.s = snapshot;
+  readyCopy = !repo.recovery && !herd?.demoMode ? await prepareCopy(repo) : null;
   showReminder();
 }
 function showReminder() {
+  if (snapshot && !repo?.recovery && !herd?.demoMode) mountBackupPanel($("backup-light"));
   const reminder = snapshot && backupReminder(snapshot);
   $("backup-reminder").hidden = !accepted || !!repo?.recovery || !!herd?.demoMode || !reminder?.due;
   $("backup-reminder-text").textContent = reminder?.text || "";
 }
-on("backup-now", "click", async () => {
-  const b = await exportBackup(repo, undefined, showProgress);
-  requestedBackup = backupContent(b.stores);
-  download(b, filename());
-  await bookkeeping("lastExportAttemptAt", { preserveView: true });
-  message(
-    "Export requested. After saving outside this browser, confirm it in Backup & Settings.",
-  );
-});
+on("backup-now", "click", doSaveCopy);
 on("backup-snooze", "click", async () => {
   await snoozeBackup(repo);
   await refreshReminder();
@@ -529,7 +560,7 @@ ownership = new OwnershipUI($("ownership"), {
     $("preview").disabled = false;
     location.hash = "#backup";
     message(
-      "Complete CSV set validated. Choose Replace or Merge, then Preview to review the restore.",
+      "Files checked. Choose how to use the copy, then check the records.",
     );
   },
 });
@@ -538,7 +569,11 @@ $("open-herd-records").addEventListener("click", () => {
   $("main").focus();
 });
 let realRepo;
+document.addEventListener('herd-saved', e => {
+  if (snapshot?.animals.length === 0 && e.detail?.form?.querySelector('[name="farmId"]')) pendingAnimalSave = true;
+});
 herd = new HerdUI($("herd"), { repository: () => repo, refresh, message,
+  backupPanel: mountBackupPanel,
   demo: (mode) => run(async () => {
     if (herd.saving || edits.dirty()) throw new Error("Finish or cancel your form before switching herds.");
     requestedBackup = null; resetPlan(); restoreInput = null;
@@ -564,10 +599,10 @@ await run(async () => {
     initialClock: new Date().toISOString(),
     onBlocked: message,
     targetVersion: SCHEMA_VERSION,
-    downloadedBackup: !!localStorage.getItem(MIGRATION_RECEIPT),
+    downloadedBackup: !!migrationReceipt(),
     onBeforeUpgrade: async ({ snapshot: before, toVersion }) => {
       const receipt = JSON.parse(
-        localStorage.getItem(MIGRATION_RECEIPT) || "null",
+        migrationReceipt() || "null",
       );
       if (
         !receipt ||
@@ -650,32 +685,33 @@ void startPWA({
   document,
   window,
   navigator,
-  storage: localStorage,
+  storage: deviceStorage,
   isBusy: () => busy || herd.saving || ownership.saving || !!plan,
   closeRepository: () => repo?.close(),
   verifyMigration: async (version, schema, file) => {
     const current = await repo.snapshot(),
       hash = await snapshotHash(current);
     if (file) {
-      const { backup } = await verifyBackup(await file.text());
+      const { backup } = await verifyBackup(await readSafeFile(file));
       if ((await snapshotHash(backup.stores)) !== hash)
         throw Error(
-          "Backup differs from current records. Download and verify a fresh backup.",
+          "Your records changed. Save and check a new copy first.",
         );
-      localStorage.setItem(
+      if (!deviceStorage) throw Error("This phone cannot keep the update check. Use another browser.");
+      deviceStorage.setItem(
         MIGRATION_RECEIPT,
         JSON.stringify({ version, schema, hash }),
       );
     }
     const receipt = JSON.parse(
-      localStorage.getItem(MIGRATION_RECEIPT) || "null",
+      migrationReceipt() || "null",
     );
     if (
       receipt?.version !== version ||
       receipt?.schema !== schema ||
       receipt?.hash !== hash
     )
-      throw Error("Download and verify a current backup before this update.");
+      throw Error("Save and check a current copy before this update.");
     return true;
   },
 }).catch(() => {
@@ -688,4 +724,58 @@ function showProgress({ phase, percent }) {
   $("transfer-progress-label").hidden = false;
   $("transfer-progress").value = percent;
   $("transfer-progress-label").textContent = `${phase}: ${percent}%`;
+}
+
+function downloadFile(file) {
+  const url = URL.createObjectURL(file), link = document.createElement('a');
+  link.href = url; link.download = file.name; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 30000);
+}
+async function doSaveCopy() {
+  if (herd?.demoMode || repo.recovery) return;
+  const now = new Date().toISOString();
+  const result = await saveCopy(repo, readyCopy, {navigator, download:downloadFile, now});
+  if (result.kind === 'cancelled') { message('Copy not saved. Try again when you are ready.'); return; }
+  if (result.kind === 'shared') {
+    writeDevice(deviceStorage, {sharedAt:now, lastCopy:result.counts});
+    phoneKeepsRecords = await keepRecords(navigator.storage, deviceStorage);
+    await bookkeeping('lastExportAttemptAt');
+    message('Copy saved. ' + copySummary(result.counts));
+  } else {
+    requestedBackup = result.content;
+    await bookkeeping('lastExportAttemptAt');
+    message('Copy download started. Keep it in Files, then pick Check my copy.');
+  }
+}
+function mountBackupPanel(root) {
+  if (!root) return;
+  root.replaceChildren(); root.className = 'card backup-light';
+  if (herd?.demoMode) {root.hidden = true; return;}
+  root.hidden = false;
+  const device = readDevice(deviceStorage);
+  const standalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  const safari = safariTab({agent:navigator.userAgent, standalone, touchPoints:navigator.maxTouchPoints});
+  // A download marked saved by hand is not proof. Only a share or read-back check can turn green.
+  const meta = {...snapshot.metadata[0]};
+  if (meta.lastUserConfirmedBackupAt !== device.sharedAt) meta.lastUserConfirmedBackupAt = null;
+  const state = healthFromSnapshot({...snapshot, metadata:[meta]}, {persisted:phoneKeepsRecords, safari});
+  root.dataset.health = state.color;
+  const add = (tag, text) => {const node=document.createElement(tag); node.textContent=text; root.append(node); return node;};
+  add('h2', 'Your saved copy');
+  add('p', `${state.checked ? '✓ ' : ''}${state.text}`).setAttribute('role', 'status');
+  if (device.lastCopy) add('p', 'Last copy had ' + copySummary(device.lastCopy));
+  const save=add('button','Save a copy'); save.type='button'; save.disabled=!readyCopy; save.onclick=()=>void run(doSaveCopy);
+  const check=add('a','Check my copy'); check.href='#backup'; check.onclick=()=>setTimeout(()=>{ $('verify-file').scrollIntoView({block:'center'}); $('verify-file').focus(); },0);
+  const why=add('details',''), summary=document.createElement('summary'); summary.textContent='Why?'; why.append(summary);
+  for(const text of ['Your records stay on this phone.', 'A share or checked file is a saved copy.', state.storageNote]) {const p=document.createElement('p');p.textContent=text;why.append(p);}
+  if(safari) {add('p',SAFARI_WARNING).className='safari-warning';add('p',SAFARI_SEPARATE);const list=add('ol','');for(const text of SAFARI_STEPS){const li=document.createElement('li');li.textContent=text;list.append(li);}}
+  if (!device.lastPracticeAt || Date.now() - device.lastPracticeAt >= 30*86400000) add('p','Try a practice restore this month. Open Backup and pick your copy.');
+  if(root.id !== 'backup-light') {
+    const switcher=add('button',snapshot.operation[0].theme === 'sunlight' ? '☾ Use dark theme' : '☀ Use Sunlight');
+    switcher.type='button'; switcher.onclick=()=>void run(async()=>{
+      const op=(await repo.snapshot()).operation[0];
+      await repo.mutate([{store:'operation', expectedRevision:op.revision, record:{...op, theme:op.theme==='sunlight'?'dark':'sunlight', revision:op.revision+1, updatedAt:new Date().toISOString()}}], {reason:'Change theme'});
+      await refresh();
+    });
+  }
 }

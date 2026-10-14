@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0-beta.1 / 2026-10-13 / schema 1 / local only
+
+- Added Save a copy on Home and Backup with a pre-verified file, share-sheet support, plain-text fallback and download fallback. Cancelled shares do not change backup timestamps.
+- Added a red, yellow or green backup light, read-back copy checks and a read-only practice restore. Downloads marked saved by hand do not turn the light green.
+- Ask the phone to keep records after the first saved animal and successful copies. Retry refusals no more than once a week. Added iPhone and iPad Safari Home Screen guidance.
+- Accept both backup file types, reject files over 50 MB before reading, and cap new text and import cells without changing stored-record validation.
+- Keep guided questions above the action bar and move the question into view. New herds start in Sunlight; existing themes remain. Home has a theme switch.
+- Fixed the printed terms URL, narrowed signup connections to the capture path, named the recipient domain and hid signup on entry screens. The owner amended the email-capture non-goal on 2026-10-13.
+- Made upgrade survival a failing gate with exact seed fields, full records and store checks, expected versions and zero page errors. Added a pinned Playwright dependency, browser-check script and release handoff.
+- Regenerated the offline inventory. Browser, real-device, live upgrade and field checks remain with the release maintainer. No origin move, schema change, install, commit or deploy was performed.
+
 ## 1.1.1-beta.1 / 2026-10-13 / schema 1 / local only
 
 - Bundled Manley Farms logo, site header, primary navigation and shared footer layout. Tools stays active; app tabs are a separate horizontally scrollable strip.

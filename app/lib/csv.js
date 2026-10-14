@@ -1,3 +1,4 @@
+import {checkImportText} from './file-safety.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { models, STORES } from "./contract.js";
 import {
@@ -156,9 +157,10 @@ export function parseCSV(input) {
     new Set(names).size === names.length && names.every(Boolean),
     "Duplicate or empty CSV headers",
   );
-  rows.forEach((r, i) =>
-    check(r.length === names.length, `Row ${i + 2}: column count mismatch`),
-  );
+  rows.forEach((r, i) => {
+    r.forEach(checkImportText);
+    check(r.length === names.length, `Row ${i + 2}: column count mismatch`);
+  });
   return { headers: names, rows };
 }
 export function decodeCell(cell, d, options = {}) {
@@ -420,6 +422,7 @@ export async function previewCSV(repo, tables, options = {}) {
           `${p.store} row ${p.row}: current identity used for snapshot`,
         );
       }
+      for (const value of Object.values(r)) checkImportText(value);
       validateRecord(p.store, r);
       if (p.store === "treatments" && r.administrationAt)
         check(

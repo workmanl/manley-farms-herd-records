@@ -23,6 +23,7 @@ export function drawDashboard(h,{el,link,button,field}) {
  const m=dashboardModel(h.s,h.today);h.title('Your herd');
  h.root.append(el('p',`Hello, farmer. ${m.empty?'Let’s start your herd.':'A little care today. A better record tomorrow.'}`,'dashboard-greeting'));
 
+ const backup=el('section');h.root.append(backup);h.backupPanel?.(backup);
  const filter=f=>{h.filters={...f,page:1};location.hash='#animals';};
  const stats=el('section',undefined,'dashboard-stats');stats.setAttribute('aria-label','Herd snapshot');
  for(const [label,count,type,f] of [['Cattle on the farm',m.active,'calf',{status:'active'}],['Calves this year',m.calves,'calf',{birthFrom:h.today.slice(0,4)+'-01-01',birthTo:h.today.slice(0,4)+'-12-31',includeInactive:true}],['On a meat hold',m.evaluation.counts.meat,'health',{withdrawal:'meat-hold',includeInactive:true}],['On a milk hold',m.evaluation.counts.milk,'milk',{withdrawal:'milk-hold',includeInactive:true}],['Needs a check',m.evaluation.counts.review,'check',{withdrawal:'needs-review',includeInactive:true}],['Last backup',m.last?new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',timeZone:h.s.operation[0].timeZone}).format(new Date(m.last)):'Not yet','backup',null]]){const tile=button('',()=>f?filter(f):location.hash='#backup');tile.className='snapshot-tile secondary';tile.append(icon(type),el('strong',count),el('span',label));stats.append(tile);}h.root.append(stats);

@@ -58,6 +58,7 @@ function field(parent, name, labelText, value = "", config = {}) {
         ? "textarea"
         : "input",
   );
+  if (!config.options && ["textarea", "text", "search", undefined].includes(config.type)) control.maxLength = 10000;
   control.name = name;
   control.id = `herd-field-${++sequence}`;
   label.htmlFor = control.id;
@@ -97,9 +98,10 @@ const details = (title, text) => {
   return d;
 };
 export class HerdUI {
-  constructor(root, { repository, refresh, message, demo }) {
+  constructor(root, { repository, refresh, message, demo, backupPanel }) {
     this.root = root;
     this.demo = demo;
+    this.backupPanel = backupPanel;
     this.health = new HealthUI(this, { el, link, button, field, details });
     this.repository = repository;
     this.refresh = refresh;
@@ -207,6 +209,7 @@ export class HerdUI {
     }
     const form=this.root.querySelector("form");
     if(form){
+      form.dataset.guideAction = action;
       const last = events(this.s,{type:"memberships",limit:1})[0]?.record;
       const group=form.elements.namedItem(action === "animal" ? "currentGroupId" : "groupId");
       if(group && last && [...group.options].some(o=>o.value===last.groupId))group.value=last.groupId;

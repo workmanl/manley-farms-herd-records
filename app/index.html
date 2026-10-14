@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://northwestmediasystems.com; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://northwestmediasystems.com/api/capture.php; worker-src 'self'; manifest-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
     />
     <meta name="theme-color" content="#1a1f16" />
     <title>Free Cattle Management Software | Manley Farms</title>
@@ -33,7 +33,7 @@
         "price": "0",
         "priceCurrency": "USD"
       },
-      "softwareVersion": "1.1.1-beta.1",
+      "softwareVersion": "1.2.0-beta.1",
       "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
       "featureList": [
         "Offline entry after verified shell download",
@@ -56,7 +56,7 @@
       "codeRepository": "https://github.com/workmanl/manley-farms-herd-records",
       "license": "https://manleyfarms.com/tools/herd-records/LICENSE",
       "programmingLanguage": "JavaScript",
-      "version": "1.1.1-beta.1"
+      "version": "1.2.0-beta.1"
     },
     {
       "@type": "FAQPage",
@@ -160,14 +160,14 @@
       ><a href="#reports" data-tab="reports">Reports</a
       ><a href="#backup" data-tab="backup">Backup &amp; Settings</a>
     </nav>
-    <p class="app-identity print-hide"><strong>Herd Records</strong> <span class="badge">Local records · 1.1.1-beta.1</span></p>
+    <p class="app-identity print-hide"><strong>Herd Records</strong> <span class="badge">Local records · 1.2.0-beta.1</span></p>
     <details id="public-intro" class="public-intro no-print" open>
       <summary>About Herd Records</summary>
       <div class="landing-copy">
         <nav class="breadcrumb" aria-label="Breadcrumb"><a href="../../">Home</a><span aria-hidden="true">&gt;</span><a href="../">Tools</a><span aria-hidden="true">&gt;</span><span aria-current="page">Herd Records</span></nav>
         <h1>Free cattle records that work offline</h1>
         <p>Free, open-source cattle records with offline entry, meat and milk withdrawal tracking, CSV exports, and backups. No account or subscription. Keep cattle history on your phone, tablet or computer, and move your records whenever you choose.</p>
-        <p class="notice">Public beta 1.1.1-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.</p>
+        <p class="notice">Public beta 1.2.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.</p>
         <a class="button" id="open-herd-records" href="#dashboard">Open herd records</a>
         <h2>See recorded meat and milk withdrawal holds</h2>
         <p>Record each treatment and the separate meat and milk instructions from the product label or your veterinarian. The dashboard shows holds, controlling recorded dates and Needs review for unknown or unresolved instructions. There is no drug database or dose advice. Recorded interval elapsed never means safe for slaughter or milk. You remain responsible for withdrawal compliance and checking the actual treatment history.</p>
@@ -201,7 +201,7 @@
             <button type="submit">Sign me up.</button>
           </form>
           <p id="news-status" role="status" aria-live="polite" aria-atomic="true"></p>
-          <p>Optional. No email is required to use the app. <a href="/privacy/">Privacy</a>.</p>
+          <p>Optional. Your email goes to northwestmediasystems.com for the Manley Farms mailing list. No email is required to use the app. <a href="/privacy/">Privacy</a>.</p>
         </section>
         <p><a href="https://github.com/workmanl/manley-farms-herd-records">Source repository</a> · <a href="source.html">Source and license guide</a> · <a href="LICENSE">AGPL-3.0-only license</a> · <a href="terms.txt">Terms of Use and Disclaimer</a></p>
         <p>This official tool is free forever. If it helps you, <a href="https://buy.stripe.com/bJefZg26S8Ry99qePt8Ra03" rel="noopener">an optional donation supports Manley Farms</a>.</p>
@@ -232,7 +232,7 @@
           >Verify saved update backup<input
             id="update-backup-file"
             type="file"
-            accept=".json,application/json"
+            accept=".json,.txt,application/json,text/plain"
         /></label>
       </div>
     </aside>
@@ -265,7 +265,7 @@
         <div class="notice">
           <strong>Public beta</strong>
           <p>
-            Public beta 1.1.1-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.
+            Public beta 1.2.0-beta.1. Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This app is not certified or endorsed by BQA, FDA, USDA or any authority.
           </p>
         </div>
         <div class="card" id="intro"></div>
@@ -282,7 +282,7 @@
           <p>
             <a href="terms.txt">Read full terms</a> ·
             <a href="source.html">Source and license</a> ·
-            <a href="#backup">Export or recover existing records</a>
+            <a href="#backup">I have a backup</a>
           </p>
           <small id="terms-version"></small>
         </div>
@@ -320,65 +320,70 @@
           </p>
         </div>
         <div id="gate-notice" class="notice" hidden>
-          Export, verification and recovery are available before acknowledgment.
+          You can save and check copies before you accept the terms.
           <a href="#terms">Read and acknowledge the terms</a> to use settings.
         </div>
+        <details class="card"><summary>About Herd Records</summary><p>App 1.2.0-beta.1</p><p>Offline build: <span id="release-version">Not ready offline yet</span></p></details>
+        <section id="backup-light" class="card backup-light" aria-label="Your saved copy"></section>
+        <details class="card"><summary>More backup options</summary>
         <div class="grid">
           <article class="card">
             <span class="step">01 / KEEP</span>
             <h2>Download a backup</h2>
             <p>
-              A complete JSON copy includes archived records, original IDs and
-              correction history.
+              A full copy keeps all your animals and their history.
             </p>
-            <button id="download">Download JSON backup</button>
+            <button id="download">Download a copy</button>
             <dl>
-              <dt>Export requested</dt>
+              <dt>Last download started</dt>
               <dd id="last-export">Never</dd>
-              <dt>Confirmed saved</dt>
+              <dt>Marked saved</dt>
               <dd id="last-confirmed">Never</dd>
             </dl>
             <label class="check"
               ><input id="saved-check" type="checkbox" /><span
-                >I saved a backup outside this browser.</span
+                >I kept this copy in Files or on another device.</span
               ></label
             ><button id="confirm-saved" class="secondary" disabled>
-              Confirm saved backup
+              Mark copy saved
             </button>
           </article>
+        </div></details>
+        <div class="grid">
           <article class="card">
             <span class="step">02 / CHECK</span>
-            <h2>Verify a backup</h2>
+            <h2>Check my copy</h2>
             <p>
-              Check the file's structure, checksum, counts and references.
-              Verification does not change your live records.
+              Pick your saved copy. We will check it against your records.
+              This does not change your herd.
             </p>
-            <label for="verify-file">Select a JSON backup</label
+            <label for="verify-file">Pick your saved copy</label
             ><input
               id="verify-file"
               type="file"
-              accept=".json,application/json"
+              accept=".json,.txt,application/json,text/plain"
             />
             <p id="verify-result" role="status">No file selected.</p>
+            <button id="practice-restore" class="secondary" type="button">Practice a restore</button>
+            <p>Pick your copy to see if it can bring your herd back. This test does not replace any records.</p>
           </article>
           <article class="card wide">
             <span class="step">03 / RECOVER</span>
             <h2>Restore from a backup</h2>
             <p>
               Preview before changing anything. Replace uses the selected
-              dataset. Merge keeps identical records and asks you to resolve
-              every conflict.
+              copy. Add keeps records that match and asks which changes to keep.
             </p>
             <div class="fields">
               <label
                 >Backup file<input
                   id="restore-file"
                   type="file"
-                  accept=".json,application/json" /></label
+                  accept=".json,.txt,application/json,text/plain" /></label
               ><label
                 >Restore method<select id="restore-mode">
-                  <option value="replace">Replace current dataset</option>
-                  <option value="merge">Merge with current dataset</option>
+                  <option value="replace">Use the copy in place of these records</option>
+                  <option value="merge">Add the copy to these records</option>
                 </select></label
               >
             </div>
@@ -400,32 +405,32 @@
               <div id="replace-safety" class="notice">
                 <h3>Keep your current records first</h3>
                 <p>
-                  Download this exact pre-restore snapshot, then select the
-                  saved file to verify it before replacement.
+                  Save your current records first. Pick that file to check it.
+                  Then you can use the other copy.
                 </p>
                 <button id="safety-download" class="secondary">
-                  Download current records</button
+                  Save current records</button
                 ><label
-                  >Verify the saved current-records backup<input
+                  >Pick the saved current copy<input
                     id="safety-file"
                     type="file"
-                    accept=".json,application/json"
+                    accept=".json,.txt,application/json,text/plain"
                 /></label>
                 <p id="safety-result">
-                  Current-records backup has not been verified.
+                  Current copy not checked yet.
                 </p>
               </div>
-              <button id="commit" disabled>Commit reviewed restore</button>
+              <button id="commit" disabled>Use these records</button>
             </div>
           </article>
           <article class="card">
             <h2>Device storage</h2>
             <p id="storage">Checking storage…</p>
             <button id="persist" class="secondary">
-              Request persistent storage
+              Save a copy
             </button>
             <p class="muted">
-              A grant can reduce eviction risk. It does not replace backups.
+              This can help keep records. You still need a saved copy.
               Clearing site data, private browsing or device loss can erase
               records.
             </p>

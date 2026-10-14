@@ -178,7 +178,7 @@ test("backup and restore progress completes only after successful committed tran
     downloadConfirmed: true,
     onProgress: (p) => progress.push(p),
   });
-  assert.equal(progress.at(-1).phase, "Restore committed");
+  assert.equal(progress.at(-1).phase, "Records restored");
   assert.ok(progress.length >= 7);
   repo.close();
   target.close();

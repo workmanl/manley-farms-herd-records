@@ -1,3 +1,4 @@
+import {readSafeFile} from './file-safety.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { STORES } from "./contract.js";
 import {
@@ -49,6 +50,7 @@ export class OwnershipUI {
     const l = this.el("label", label, parent),
       n = this.el("input", null, l);
     n.type = type;
+    if (type === "text") n.maxLength = 10000;
     n.value = value;
     return n;
   }
@@ -342,7 +344,7 @@ export class OwnershipUI {
       generatedIds = {};
       try {
         for (const file of files.files) {
-          const text = await file.text(),
+          const text = await readSafeFile(file),
             parsed = parseCSV(text),
             box = this.el("fieldset", null, mapped);
           this.el("legend", file.name, box);
@@ -593,7 +595,7 @@ export class OwnershipUI {
       "Prepare full-set restore",
       async () => {
         const contents = {};
-        for (const f of full.files) contents[f.name] = await f.text();
+        for (const f of full.files) contents[f.name] = await readSafeFile(f);
         if (!contents["csv-manifest.json"])
           throw new Error("Select csv-manifest.json with all tables");
         const backup = await csvSetBackup(

@@ -70,6 +70,7 @@ test("no runtime dependency, build step, record connection or HTML injection sin
   const pkg = JSON.parse(read("package.json"));
   assert.equal(pkg.dependencies, undefined);
   assert.deepEqual(Object.keys(pkg.devDependencies), [
+    "playwright",
     "fake-indexeddb",
     "jsdom",
   ]);
@@ -86,7 +87,7 @@ test("no runtime dependency, build step, record connection or HTML injection sin
     source,
     /innerHTML|eval\(|fetch\(|XMLHttpRequest|WebSocket/,
   );
-  assert.match(read("app/index.html"), /connect-src 'self' https:\/\/northwestmediasystems\.com; worker-src 'self'; manifest-src 'self'/);
+  assert.match(read("app/index.html"), /connect-src 'self' https:\/\/northwestmediasystems\.com\/api\/capture\.php; worker-src 'self'; manifest-src 'self'/);
 });
 
 test("site header and navigation equal the home and Tools link contract", async () => {

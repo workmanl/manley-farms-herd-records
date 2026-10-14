@@ -72,7 +72,7 @@ test('offline attempts have no request and no queue; invalid input and HTTP erro
 test('CSP allows only host and capture origin, font files and licenses are inventoried, typography is local', () => {
   const d = new JSDOM(read('app/index.html')).window.document;
   const csp = d.querySelector('meta[http-equiv="Content-Security-Policy"]').content;
-  assert.equal(csp.match(/connect-src ([^;]+)/)[1], "'self' https://northwestmediasystems.com");
+  assert.equal(csp.match(/connect-src ([^;]+)/)[1], "'self' https://northwestmediasystems.com/api/capture.php");
   assert.match(csp, /font-src 'self';/);
   const ctx = { self: {} }; vm.runInNewContext(read('app/precache.js'), ctx);
   for (const p of ['dm-sans-latin-var.woff2', 'inter-latin-var.woff2', 'DM-Sans-OFL.txt', 'Inter-OFL.txt']) assert.ok(ctx.self.HERD_RELEASE.assets.some(a => a.path === 'fonts/'+p));

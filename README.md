@@ -2,7 +2,7 @@
 
 Free cattle records that work offline after the first verified download. Keep animal identity, parentage, calving, weights, breeding, treatments and departures, with separate recorded meat and milk withdrawal holds.
 
-**Public beta 1.1.1-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
+**Public beta 1.2.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
 
 [Open Herd Records](https://manleyfarms.com/tools/herd-records/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases)
 

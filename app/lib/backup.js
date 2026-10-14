@@ -1,3 +1,4 @@
+import {backupError} from './file-safety.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { STORES } from "./contract.js";
 import {
@@ -55,13 +56,17 @@ export async function envelope(stores, exportedAt = new Date().toISOString()) {
 export async function exportBackup(repo, now, onProgress = () => {}) {
   onProgress({ phase: "Reading records", percent: 0 });
   const stores = await repo.snapshot();
-  onProgress({ phase: "Validating and checksumming backup", percent: 40 });
+  onProgress({ phase: "Checking your copy", percent: 40 });
   await new Promise((resolve) => setTimeout(resolve, 0));
   const backup = await envelope(stores, now);
   onProgress({ phase: "Backup ready to save", percent: 100 });
   return backup;
 }
 export async function verifyBackup(input) {
+  try { return await verifyBackupBytes(input); }
+  catch (error) { throw Error(backupError(error)); }
+}
+async function verifyBackupBytes(input) {
   let b;
   try {
     b = typeof input === "string" ? JSON.parse(input) : structuredClone(input);
@@ -293,7 +298,7 @@ export async function previewRestore(
     mode,
     warnings: [...warnings],
   });
-  onProgress({ phase: "Restore preview ready", percent: 100 });
+  onProgress({ phase: "Records ready to check", percent: 100 });
   return plan;
 }
 function unionReceipts(a, b) {
@@ -316,7 +321,7 @@ export async function commitRestore(
     !repo.recovery,
     "Recovery mode is read-only. Export and reopen with a compatible app.",
   );
-  onProgress({ phase: "Checking restore safety", percent: 0 });
+  onProgress({ phase: "Checking your current copy", percent: 0 });
   await new Promise((resolve) => setTimeout(resolve, 0));
   const staged = plans.get(plan);
   check(
@@ -351,7 +356,7 @@ export async function commitRestore(
     writeDifference(tx, current, staged.staged, onProgress);
     return staged.staged;
   });
-  onProgress({ phase: "Restore committed", percent: 100 });
+  onProgress({ phase: "Records restored", percent: 100 });
   plans.delete(plan);
   return result;
 }

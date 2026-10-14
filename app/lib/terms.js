@@ -42,6 +42,7 @@ export async function acknowledge(
 export async function storageStatus(storage = globalThis.navigator?.storage) {
   if (!storage)
     return { supported: false, persisted: false, usage: null, quota: null };
+  try {
   const estimate = (await storage.estimate?.()) || {};
   return {
     supported: typeof storage.persist === "function",
@@ -49,4 +50,5 @@ export async function storageStatus(storage = globalThis.navigator?.storage) {
     usage: estimate.usage ?? null,
     quota: estimate.quota ?? null,
   };
+  } catch { return {supported: typeof storage.persist === "function", persisted:false, usage:null, quota:null}; }
 }

@@ -151,6 +151,7 @@ export async function startPWA({
       $("offline-status").textContent = readyOffline(active, status)
         ? "Ready offline"
         : "Offline preparation is not complete. Keep this page open while connected.";
+      if ($("release-version")) $("release-version").textContent = status.version || "Not ready offline yet";
       const waiting = registration.waiting;
       waitingStatus = waiting && (await workerStatus(waiting));
       $("pwa-update").hidden = !readyOffline(waiting, waitingStatus);

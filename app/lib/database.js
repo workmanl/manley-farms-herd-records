@@ -9,7 +9,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "1.1.1-beta.1";
+export const APP_VERSION = "1.2.0-beta.1";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -30,7 +30,7 @@ export function emptyDataset(now = new Date().toISOString()) {
       weightUnit: "lb",
       backupReminderDays: 7,
       backupSnoozedUntil: null,
-      theme: "dark",
+      theme: "sunlight",
     },
   ];
   s.metadata = [

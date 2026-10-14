@@ -16,6 +16,11 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
     fs.readFileSync(new URL("../app/index.html", import.meta.url), "utf8"),
     { url: "https://herd.test/#dashboard" },
   );
+  let persistRequests = 0;
+  Object.defineProperty(dom.window.navigator, 'storage', {value:{
+    persisted:async()=>false, estimate:async()=>({}), persist:async()=>{persistRequests++;return false;}
+  }});
+  Object.defineProperty(globalThis, 'navigator', {value:dom.window.navigator,configurable:true});
   Object.assign(globalThis, {
     window: dom.window,
     document: dom.window.document,
@@ -26,6 +31,7 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   });
   await import("../app/app.js");
   const $ = (id) => document.getElementById(id);
+  assert.equal(persistRequests,0);
   assert.equal($("public-intro").open, true);
   assert.equal($("herd").hidden, true);
   assert.equal($("gate").hidden, false);
@@ -40,6 +46,8 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   assert.match($("herd").textContent, /Meat hold/);
   location.hash = "#animals/new";
   await until(() => $("herd").querySelector("[name=farmId]"));
+  assert.equal($("news-signup").hidden,true);
+  assert.equal($("news-signup-link").hidden,true);
   $("herd").querySelector("[name=farmId]").value = "0001";
   $("herd")
     .querySelector("form")
@@ -51,6 +59,7 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
       location.hash === "#animals" && /1 matching/.test($("herd").textContent),
   );
   assert.match($("status").textContent, /Saved/);
+  await until(()=>persistRequests===1);
   assert.equal($("public-intro").open, false);
   assert.equal(document.querySelectorAll("#public-faq article").length, 8);
   location.hash = "#backup";

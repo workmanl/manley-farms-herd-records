@@ -26,7 +26,7 @@ export function backupReminder(
     return {
       due: true,
       reason,
-      text: "Back up and verify existing records before continuing.",
+      text: "Save and check your current copy first.",
     };
   const op = s.operation[0],
     m = s.metadata[0],
@@ -66,11 +66,12 @@ export function backupReminder(
     (!last || clock - Date.parse(last) >= op.backupReminderDays * DAY);
   return {
     due,
+    latest,
     unbacked,
     reason: last ? "interval" : "first-saved-session",
     text: last
-      ? "Unbacked changes need an external backup."
-      : "Your first saved work is ready for an external backup.",
+      ? "You have new records. Save a copy today."
+      : "Your records live only on this phone. Save a copy now.",
   };
 }
 export async function snoozeBackup(
@@ -107,7 +108,7 @@ export async function confirmRequestedBackup(
   return transaction(repo.db, "readwrite", (before, tx) => {
     check(
       requested && same(requested, backupContent(before)),
-      "Records changed or no backup was requested in this session. Download a fresh backup before confirming it.",
+      "Records changed or no copy was saved here. Save a fresh copy before you mark it saved.",
     );
     const next = structuredClone(before),
       m = next.metadata[0];

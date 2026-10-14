@@ -2,6 +2,7 @@
 // Presentation only. The original form owns collection, validation and commit.
 export function guideForm(form, { selection=false }={}) {
  if(!form)return;
+ const document=form.ownerDocument;
  const body=form.querySelector('.fields');if(!body)return;
  form.classList.add('guided-form');
  form.noValidate=true;
@@ -30,7 +31,7 @@ export function guideForm(form, { selection=false }={}) {
  progress.textContent=`Step ${review?questions.length+offset+1:step+offset+1} of ${questions.length+offset+1}${review?': Check your answers, then save.':''}`;
  [...dots.children].forEach((dot,i)=>dot.classList.toggle('current',i===(review?questions.length+offset:step+offset)));
  back.disabled=!review&&step===0;next.hidden=review;submit.hidden=!review;
- if(focus)(review?progress:questions[step].querySelector('input,select,textarea'))?.focus();
+ if(focus){const target=review?progress:questions[step].querySelector('input,select,textarea');target?.focus({preventScroll:true});(review?progress:questions[step]).scrollIntoView?.({block:'nearest'});}
  };
  progress.tabIndex=-1;
  next.onclick=()=>{const input=questions[step].querySelector('input,select,textarea');if(input&&!input.reportValidity())return;if(step===questions.length-1)review=true;else step++;show();};
@@ -42,9 +43,11 @@ export function guideForm(form, { selection=false }={}) {
  const observer=new form.ownerDocument.defaultView.MutationObserver(records=>{if(records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&(n.matches('label,fieldset')||n.querySelector?.('label'))))){observer.disconnect();labels.forEach(l=>l.hidden=false);progress.remove();dots.remove();back.remove();next.remove();form.onsubmit=save;guideForm(form, {selection});}});
  observer.observe(body,{childList:true,subtree:true});
  show(false);
+ if(form.isConnected) form.scrollIntoView?.({block:'start'});
 }
 
 export function pickerProgress(form, count){
+ const document=form.ownerDocument;
  const progress=document.createElement('p');progress.className='guide-progress';progress.setAttribute('role','status');progress.textContent=`Step 1 of ${count}`;
  const dots=document.createElement('div');dots.className='progress-dots';dots.setAttribute('aria-hidden','true');
  for(let i=0;i<count;i++){const dot=document.createElement('span');if(!i)dot.className='current';dots.append(dot);}form.prepend(progress,dots);
