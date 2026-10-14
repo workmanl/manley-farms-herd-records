@@ -10,7 +10,7 @@ import { updateIntroduction } from "../app/lib/landing.js";
 const read = (p) => fs.readFileSync(new URL(`../${p}`, import.meta.url), "utf8");
 const dom = () => new JSDOM(read("app/index.html"));
 const graph = () => JSON.parse(dom().window.document.querySelector('script[type="application/ld+json"]').textContent)['@graph'];
-const version = "1.6.0-beta.1";
+const version = "1.7.0-beta.1";
 test("public beta version agrees across package, app, structured data and hash-derived worker release", () => {
   assert.equal(JSON.parse(read("package.json")).version, version);
   const lock = JSON.parse(read("package-lock.json"));

@@ -1,12 +1,28 @@
 import {plainOption,plainLabel,plainReason} from './copy.js';
 import {humanWhen} from './when.js';
 import {APP_ADDRESS} from './deploy-config.js';
+import {savedCopyLine, shelfReport, calfSales} from './herd-stats.js';
+import {drawWeightChart, weightPoints} from './chart.js';
 // SPDX-License-Identifier: AGPL-3.0-only
 import { evaluateWithdrawal, LABELS } from "./withdrawal.js";
 import { events } from "./workflows.js";
 import { isDate, requireThat as check } from "./validation.js";
 export const PRINT_FOOTER =
   `Manley Farms Herd Records organizes user-entered records. This report is not veterinary, legal or regulatory advice, a compliance certificate, or authorization for slaughter or milk sale. Verify entries, withdrawal instructions and applicable requirements. This app is not certified by BQA or any authority. Provided as is, without warranty to the extent allowed by law. The user is responsible for decisions and backups. Full terms: ${APP_ADDRESS.replace(/^https:\/\//, "")}terms.txt.`;
+export const PRINT_REPORTS = [
+  ["treatments", "Treatment log for BQA preparation"],
+  ["calvings", "Calving book"],
+  ["animal", "Individual animal card"],
+  ["herd-book", "Herd book"],
+  ["open-cows", "Open cows"],
+  ["expected-calving", "Expected calving"],
+  ["cull-list", "Cull list"],
+  ["barn-holds", "Barn hold sheet"],
+  ["blank-chute", "Blank chute sheet"],
+  ["blank-calving", "Blank calving sheet"],
+  ["herd-numbers", "Herd numbers"],
+  ["sales", "Calf sales"],
+];
 export const SWITCHING_STEPS = [
  'Save a copy and check it. Save all the tables and the field guide. Keep record links in the files.',
  'Print the treatment log and calf book. Check totals and some records. Check leading zeros, sold animals and holds that need review.',
@@ -14,12 +30,6 @@ export const SWITCHING_STEPS = [
  'Match fields in the new app. Add animals before their events. Check totals, parents, weights and wait instructions. Other apps may use different fields.',
  'Keep the original files, the app source and the guide. A helper can run that copy if this site closes. The guide explains how to host it and restore your herd. Opening the page as a file will not work.',
 ];
-const display = (v) =>
-  v === null || v === undefined
-    ? "Unknown"
-    : typeof v === "object"
-      ? JSON.stringify(v)
-      : String(v);
 const identity = (a) =>
   a
     ? `${a.farmId} | tag ${a.visualTag ?? "Unknown"} | RFID ${a.rfid ?? "Unknown"}`
@@ -37,10 +47,11 @@ export function assembleReport(
     season = "",
     animalId = "",
     unit = s.operation[0].weightUnit,
+    groupId = "",
     now = new Date().toISOString(),
   } = {},
 ) {
-  check(["treatments", "calvings", "animal"].includes(type), "Choose a report");
+  check(PRINT_REPORTS.some(([value]) => value === type), "Choose a report");
   check(["lb", "kg"].includes(unit), "Choose lb or kg");
   check(
     (!from || isDate(from)) &&
@@ -55,14 +66,10 @@ export function assembleReport(
     !w
       ? "Unknown"
       : `${(w.unit === unit ? w.value : unit === "kg" ? w.value * 0.45359237 : w.value / 0.45359237).toFixed(2)} ${unit} (entered ${w.value} ${w.unit})`;
+  const zone = s.operation[0].timeZone;
   const report = {
     type,
-    title:
-      type === "treatments"
-        ? "Treatment log for BQA preparation"
-        : type === "calvings"
-          ? "Calving book"
-          : "Individual animal card",
+    title: PRINT_REPORTS.find(([value]) => value === type)[1],
     operation: s.operation[0].name,
     range: `${season ? season + ": " : ""}${from || "All dates"} to ${to || "today and saved future dates"}`,
     generatedAt: now,
@@ -106,7 +113,7 @@ export function assembleReport(
           `${t.product}\nLot: ${t.lot ?? "Unknown"}\nExpiry: ${t.expiryDate ?? "Unknown"}`,
           `Dose: ${t.doseValue ?? "Unknown"} ${t.doseUnit ?? ""}\nHow given: ${plainOption(t.route)} ${t.routeOther ?? ""}\nSite: ${t.injectionSite ?? "Unknown"}\nReason: ${t.reason}\nAdministrator: ${t.administrator ?? "Unknown"}\nVeterinarian: ${t.veterinarian ?? "Unknown"}`,
           `Meat: ${instruction(t.meat,s.operation[0].timeZone)}\nMilk: ${instruction(t.milk,s.operation[0].timeZone)}\nReference: ${t.instructionReference ?? "Unknown"}`,
-          `${calculation}\nCourse: ${t.courseId ? "Linked doses" : "Single dose"}\nGroup treatment: ${t.batchId ? "Yes" : "No"}\nArchived: ${t.archivedAt ?? "No"}; voided: ${t.voidedAt ?? "No"}\nNotes: ${t.notes ?? ""}`,
+          `${calculation}\nCourse: ${t.courseId ? "Linked doses" : "Single dose"}\nGroup treatment: ${t.batchId ? "Yes" : "No"}\nArchived: ${t.archivedAt ? humanWhen(t.archivedAt, zone) : "No"}; voided: ${t.voidedAt ? humanWhen(t.voidedAt, zone) : "No"}\nNotes: ${t.notes ?? ""}`,
         ],
       };
     });
@@ -133,16 +140,16 @@ export function assembleReport(
           id: `${c.id}:${outcome.calfId}`,
           cells: [
             `${c.birthDate}\nDam: ${identity(find(c.damId))}\nSire: ${c.sireId ? identity(find(c.sireId)) : (c.sireReference ?? "Unknown")}`,
-            `${identity(calf)}\nSex: ${calf.sex}\nOutcome: ${outcome.outcome}`,
+            `${identity(calf)}\nSex: ${plainOption(calf.sex)}\nOutcome: ${plainOption(outcome.outcome)}`,
             weight(s.weights.find((w) => w.id === outcome.birthWeightId)),
-            `Ease: ${c.easeScore ?? "Unknown"}\n${c.notes ?? ""}\nArchived: ${c.archivedAt ?? "No"}; voided: ${c.voidedAt ?? "No"}`,
+            `Ease: ${c.easeScore ?? "Unknown"}\n${c.notes ?? ""}\nArchived: ${c.archivedAt ? humanWhen(c.archivedAt, zone) : "No"}; voided: ${c.voidedAt ? humanWhen(c.voidedAt, zone) : "No"}`,
           ],
         };
       }),
     );
     report.legend +=
       " Local ease scale: 1 unassisted, 2 easy assistance, 3 difficult assistance, 4 surgical delivery, 5 abnormal presentation; unknown is unrecorded. No registry equivalence.";
-  } else {
+  } else if (type === "animal") {
     const a = find(animalId);
     check(a, "Choose an animal");
     report.animal = a;
@@ -154,7 +161,7 @@ export function assembleReport(
         id: a.id,
         cells: [
           "Current animal identity and parentage",
-          recordWords(a),
+          recordWords(a, "", zone),
         ],
       },
       ...events(s, { animalId, from, to })
@@ -162,14 +169,31 @@ export function assembleReport(
         .map((e) => ({
           id: `${e.store}:${e.record.id}`,
           cells: [
-            `${e.date}\n${e.store}`,
-            recordWords(e.record) +
+            `${e.date}\n${plainOption(e.store)}`,
+            recordWords(e.record, "", zone) +
               (e.store === "weights"
                 ? "\nDisplay weight: " + weight(e.record)
                 : ""),
           ],
         })),
     ];
+    const points = weightPoints((s.weights || []).filter((w) => w.animalId === a.id), unit);
+    if (points.length) report.chartPoints = points;
+    if ((s.calvings || []).some((c) => !c.voidedAt && c.damId === a.id)) {
+      for (const line of calfSales(s, { from, to, damId: a.id }).lines) {
+        report.rows.push({ id: `sales:${report.rows.length}`, cells: ["Calf sales", line] });
+      }
+    }
+  } else {
+    const shelf = shelfReport(s, { type, from, to, unit, now, groupId, season });
+    check(shelf, "Choose a report");
+    report.title = shelf.title;
+    report.columns = shelf.columns;
+    report.rows = shelf.rows;
+    report.legend = shelf.legend;
+    report.range = shelf.range;
+    report.skipSafety = !!shelf.skipSafety;
+    ids = new Set(shelf.animalIds || []);
   }
   report.holds = health.animals
     .filter((h) => ids.has(h.animal.id))
@@ -187,6 +211,7 @@ export function assembleReport(
       voidedAt: m.voidedAt,
       acknowledgment: m.holdAcknowledgment,
     }));
+  report.savedCopy = savedCopyLine(s);
   return report;
 }
 export function renderReport(root, report) {
@@ -225,27 +250,36 @@ export function renderReport(root, report) {
   table.append(body);
   root.append(table);
   if (!report.rows.length) root.append(el("p", "No records in this range."));
-  root.append(
-    el(
-      "h3",
-      "Current holds use all saved records, not just these dates",
-    ),
-  );
-  for (const h of report.holds)
+  if (report.chartPoints) {
+    root.append(el("h3", "Weight line"));
+    const chart = el("div");
+    chart.className = "weight-chart";
+    chart.append(drawWeightChart(doc, report.chartPoints, report.unit));
+    root.append(chart);
+  }
+  if (!report.skipSafety) {
     root.append(
       el(
-        "p",
-        `${h.identity}\nMeat: ${h.meat}\nMilk: ${h.milk}${h.departureAlert ? "\nDeparture warning: saved unresolved or historical holds." : ""}`,
+        "h3",
+        "Current holds use all saved records, not just these dates",
       ),
     );
-  root.append(el("h3", "Historical departure warnings"));
-  for (const d of report.departures)
-    root.append(
-      el(
-        "p",
-        `${d.identity} | ${d.date} | Voided: ${d.voidedAt ?? "No"}\n${recordWords(d.acknowledgment)}`,
-      ),
-    );
+    for (const h of report.holds)
+      root.append(
+        el(
+          "p",
+          `${h.identity}\nMeat: ${h.meat}\nMilk: ${h.milk}${h.departureAlert ? "\nDeparture warning: saved unresolved or historical holds." : ""}`,
+        ),
+      );
+    root.append(el("h3", "Historical departure warnings"));
+    for (const d of report.departures)
+      root.append(
+        el(
+          "p",
+          `${d.identity} | ${d.date} | Voided: ${d.voidedAt ?? "No"}\n${recordWords(d.acknowledgment, "", report.zone)}`,
+        ),
+      );
+  }
   const footer = el("div");
   footer.className = "report-print-footer";
   footer.append(
@@ -253,19 +287,20 @@ export function renderReport(root, report) {
       "p",
       `${report.operation} | ${report.title} | ${report.range} | ${humanWhen(report.generatedAt,report.zone)}`,
     ),
+    el("p", report.savedCopy),
     el("p", report.footer),
   );
   root.append(footer);
 }
 
-function recordWords(value, prefix='') {
+function recordWords(value, prefix='', zone) {
  if(value===null || value===undefined)return 'Not known';
  if(typeof value!=='object')return typeof value==='boolean'?(value?'Yes':'No'):String(value);
  return Object.entries(value).filter(([key])=>!['id','animalId','damId','sireId','createdAt','updatedAt','revision','datasetId'].includes(key)).map(([key,v])=>{
   const name=plainLabel(key.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,c=>c.toUpperCase()));
   if(typeof v==='string' && /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(v))return `${name}: linked record`;
-  if(typeof v==='string' && /^\d{4}-\d\d-\d\dT.*Z$/.test(v))return `${name}: ${humanWhen(v)}`;
-  if(key==='timeZone')return `${name}: ${v?.split('/').slice(1).join(', ').replaceAll('_',' ') || 'Not known'}`;
-  return `${name}: ${typeof v==='object'?recordWords(v,name):typeof v==='string'&&/^[a-z]+(?:-[a-z]+)*$/.test(v)?plainOption(v):recordWords(v)}`;
+  if(typeof v==='string' && /^\d{4}-\d\d-\d\dT.*Z$/.test(v))return `${name}: ${humanWhen(v, zone)}`;
+  if(key==='timeZone')return `${name}: ${v === 'Etc/UTC' ? 'World clock' : (v?.split('/').slice(1).join(', ').replaceAll('_',' ') || 'Not known')}`;
+  return `${name}: ${typeof v==='object'?recordWords(v,name,zone):typeof v==='string'&&/^[a-z]+(?:-[a-z]+)*$/.test(v)?plainOption(v):recordWords(v)}`;
  }).join('\n');
 }

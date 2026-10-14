@@ -472,12 +472,12 @@ export class HealthUI {
         ),
       );
       for (const [key, label] of [
-        ["directedReleaseAt", "Directed release UTC (ISO timestamp with Z)"],
+        ["directedReleaseAt", "Vet end time on the farm clock"],
         [
           "resolutionReason",
           "Resolution reason, including how unknown timing was addressed",
         ],
-        ["resolvedAt", "Resolution recorded UTC (ISO timestamp with Z)"],
+        ["resolvedAt", "When you saved the vet check"],
         ["resolvedBy", "Resolution recorded by"],
       ])
         field(directed, `${commodity}:${key}`, label, r[key]);

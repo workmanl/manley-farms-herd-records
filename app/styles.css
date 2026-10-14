@@ -1475,3 +1475,17 @@ button > svg,
 .pedigree .list-row > p, .due-list .list-row > p { flex: 1 1 140px; min-width: 0; margin: 0; }
 .pedigree .list-row > a, .due-list .list-row > a { flex: 0 1 auto; max-width: 100%; white-space: normal; }
 .chute-count { margin: 8px 0; }
+.print-shelf { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; }
+.print-shelf button {
+  flex: 1 1 9.5rem;
+  min-height: 48px;
+  min-width: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  text-align: left;
+}
+.print-shelf svg { width: 24px; height: 24px; flex: 0 0 auto; }
+.herd-numbers p { margin: 8px 0; }
+.report-preview .weight-chart svg { width: 100%; max-width: 100%; height: auto; display: block; }

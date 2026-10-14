@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.7.0-beta.1 (2026-10-13)
+
+- Add herd book, open cows, expected calving, cull list, barn hold sheet, and blank chute and calving sheets.
+- Show herd numbers with the counts behind each rate. No target numbers and no age-adjusted weights.
+- Show what a cow's calves sold for. Each currency stays apart. Price per pound uses the sale weight.
+- Print farm-clock times and a saved-copy line. Recorded interval elapsed still never means safe.
+- See docs/round-3-report.md. Not field tested. No schema change.
+
 ## 1.6.0-beta.1 (2026-10-13)
 
 - Show who is due to calve from dates the farmer saved. Ask how many days until she calves. Do not assume a gestation length.
