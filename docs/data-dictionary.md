@@ -481,6 +481,29 @@ Checksum serialization `herd-json-v1`: remove only the top-level integrity membe
 
 Export a single consistent readonly transaction snapshot of all stores including revisions/voids/archives. Export bookkeeping is recorded afterward and is not retroactively inserted into that snapshot. Reject Farm Records crop files, wrong format, counts/checksum mismatch, bad dates/enums/types/IDs/FKs/cycles and newer schema without writing. Old schema migration is sequential; no v0 implicit mapping. Do not reset on failure. Before replace, download and verify the existing dataset backup. Stage and validate all incoming records before an atomic commit. Identical ID plus content skips; differing content/revision needs explicit choice with local revision history, not timestamp wins. Operation/metadata singletons need special preview reconciliation so a merge never creates a second operation. Import order is immaterial within a staged validated transaction. After restore reset device-local acceptance as above, preserve receipt history and annotate those metadata adjustments in revisions. Export/download/verification receipts refer to the target device only; imported historical values are retained in the audit snapshot but reset to null in active metadata until confirmed locally.
 
+## Herd numbers and calf sales (not stored)
+
+These figures are calculated when a report opens. They are not saved fields and they add no schema. No target, benchmark, or 205-day adjusted weight is shown. A season is the inclusive dates the farmer types. If both dates are empty, the label is All saved dates. A group filter uses the animal's current group only.
+
+| Figure | How it is counted |
+|---|---|
+| Cows with a breeding record | Distinct non-void females whose non-void breeding overlaps the dates. A service date counts on that day. An exposure counts when its start-to-end range overlaps the dates. An open-ended exposure runs through the later date. A breeding with no service date and no exposure start counts only for All saved dates. Sold cows stay in the count. Voided cows and voided breedings do not. |
+| Cows that calved | Of those cows, how many also have a non-void calving whose birth date is inside the dates. Twins are one calving. Cows who calved in the dates but have no breeding record in the dates are reported separately and are not inside the first fraction. |
+| Pregnancy rate | Latest non-void pregnancy check inside the dates, one per female. Pregnant counts. Open and not sure yet do not. The line is pregnant cows of checked cows. |
+| Calving interval | Days between consecutive non-void calving dates for the same dam. A gap counts when the later birth date is inside the dates. The average rounds half up to a whole day. One calving is not a gap. Twins in one calving are not a gap. |
+| Weaning weight average | Non-void weights of type weaning whose date is inside the dates. Mixed pounds and kilograms convert with 1 lb = 0.45359237 kg, the same factor as daily gain, then round half up to two decimal places. No age adjustment. |
+| Calves per cow | Calf rows on non-void calvings in the dates, divided by the distinct dams. Twins add two calves and one cow. Stillborn, died after birth, and unknown outcomes stay in the calf count. Only outcome live is born alive. |
+
+Open cows are animals whose latest non-void pregnancy check says open. A newer check replaces an older one. Voided checks are ignored. The date boxes do not hide this list.
+
+The cull list is animals that are still active and have a non-void cull decision. The latest decision is shown. A later sale, death, or other departure changes status and removes the animal from this list.
+
+Calf sales sum non-void sale amounts on animals who are calves in a non-void calving. The amount is the decimal string on that sale. Currencies are totaled separately and never added together. Price per pound is the sale amount divided by the sale weight, converted to pounds with the factor above, rounded half up to four decimal places. A missing weight does not invent a price. A voided sale, a purchase, and a sale of the cow herself are not calf sales. The cow's own sale stays on her movement history.
+
+The herd book footer uses `lastUserConfirmedBackupAt`. The file name date is that instant's calendar day in the farm time zone. The animal count is non-void animals. If that instant is empty, the line is "No saved copy on this phone yet."
+
+The barn hold sheet lists meat and milk results from the existing withdrawal calculation. Recorded interval elapsed is not permission for slaughter or milk sale. Blank chute and calving sheets are empty lines. They are not saved records.
+
 ## Fixture
 
 [sample fixture](../tests/fixtures/sample-herd.json) is a complete checksummed v1 envelope, not a seed database to install automatically. Fixed evaluation time: **2026-10-12T12:00:00.000Z**, display zone Etc/UTC. Twelve animals, one twin delivery, one stillbirth, an external sire, historical tag, group change, purchase, cull decision, sale with held withdrawal, mixed-unit weights, breeding/check, batch, repeated course, open course, correction and all five rule states. Fixture metadata has no accepted terms.

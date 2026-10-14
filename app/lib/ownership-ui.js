@@ -13,7 +13,9 @@ import {
   commitCSV,
   csvSetBackup,
 } from "./csv.js";
-import { assembleReport, renderReport, SWITCHING_STEPS } from "./reports.js";
+import { assembleReport, renderReport, SWITCHING_STEPS, PRINT_REPORTS } from "./reports.js";
+import { herdNumbers, calfSales } from "./herd-stats.js";
+import { ICONS, ICON_STROKE } from "./icons.js";
 export class OwnershipUI {
   constructor(root, { repository, refresh, message, advancedRestore }) {
     Object.assign(this, {
@@ -101,19 +103,33 @@ export class OwnershipUI {
     if (!this.repository().moved) this.imports();
     this.guide();
   }
+  glyph(name) {
+    const svg = this.doc.createElementNS("http://www.w3.org/2000/svg", "svg");
+    for (const [key, value] of Object.entries({
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      "stroke-width": ICON_STROKE,
+      "stroke-linecap": "round",
+      "stroke-linejoin": "round",
+      "aria-hidden": "true",
+    })) svg.setAttribute(key, value);
+    const path = this.doc.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", ICONS[name] || ICONS.tag);
+    svg.append(path);
+    return svg;
+  }
   reports() {
     const section = this.el("section"),
       title = this.el("h2", "Print reports", section);
     title.id = "report-controls-title";
     const form = this.el("form", null, section);
     form.setAttribute("aria-labelledby", title.id);
+    const shelf = this.el("div", null, form);
+    shelf.className = "print-shelf";
     const type = this.select(
       "Report",
-      [
-        ["treatments", "Treatment log for BQA preparation"],
-        ["calvings", "Calving book"],
-        ["animal", "Individual animal card"],
-      ],
+      PRINT_REPORTS,
       form,
     );
     const from = this.input("From date (inclusive)", "", "date", form),
@@ -130,17 +146,49 @@ export class OwnershipUI {
         ["", "Choose an animal"],
         ...this.s.animals.map((a) => [
           a.id,
-          `${a.farmId} | ${a.visualTag ?? "No tag"} | ${a.status}`,
+          `${a.farmId} | ${a.visualTag ?? "No tag"} | ${plainOption(a.status)}`,
         ]),
       ],
       form,
     );
     const unit = this.select("Display weight unit", ["lb", "kg"], form);
     unit.value = this.s.operation[0].weightUnit;
+    const group = this.select(
+      "Group",
+      [
+        ["", "All groups"],
+        ...(this.s.groups || [])
+          .filter((g) => !g.voidedAt)
+          .map((g) => [g.id, g.name]),
+      ],
+      form,
+    );
+    const numbers = this.el("article", null, section);
+    numbers.id = "herd-numbers";
+    numbers.className = "card herd-numbers";
     const preview = this.el("article", null, section);
     preview.id = "report-print-area";
     preview.setAttribute("aria-label", "Report preview");
     let report;
+    const paintNumbers = () => {
+      const stats = herdNumbers(this.s, {
+        from: from.value,
+        to: to.value,
+        unit: unit.value,
+        groupId: group.value,
+      });
+      const sales = calfSales(this.s, {
+        from: from.value,
+        to: to.value,
+        groupId: group.value,
+      });
+      numbers.replaceChildren();
+      this.el("h3", "Herd numbers", numbers);
+      this.el("p", stats.window, numbers);
+      for (const line of stats.lines) this.el("p", line, numbers);
+      this.el("h3", "Calf sales", numbers);
+      for (const line of sales.lines) this.el("p", line, numbers);
+    };
     const build = () => {
       report = assembleReport(this.s, {
         type: type.value,
@@ -149,10 +197,38 @@ export class OwnershipUI {
         season: season.value,
         animalId: animal.value,
         unit: unit.value,
+        groupId: group.value,
       });
       renderReport(preview, report);
+      paintNumbers();
       print.disabled = false;
     };
+    for (const [value, text, icon] of [
+      ["treatments", "Treatment log", "health"],
+      ["calvings", "Calving book", "calf"],
+      ["animal", "Animal card", "person"],
+      ["herd-book", "Herd book", "animals"],
+      ["open-cows", "Open cows", "cow"],
+      ["expected-calving", "Expected calving", "calendar"],
+      ["cull-list", "Cull list", "tag"],
+      ["barn-holds", "Barn hold sheet", "hold"],
+      ["blank-chute", "Blank chute sheet", "group"],
+      ["blank-calving", "Blank calving sheet", "calf"],
+      ["herd-numbers", "Herd numbers", "chart"],
+      ["sales", "Calf sales", "sale"],
+    ]) {
+      const button = this.button(
+        text,
+        async () => {
+          type.value = value;
+          this.s = await this.repository().snapshot();
+          build();
+        },
+        shelf,
+      );
+      button.classList.add("shelf-button");
+      button.prepend(this.glyph(icon));
+    }
     this.button(
       "Preview report",
       async () => {
