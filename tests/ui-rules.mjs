@@ -1,19 +1,25 @@
 // Maintainer browser checks. Synthetic fixture only. No app writes from form completion.
-// node tests/ui-rules.mjs BASE_URL OUT_DIR
+// node tests/ui-rules.mjs BASE_URL OUT_DIR [--moved]
+// --moved seeds a synthetic prior-release profile, then checks real read-only flows.
 import {chromium} from 'playwright';
 import {readFile, mkdir} from 'node:fs/promises';
 import {join} from 'node:path';
 import assert from 'node:assert/strict';
-const [base,out]=process.argv.slice(2);
+const [base,out,mode]=process.argv.slice(2);
+const moved=mode==='--moved';
 if(!base || !out) throw Error('Usage: BASE_URL OUT_DIR');
 const url=new URL(base).href, fixture=JSON.parse(await readFile(new URL('./fixtures/sample-herd.json',import.meta.url),'utf8'));
 await mkdir(out,{recursive:true});
 const browser=await chromium.launch();
 try {
   for(const [width,height] of [[390,844],[320,568]]) for(const theme of ['sunlight','dark']) {
-    const context=await browser.newContext({viewport:{width,height},serviceWorkers:'allow'}), errors=[];
+    const context=await browser.newContext({viewport:{width,height},serviceWorkers:moved?'block':'allow'}), errors=[];
     try {
       const page=await context.newPage();page.on('pageerror',e=>errors.push(e.message));
+      if(moved) await page.route('**/lib/deploy-config.js',async route=>{
+        const response=await route.fetch();
+        await route.fulfill({response,body:(await response.text()).replace('"moved":true','"moved":false')});
+      });
       await page.goto(url,{waitUntil:'networkidle'});
       const animalId=await page.evaluate(async({url,fixture,theme})=>{
         const {openRepository}=await import(new URL('lib/database.js',url));
@@ -28,9 +34,31 @@ try {
           return fixture.stores.animals.find(a=>a.sex==='female'&&a.status==='active').id;
         }finally{repo.close();}
       },{url,fixture,theme});
+      if(moved) await page.unrouteAll({behavior:'wait'});
       await page.reload({waitUntil:'networkidle'});
       await page.locator('#herd h1').waitFor();
       await page.screenshot({path:join(out,`home-${width}-${theme}.png`),fullPage:true});
+      if(moved) {
+        assert.equal(await page.locator('#move-panel').isVisible(),true);
+        const before=await page.evaluate(async url=>{
+          const {openRepository}=await import(new URL('lib/database.js',url));
+          const repo=await openRepository();try{return await repo.snapshot();}finally{repo.close();}
+        },url);
+        for(const flow of ['animal','weight','move','calving','breeding','pregnancy','movement','treatment']) {
+          await page.goto(url+`#dashboard/quick/${flow}${flow==='animal'?'':'/'+animalId}`,{waitUntil:'networkidle'});
+          assert.equal(await page.locator('#herd .guided-form').count(),0,flow+' stays read-only');
+          assert.match(await page.locator('#herd').textContent(),/read-only/);
+          assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),flow+' horizontal scroll');
+          await page.screenshot({path:join(out,`moved-${flow}-${width}-${theme}.png`)});
+        }
+        const after=await page.evaluate(async url=>{
+          const {openRepository}=await import(new URL('lib/database.js',url));
+          const repo=await openRepository();try{return await repo.snapshot();}finally{repo.close();}
+        },url);
+        assert.deepEqual(after,before,'moved flow checks never change records');
+        assert.deepEqual(errors,[]);
+        continue;
+      }
       // Show each backup state using real verified paths, then changed work.
       for(const state of ['red','green','yellow']) {
         if(state==='green') await page.evaluate(async url=>{
@@ -47,12 +75,25 @@ try {
         await page.locator(`#herd .backup-light[data-health="${state}"]`).waitFor();
         await page.locator('#herd .backup-light').screenshot({path:join(out,`light-${state}-${width}-${theme}.png`)});
       }
+      const homeCopy=page.locator('#herd .backup-light');
+      assert.equal(await homeCopy.count(),1,'Home has one backup card');
+      assert.equal(await homeCopy.getByRole('button',{name:'Save a copy',exact:true}).count(),1);
+      assert.equal(await page.locator('#backup-reminder').count(),0);
+      assert.equal(await homeCopy.getByRole('button',{name:/Use dark theme|Use Sunlight/}).count(),0);
       for(const flow of ['animal','weight','move','calving','breeding','pregnancy','movement','treatment']) {
         await page.goto(url+`#dashboard/quick/${flow}${flow==='animal'?'':'/'+animalId}`,{waitUntil:'networkidle'});
         const form=page.locator(`#herd .guided-form[data-guide-action="${flow}"]`);await form.waitFor();
+        let reachedReview=false;
         for(let step=0;step<80;step++) {
           const review=await form.locator('.guide-progress').textContent();
-          if(review.includes('Check your answers')) break;
+          if(review.includes('Check your answers')) {reachedReview=true;break;}
+          if(flow==='calving') {
+            for(const name of ['Add twin to this delivery','Discard draft and start again']) {
+              const button=form.getByRole('button',{name,exact:true});
+              assert.ok(await button.evaluate(b=>b.classList.contains('secondary')),name+' must be secondary');
+              const box=await button.boundingBox();assert.ok(box.height>=48 && box.width>=48,name+' target under 48px');
+            }
+          }
           const controls=form.locator('.fields label:not([hidden]) input, .fields label:not([hidden]) select, .fields label:not([hidden]) textarea');
           for(const input of await controls.all()) {
             await input.evaluate(control=>{
@@ -80,6 +121,7 @@ try {
           assert.notEqual(await form.locator('.guide-progress').textContent(),before,`${flow}: cannot advance step ${step}`);
           if(step===79) assert.fail(`${flow}: step count exceeded`);
         }
+        assert.ok(reachedReview,flow+': review was reached');
       }
       assert.deepEqual(errors,[]);
     } finally {await context.close();}

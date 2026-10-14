@@ -32,6 +32,8 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   await import("../app/app.js");
   const $ = (id) => document.getElementById(id);
   assert.equal(persistRequests,0);
+  await until(() => $("status").hidden);
+  assert.equal($("status").textContent, "");
   assert.equal($("public-intro").open, true);
   assert.equal($("herd").hidden, true);
   assert.equal($("gate").hidden, false);
@@ -43,6 +45,13 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
       !$("herd").hidden && /Acknowledgment saved/.test($("status").textContent),
   );
   assert.match($("herd").textContent, /Your herd/);
+  const homeCopy = $("herd").querySelector('.backup-light');
+  assert.ok(homeCopy);
+  assert.equal([...homeCopy.querySelectorAll('button')].filter(b=>b.textContent==='Save a copy').length,1);
+  assert.equal(homeCopy.querySelector('[data-backup-snooze]'),null);
+  assert.doesNotMatch(homeCopy.textContent,/Use dark theme|Use Sunlight|Backup now/);
+  assert.ok($("theme").closest('#settings'));
+
   assert.match($("herd").textContent, /Meat hold/);
   location.hash = "#animals/new";
   await until(() => $("herd").querySelector("[name=farmId]"));
@@ -64,6 +73,7 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   assert.equal(document.querySelectorAll("#public-faq article").length, 8);
   location.hash = "#backup";
   await until(() => !$("backup").hidden);
+  assert.equal(document.querySelector("#backup-light [data-backup-snooze]").className,"secondary quiet-link");
   $("theme").value = "sunlight";
   $("settings").dispatchEvent(
     new dom.window.Event("submit", { cancelable: true, bubbles: true }),
@@ -77,7 +87,8 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
     document.querySelector("[data-tab=animals]").getAttribute("aria-current"),
     "page",
   );
-  assert.equal($("backup-reminder").hidden, false);
+  assert.equal($("backup-reminder"), null);
+  assert.equal($("herd").querySelectorAll(".backup-light").length, 0);
   location.hash = "#reports";
   await until(
     () =>
@@ -93,8 +104,8 @@ test("real app shell gates workflows, routes nested forms, saves and applies sun
   window.dispatchEvent(new dom.window.Event("pageshow"));
   await new Promise((resolve) => setTimeout(resolve, 20));
   assert.equal($("herd").querySelector("[name=farmId]").value, "Unsaved draft");
-  $("backup-snooze").click();
-  await until(() => $("backup-reminder").hidden);
+  document.querySelector("#backup-light [data-backup-snooze]").click();
+  await until(() => !document.querySelector("#backup-light [data-backup-snooze]"));
   assert.equal($("herd").querySelector("[name=farmId]").value, "Unsaved draft");
   dom.window.close();
 });

@@ -113,6 +113,10 @@ test("calf UI recovers draft, adds twin and commits once after date confirmation
   const h = await setup(),
     dam = await h.save("animal", { farmId: "Dam", sex: "female" });
   await h.render(`animals/${dam.id}/calving`);
+  const twinButton = [...h.root.querySelectorAll('button')].find(b=>b.textContent==='Add twin to this delivery');
+  const discardButton = [...h.root.querySelectorAll('button')].find(b=>b.textContent==='Discard draft and start again');
+  assert.equal(twinButton.className,'secondary');
+  assert.equal(discardButton.className,'secondary danger');
   h.field("calf0:visualTag", "00002");
   h.field("calf0:sex", "female");
   h.field("calf0:weight", "80");
@@ -121,7 +125,7 @@ test("calf UI recovers draft, adds twin and commits once after date confirmation
   );
   assert.match(
     h.root.querySelector("[role=status]").textContent,
-    /draft retained/,
+    /Not saved yet\. Your answers are kept on this phone until you tap Save\./,
   );
   await h.render(`animals/${dam.id}/calving`);
   assert.equal(h.field("calf0:visualTag").value, "00002");

@@ -61,6 +61,7 @@ let repo,
   decisions = {},
   busy = false;
 const message = (text, error = false) => {
+  $("status").hidden = !text;
   $("status").textContent = text;
   $("status").classList.toggle("error", error);
 };
@@ -547,16 +548,13 @@ async function refreshReminder() {
 }
 function showReminder() {
   if (snapshot && !repo?.recovery && !herd?.demoMode) mountBackupPanel($("backup-light"));
-  const reminder = snapshot && backupReminder(snapshot);
-  $("backup-reminder").hidden = !accepted || !!repo?.recovery || !!herd?.demoMode || !reminder?.due;
-  $("backup-reminder-text").textContent = reminder?.text || "";
+  for (const root of document.querySelectorAll('#herd .backup-light')) mountBackupPanel(root);
 }
-on("backup-now", "click", doSaveCopy);
-on("backup-snooze", "click", async () => {
+async function snoozeCopyReminder() {
   await snoozeBackup(repo);
   await refreshReminder();
-  message("Backup reminder snoozed for one day. No backup was confirmed.");
-});
+  message("We will remind you tomorrow. No copy was saved.");
+}
 ownership = new OwnershipUI($("ownership"), {
   repository: () => repo,
   refresh,
@@ -643,14 +641,12 @@ await run(async () => {
     $("recovery").hidden = false;
     $("recovery-message").textContent = repo.recovery;
     route();
-    message("Recovery mode. Existing records have been retained.", true);
+    message("Your records could not open. They are still on this phone. Use the recovery tools below.", true);
     return;
   }
   await refresh();
   await showStorage();
-  message(
-    "Local database ready. Changes are saved only after a transaction completes.",
-  );
+  message("");
 });
 
 // Update only derived panels during ticks/resume, retaining unsaved forms and focus.
@@ -734,7 +730,7 @@ void startPWA({
   },
 }).catch(() => {
   $("offline-status").textContent =
-    "Offline preparation unavailable. Keep this tab open and retry online.";
+    "Cannot get ready offline. Connect and try again.";
 });
 
 function showProgress({ phase, percent }) {
@@ -788,14 +784,12 @@ function mountBackupPanel(root) {
   for(const text of ['Your records stay on this phone.', 'A share or checked file is a saved copy.', state.storageNote]) {const p=document.createElement('p');p.textContent=text;why.append(p);}
   if(safari) {add('p',SAFARI_WARNING).className='safari-warning';add('p',SAFARI_SEPARATE);const list=add('ol','');for(const text of SAFARI_STEPS){const li=document.createElement('li');li.textContent=text;list.append(li);}}
   if (!device.lastPracticeAt || Date.now() - device.lastPracticeAt >= 30*86400000) add('p','Try a practice restore this month. Open Backup and pick your copy.');
-  if(root.id !== 'backup-light' && !DEPLOY.moved) {
-    const switcher=add('button',snapshot.operation[0].theme === 'sunlight' ? '☾ Use dark theme' : '☀ Use Sunlight');
-    switcher.type='button'; switcher.onclick=()=>void run(async()=>{
-      const op=(await repo.snapshot()).operation[0];
-      await repo.mutate([{store:'operation', expectedRevision:op.revision, record:{...op, theme:op.theme==='sunlight'?'dark':'sunlight', revision:op.revision+1, updatedAt:new Date().toISOString()}}], {reason:'Change theme'});
-      await refresh();
-    });
+  if (!DEPLOY.moved && accepted && backupReminder(snapshot)?.due) {
+    const snooze=add('button','Remind me tomorrow');
+    snooze.type='button'; snooze.className='secondary quiet-link';
+    snooze.dataset.backupSnooze='true'; snooze.onclick=()=>void run(snoozeCopyReminder);
   }
+
 }
 
 function enforceMovedView() {
@@ -807,7 +801,7 @@ function enforceMovedView() {
       }
     }
   }
-  for (const id of ['save-settings','accept','commit','preview','restore-file','backup-snooze','confirm-saved','practice-restore']) $(id).disabled = true;
+  for (const id of ['save-settings','accept','commit','preview','restore-file','confirm-saved','practice-restore']) $(id).disabled = true;
 }
 function updateMovePanel() {
   $('restore-welcome').hidden = DEPLOY.moved || hasHerdRecords(snapshot);

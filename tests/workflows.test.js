@@ -193,7 +193,7 @@ test("twins share one atomic delivery with reciprocal weights and stillbirth ret
     assert.equal(w.calvingId, c.id);
     assert.equal(w.animalId, calf.calfId);
   }
-  await failsWithoutWrites(r, "calving", input, /already committed/);
+  await failsWithoutWrites(r, "calving", input, /already saved/);
   r.close();
 });
 for (const [label, patch, error] of [
@@ -670,7 +670,7 @@ test("local draft survives interruption, isolates datasets and retains the deliv
     r,
     "calving",
     drafts.load("calf"),
-    /already committed/,
+    /already saved/,
   );
   drafts.clear("calf");
   assert.equal(drafts.load("calf"), null);

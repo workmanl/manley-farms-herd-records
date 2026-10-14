@@ -12,7 +12,7 @@ try {
     'Usage: seed|check OLD_URL NEW_URL OLD_PROFILE NEW_PROFILE OUT_DIR');
   assert.notEqual(new URL(oldURL).origin,new URL(newURL).origin,'Use separate origins');
   assert.notEqual(resolve(oldProfile),resolve(newProfile),'Use separate throwaway profiles');
-  const gate = spawnSync(process.execPath,[new URL('./live-upgrade-check.mjs',import.meta.url).pathname,mode,oldURL,oldProfile,output,'1','1.3.0-beta.1'],{stdio:'inherit'});
+  const gate = spawnSync(process.execPath,[new URL('./live-upgrade-check.mjs',import.meta.url).pathname,mode,oldURL,oldProfile,output,'1','1.3.1-beta.1'],{stdio:'inherit'});
   assert.equal(gate.status,0,'Old-site upgrade gate failed');
   if (mode === 'check') {
     await mkdir(output,{recursive:true});

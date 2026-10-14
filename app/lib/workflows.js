@@ -259,7 +259,7 @@ export function prepareWorkflow(
     );
     check(
       !s.calvings.some((c) => c.id === input.eventId),
-      "This delivery is already committed. Open the dam history before entering another.",
+      "This delivery is already saved. Open the dam history before entering another.",
     );
     const dam = find(s, "animals", input.damId);
     check(

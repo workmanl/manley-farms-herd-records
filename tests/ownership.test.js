@@ -571,7 +571,7 @@ test("Reports UI renders working controls, safe previews, imports and offline sw
   for (const text of [
     "Print / Save as PDF",
     "Preview / apply decisions",
-    "Confirm atomic CSV import",
+    "Save imported records",
     "Switching away",
     "Full CSV set and manifest",
   ])
@@ -790,14 +790,14 @@ test("Rendered CSV import maps columns, previews errors and commits only after e
   assert.match(root.textContent, /0 errors/);
   assert.equal(root.querySelector("script"), null);
   assert.equal((await r.snapshot()).animals.length, 0);
-  await button("Confirm atomic CSV import").onclick();
+  await button("Save imported records").onclick();
   assert.match(messages.at(-1).text, /Confirm/);
   assert.equal((await r.snapshot()).animals.length, 0);
   const confirm = [...root.querySelectorAll("label")]
     .find((l) => l.textContent.startsWith("I reviewed every staged row"))
     .querySelector("input");
   confirm.checked = true;
-  await button("Confirm atomic CSV import").onclick();
+  await button("Save imported records").onclick();
   assert.equal(refreshed, 1);
   assert.equal((await r.snapshot()).animals[0].farmId, "00007");
   assert.equal((await r.snapshot()).animals[0].notes, "<script>bad()</script>");

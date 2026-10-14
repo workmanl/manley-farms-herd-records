@@ -47,3 +47,21 @@ Manual removal stays hidden until a picked file is verified and matches the curr
 Local unit tests cover base config, absolute site links, empty-old redirect, read-only writes, same-path Save a copy and restore round trip, cancelled shares, no automatic removal, manual removal gates, hosting headers and both packaged inventories. All 447 local unit tests pass, including the existing tests. The 10,000-animal, 250,000-event scale test also passes with a lossless full backup/restore round trip; this is Node evidence, not a device claim. Both output inventories and archive checksums are regenerated.
 
 No git command, network request, browser session or deploy was run in this build task. Claude still owns staging, browser review, the live gate and deploy. Physical iPhone Safari/Home Screen and Android share/offline behavior are untested here. The new host's actual Apache headers, HTTPS and installed-app update behavior need live verification. The old origin still shares the main site's trust boundary until each farmer moves their records.
+
+
+## Polish pass
+
+1.3.1-beta.1 addresses the Wave 1 browser findings. Both deploy builds share the enlarged checkbox targets, secondary twin and discard buttons, plain unsaved-answer text, and the copy sweep. Home now has one backup card with one primary Save a copy button. Its reminder is a small secondary link. The separate reminder banner and repeated attention-list backup prompt are gone. Theme selection remains in Backup & Settings. Healthy database startup has no visible status box. Offline preparation says "Getting ready to work offline..." until the worker reports readiness.
+
+Local verification: 451 unit tests pass. Regression coverage checks the Home card, reminder snooze without losing an open form, theme placement, checkbox sizing rules, calving button styles and draft recovery text, offline status selection, plain UI copy, and moved-view control references. Existing release tests verify the two build inventories and checksums. Both inventories and the four release archives were regenerated for 1.3.1-beta.1.
+
+No git, network, browser session or deploy was used. Computed browser geometry is not verified locally. Claude should run these staged checks, then inspect screenshots:
+
+```sh
+node tests/ui-rules.mjs https://herd.manleyfarms.com/ /tmp/herd-polish-origin
+node tests/ui-rules.mjs https://manleyfarms.com/tools/herd-records/ /tmp/herd-polish-moved --moved
+```
+
+The first checks all eight guided flows at 390x844 and 320x568 in Sunlight and dark. It checks each question against the action bar, minimum targets, no sideways scroll and arrival at review. It also checks the merged Home card and calving secondary buttons. The moved check seeds synthetic prior-release records with a temporary test-only config response, removes that response override, and checks the actual moved build. All eight entry routes must stay read-only, show no guided form, fit the screen and leave records unchanged. It blocks service workers during the synthetic seed; run the existing move and offline gates separately for worker behavior. No farmer profile should be used.
+
+Physical-device share, installed-app updates, screen readers and outdoor glove use remain untested here. Not field tested. No easiest-use claim is made. Claude owns browser review and deploy.

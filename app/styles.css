@@ -196,9 +196,10 @@ textarea {
 }
 input[type="checkbox"] {
   display: inline-block;
-  width: 24px;
-  min-height: 24px;
-  height: 24px;
+  width: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  height: 48px;
   margin: 0 10px 0 0;
   vertical-align: middle;
 }
@@ -1174,3 +1175,5 @@ body[data-moved="true"] [aria-disabled="true"] { opacity:.65; cursor:default; }
 body[data-empty-move="true"] main > :not(#move-panel),
 body[data-empty-move="true"] #move-panel > :not(#move-title):not(#move-copy),
 body[data-empty-move="true"] .app-tabs { display:none; }
+
+.backup-light .quiet-link { text-decoration: underline; font-size: 15px; padding: 8px; }

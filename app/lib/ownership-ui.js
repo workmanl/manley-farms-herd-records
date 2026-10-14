@@ -551,7 +551,7 @@ export class OwnershipUI {
       section,
     );
     const commit = this.button(
-      "Confirm atomic CSV import",
+      "Save imported records",
       async () => {
         this.saving = true;
         try {
@@ -561,7 +561,7 @@ export class OwnershipUI {
           });
           plan = null;
           await this.refresh();
-          this.message("CSV import committed atomically.");
+          this.message("Imported records saved.");
         } finally {
           this.saving = false;
         }
@@ -619,7 +619,7 @@ export class OwnershipUI {
     for (const step of SWITCHING_STEPS) this.el("li", step, list);
     this.el(
       "p",
-      "Back up before replacing a device, clearing browser storage, restore replacement, or schema upgrades. Local records are not application-encrypted. Device/profile access, private browsing, storage eviction and same-origin scripts can expose or remove records.",
+      "Save a copy before changing phones, clearing browser storage, replacing records or updating the file format. Records on this phone are not locked. Anyone with access to this browser may read them. Private browsing, storage cleanup and other scripts at this address can remove or expose records.",
       section,
     );
   }

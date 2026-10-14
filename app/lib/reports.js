@@ -62,12 +62,12 @@ export function assembleReport(
           ? "Calving book"
           : "Individual animal card",
     operation: s.operation[0].name,
-    range: `${season ? season + ": " : ""}${from || "All dates"} to ${to || "present and retained future dates"}`,
+    range: `${season ? season + ": " : ""}${from || "All dates"} to ${to || "today and saved future dates"}`,
     generatedAt: now,
     zone: s.operation[0].timeZone,
     unit,
     legend:
-      "Unknown means not recorded. Archived and voided records are retained and labeled. Voided treatments do not contribute to current holds. Recorded interval elapsed is not permission for slaughter or milk sale. Releases are UTC instants; current holds use the entire retained history, regardless of report range.",
+      "Unknown means not recorded. Archived and voided records are kept and labeled. Voided treatments do not contribute to current holds. Recorded interval elapsed is not permission for slaughter or milk sale. Releases are UTC instants; current holds use the entire saved history, regardless of report range.",
     footer: PRINT_FOOTER,
     rows: [],
     holds: [],
@@ -146,7 +146,7 @@ export function assembleReport(
     report.animal = a;
     report.title += ": " + a.farmId;
     ids = new Set([a.id]);
-    report.columns = ["Date / entity", "Retained record"];
+    report.columns = ["Date / entity", "Saved record"];
     report.rows = [
       {
         id: a.id,
@@ -226,14 +226,14 @@ export function renderReport(root, report) {
   root.append(
     el(
       "h3",
-      "Current holds from all retained history, independent of selected range",
+      "Current holds from all saved history, independent of selected range",
     ),
   );
   for (const h of report.holds)
     root.append(
       el(
         "p",
-        `${h.identity}\nMeat: ${h.meat}\nMilk: ${h.milk}${h.departureAlert ? "\nDeparture warning: retained unresolved or historical holds." : ""}`,
+        `${h.identity}\nMeat: ${h.meat}\nMilk: ${h.milk}${h.departureAlert ? "\nDeparture warning: saved unresolved or historical holds." : ""}`,
       ),
     );
   root.append(el("h3", "Historical departure warnings"));

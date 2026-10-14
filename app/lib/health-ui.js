@@ -480,7 +480,7 @@ export class HealthUI {
     if (prior) {
       body.append(
         this.details(
-          "Prior values retained on correction",
+          "Earlier answers are kept when changed",
           JSON.stringify(prior, null, 2),
         ),
       );

@@ -560,7 +560,7 @@ export class HerdUI {
     this.root.append(
       el(
         "p",
-        `${rows.length} events, newest first. Page ${page} of ${pages}. Archived, voided and correction history are retained.`,
+        `${rows.length} events, newest first. Page ${page} of ${pages}. Old records and changes are kept.`,
       ),
     );
     this.history(rows.slice((page - 1) * 25, page * 25));
@@ -639,7 +639,7 @@ export class HerdUI {
             draft.clear();
           } catch {
             cleanup =
-              " The committed draft could not be removed; it will be recognized on reopening.";
+              " The saved answers are still on this phone. Reopening will show that they were saved.";
           }
         this.message(`Saved on this device.${cleanup}`);
         await this.refresh();
@@ -1091,7 +1091,7 @@ export class HerdUI {
       save: (data) => {
         if (!store)
           throw new Error(
-            "Local draft storage is unavailable. Enable browser storage before recording a calf.",
+            "This phone cannot keep your answers. Allow browser storage before adding a calf.",
           );
         store.save(key, data);
       },
@@ -1106,7 +1106,7 @@ export class HerdUI {
     );
     if (saved)
       status.textContent =
-        "Recovered local draft. Review and confirm the birth date. Not committed.";
+        "Your unsaved answers are back. Check and confirm the birth date before you save.";
     if (loadError)
       status.textContent = `Draft recovery unavailable: ${loadError}`;
     field(body, "birthDate", "Birth date", initial.birthDate, {
@@ -1167,6 +1167,7 @@ export class HerdUI {
         calfArea.lastElementChild.querySelector("input").focus();
       }
     });
+    twin.className = "secondary";
     twin.disabled = calfCount === 2;
     body.append(twin);
     const more = el("details");
@@ -1194,22 +1195,22 @@ export class HerdUI {
       try {
         draft.save(collect({ eventId: initial.eventId, ...values(form) }));
         status.textContent =
-          "Local draft retained. Not committed to herd records.";
+          "Not saved yet. Your answers are kept on this phone until you tap Save.";
       } catch (e) {
-        status.textContent = `Draft not retained: ${e.message}`;
+        status.textContent = `Could not keep your answers: ${e.message}`;
       }
     };
     form.addEventListener("input", persist);
     form.addEventListener("change", persist);
-    body.append(
-      button("Discard draft and start again", () => {
+    const discard = button("Discard draft and start again", () => {
         try {
           draft.clear();
           this.render(this.s, `animals/${dam.id}/calving`);
         } catch (e) {
           status.textContent = e.message;
         }
-      }),
-    );
+      });
+    discard.className = "secondary danger";
+    body.append(discard);
   }
 }

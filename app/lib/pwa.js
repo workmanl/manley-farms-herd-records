@@ -88,7 +88,7 @@ export async function startPWA({
   );
   if (!navigator.serviceWorker) {
     $("offline-status").textContent =
-      "Offline preparation is unavailable in this browser context.";
+      "This browser cannot get ready offline.";
     return;
   }
   let registration,
@@ -151,7 +151,7 @@ export async function startPWA({
       const status = await workerStatus(active);
       $("offline-status").textContent = readyOffline(active, status)
         ? "Ready offline"
-        : "Offline preparation is not complete. Keep this page open while connected.";
+        : "Getting ready to work offline...";
       if ($("release-version")) $("release-version").textContent = status.version || "Not ready offline yet";
       const waiting = registration.waiting;
       waitingStatus = waiting && (await workerStatus(waiting));
@@ -159,13 +159,13 @@ export async function startPWA({
       if (!$("pwa-update").hidden)
         $("update-status").textContent =
           waitingStatus.schema !== SCHEMA_VERSION
-            ? "Update staged. Download and verify a current backup before this schema migration."
+            ? "Update ready. Save and check a copy before changing the file format."
             : "Update staged. Save your work in every Herd Records tab, then choose Update when ready.";
       $("update-backup").hidden =
         !waitingStatus || waitingStatus.schema === SCHEMA_VERSION;
     } catch {
       $("offline-status").textContent =
-        "Offline cache check failed. Reconnect and try again.";
+        "Could not check offline use. Connect and try again.";
     }
   }
   $("pwa-update").onclick = async () => {

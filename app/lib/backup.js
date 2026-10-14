@@ -81,7 +81,7 @@ async function verifyBackupBytes(input) {
   );
   check(
     b.schemaVersion === 1,
-    "Unsupported schema version. Use a compatible app; no records were changed.",
+    "This file format needs a compatible app. No records were changed.",
   );
   exactKeys(
     b,
@@ -136,7 +136,7 @@ async function verifyBackupBytes(input) {
   check(
     b.datasetId === b.stores.metadata[0].datasetId &&
       b.schemaVersion === b.stores.metadata[0].schemaVersion,
-    "dataset identity/version mismatch",
+    "The herd name or file version does not match.",
   );
   if (
     b.stores.treatments.some(
@@ -335,13 +335,13 @@ export async function commitRestore(
   if (staged.mode === "replace") {
     check(
       downloadConfirmed && safetyBackup,
-      "Download and verify the current dataset backup before replacement.",
+      "Save and check a copy of your current herd before replacing it.",
     );
     const verified = await verifyBackup(safetyBackup);
     check(
       datasetToken(sorted(verified.backup.stores)) ===
         datasetToken(sorted(JSON.parse(staged.token))),
-      "Safety backup does not match the current preview dataset.",
+      "Safety backup does not match the herd in this preview.",
     );
   }
   const result = await transaction(repo.db, "readwrite", (current, tx) => {

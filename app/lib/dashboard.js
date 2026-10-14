@@ -16,7 +16,7 @@ export function dashboardModel(s, today, now=new Date().toISOString()) {
  const commodity=isHold(row.meat.status)?'meat':'milk',hold=row[commodity];
  attention.push({text:`${row.animal.farmId} is on a ${commodity} hold${hold.releaseAt?` until ${new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit',timeZone:s.operation[0].timeZone}).format(new Date(hold.releaseAt))} (${s.operation[0].timeZone})`:'. Needs review: '+hold.reasons.join('; ')}.`,href:`#animals/${row.animal.id}`,fix:'Review hold'});
  }
- if(backupReminder(s,{now}).due)attention.push({text:last?`You haven't backed up in ${Math.max(0,Math.floor((Date.parse(now)-Date.parse(last))/86400000))} days. Back up now.`:'Your records need their first backup. Save a copy outside this browser.',href:'#backup',fix:'Back up now'});
+
  return {evaluation,calves,last,attention,empty:s.animals.length===0,active:s.animals.filter(a=>a.status==='active').length};
 }
 export function drawDashboard(h,{el,link,button,field}) {

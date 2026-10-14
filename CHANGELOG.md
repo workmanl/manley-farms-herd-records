@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.1-beta.1 (2026-10-13)
+
+- Merge Home backup prompts into one saved-copy card with one primary Save a copy button and a quiet reminder link. Remove the repeated backup alert.
+- Hide the healthy database message. Use short offline preparation text only while preparation is pending. Keep theme selection in Settings.
+- Enlarge checkboxes to at least 48px, make Add twin secondary and Discard a quiet danger action, and explain unsaved answers in plain words.
+- Replace save and storage jargon in visible messages, imports, reports, recovery and help.
+- Add polish regression tests and strengthen staged UI checks for both phone sizes, both themes and all eight flows. The moved checks verify read-only routes.
+- Rebuild both deploy outputs and inventories. Browser, screen reader and field checks remain with the release maintainer. Not field tested.
+
 ## 1.3.0-beta.1 (2026-10-13)
 
 - Move the main app to herd.manleyfarms.com with a root deploy base and bundled site assets.

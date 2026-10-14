@@ -112,7 +112,7 @@ test('dashboard counts and Today use evaluator including departed and unknown ho
  await h.render(`animals/${a.id}/treatment`);healthFields(h);h.field('administrationPrecision','date-only');await h.submit();
  const s=await h.repo.snapshot(),m=dashboardModel(s,'2026-10-13','2026-10-13T12:00:00.000Z'),e=evaluateWithdrawal(s,{now:'2026-10-13T12:00:00.000Z'});
  assert.deepEqual(m.evaluation.counts,e.counts);assert.equal(m.calves,1);assert.equal(m.active,1);
- assert.ok(m.attention.some(i=>/needs? a check/.test(i.text)));assert.ok(m.attention.some(i=>/first backup/.test(i.text)));assert.ok(m.attention.some(i=>/meat hold/.test(i.text)));
+ assert.ok(m.attention.some(i=>/needs? a check/.test(i.text)));assert.ok(!m.attention.some(i=>/backup|copy/.test(i.text)));assert.ok(m.attention.some(i=>/meat hold/.test(i.text)));
  await h.render('dashboard');h.root.querySelectorAll('.snapshot-tile')[4].click();assert.equal(h.ui.filters.withdrawal,'needs-review');assert.equal(h.ui.filters.includeInactive,true);h.cleanup();
 });
 test('demo records have separate dataset IDs, writes cannot reach real herd, delete recreates only demo',async()=>{

@@ -10,7 +10,7 @@ import {
   requireThat as check,
   needsHoldReview,
 } from "./validation.js";
-export const APP_VERSION = "1.3.0-beta.1";
+export const APP_VERSION = "1.3.1-beta.1";
 export const DB_NAME = "manley_herd_records";
 export const common = (now = new Date().toISOString()) => ({
   id: crypto.randomUUID(),
@@ -300,7 +300,7 @@ export class Repository {
       let failure;
       tx.oncomplete = () => resolve(record);
       tx.onabort = () =>
-        reject(failure || tx.error || Error("Weight transaction aborted."));
+        reject(failure || tx.error || Error("Weight was not saved."));
       const refs = [
         ["animals", record.animalId],
         ...record.snapshots.flatMap((s) => [
@@ -656,7 +656,7 @@ export async function openRepository({
       }
     }
     return new Repository(db, {
-      recovery: `Migration failed: ${error.message}. Original records retained; export or use the matching app version.`,
+      recovery: `Migration failed: ${error.message}. Your records are still here. Save a copy or use the matching app version.`,
       onVersionChange,
     });
   }
