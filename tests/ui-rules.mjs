@@ -72,7 +72,8 @@ try {
       assert.ok(await logo.isVisible(),'site logo renders');
       assert.equal(await logo.evaluate(img=>new URL(img.src).pathname),new URL('images/logo.png',url).pathname,'logo stays inside app base');
       assert.ok(await page.locator('#pwa-panel').evaluate(panel=>panel.getBoundingClientRect().top>=document.querySelector('#main').getBoundingClientRect().bottom),'offline status follows work');
-      assert.equal(await page.locator('#update-status').evaluate(n=>n.closest('details').open),false,'failure details start closed');
+      assert.equal(await page.locator('#pwa-panel details').evaluate(n=>n.open),false,'offline help starts closed');
+      assert.equal(await page.locator('#update-status').evaluate(n=>n.closest('details')),null,'update status stays visible outside the collapsed help');
       const nav=page.locator('.app-tabs');
       assert.equal(await nav.locator('a').count(),4);
       const bar=await nav.boundingBox();assert.equal(bar.height,56);assert.ok(Math.abs(bar.y+bar.height-height)<2);

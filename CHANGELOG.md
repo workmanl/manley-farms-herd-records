@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.6.1-beta.1 (2026-10-13)
+
+- Fix: family labels no longer run into their values on the animal card.
+- Fix: empty-state icons are small and quiet instead of oversized.
+- Fix: Work a group jobs are disabled until at least one animal is picked.
+- Screen rules updated to require the update prompt outside the collapsed offline help.
+
 ## 1.6.0-beta.1 (2026-10-13)
 
 - Show who is due to calve from dates the farmer saved. Ask how many days until she calves. Do not assume a gestation length.

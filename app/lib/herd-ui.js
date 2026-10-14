@@ -492,6 +492,8 @@ export class HerdUI {
     const jobButton = (text, glyph, action) => {
       const control = button(text, action);
       control.prepend(icon(glyph));
+      // Nothing to work on yet: show the jobs, but quietly disabled.
+      if (!chosen.length) { control.disabled = true; control.title = "Pick at least one animal first"; }
       return control;
     };
     jobs.append(
@@ -733,7 +735,7 @@ export class HerdUI {
         const line = el("div", undefined, "pedigree-row");
         for (const cell of row) {
           const item = el("div");
-          item.append(el("strong", cell.role), familyLink(cell));
+          item.append(el("strong", cell.role), el("br"), familyLink(cell));
           line.append(item);
         }
         box.append(line);
