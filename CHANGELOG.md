@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Docs: the README link bar now includes the changelog, so farmers and contributors can see what changed in each version.
+
 ## 1.7.0-beta.1 (2026-10-13)
 
 - Add herd book, open cows, expected calving, cull list, barn hold sheet, and blank chute and calving sheets.
