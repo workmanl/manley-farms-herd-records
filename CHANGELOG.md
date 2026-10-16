@@ -4,6 +4,7 @@
 
 - Project: tests now run automatically on GitHub for every pull request and every change to main.
 - Docs: the README now has a "What's new" link to this list of changes.
+- Project: add Finn-loop agent skills that turn approved GitHub issues into pull requests. Humans still merge. See docs/finn-loop.md.
 
 ## 1.7.0-beta.1 (2026-10-13)
 
