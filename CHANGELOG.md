@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Docs: the README link bar now includes the changelog, so farmers and contributors can see what changed in each version.
+- Docs: the README now has a "What's new" link to this list of changes.
 
 ## 1.7.0-beta.1 (2026-10-13)
 

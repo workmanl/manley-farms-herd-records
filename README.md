@@ -4,7 +4,7 @@ Free cattle records that work offline after the first verified download. Keep an
 
 **Public beta 1.3.0-beta.1, schema 1.** Veterinarian/BQA clinical review and the multi-device field pilot have not been completed. This is not certified or endorsed by BQA, FDA, USDA or any authority. Results need independent checking. The terms are not lawyer-reviewed; Manley Farms is a Washington business, not a law firm.
 
-[Open Herd Records](https://herd.manleyfarms.com/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases) · [Changelog](CHANGELOG.md)
+[Open Herd Records](https://herd.manleyfarms.com/) · [Source repository](https://github.com/workmanl/manley-farms-herd-records) · [Release archives](https://github.com/workmanl/manley-farms-herd-records/releases) · [What's new](CHANGELOG.md)
 
 This checkout prepares the release locally. Publication and deployment are separate handoff steps; the live link above is the intended public destination.
 
